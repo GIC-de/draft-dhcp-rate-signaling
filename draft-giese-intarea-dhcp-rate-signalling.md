@@ -4,12 +4,12 @@ category: info
 
 docname: draft-giese-intarea-dhcp-rate-signalling-latest
 submissiontype: IETF  # also: "independent", "editorial", "IAB", or "IRTF"
-number: 
+number:
 date: 2026-05-21
 consensus: true
 v: 3
-area: Internet Area
-workgroup: Internet Area Working Group
+area: "Internet"
+workgroup: "Internet Area Working Group"
 keyword:
  - next generation
  - unicorn
