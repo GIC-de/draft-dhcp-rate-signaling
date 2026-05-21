@@ -1,0 +1,7 @@
+<note title="Discussion Venues" removeInRFC="true">
+<t>Discussion of this document takes place on the
+    Internet Area Working Group Working Group mailing list (int-area@ietf.org),
+    which is archived at <eref target="https://mailarchive.ietf.org/arch/browse/int-area/"/>.</t>
+<t>Source for this draft and an issue tracker can be found at
+    <eref target="https://github.com/GIC-de/draft-dhcp-rate-signalling"/>.</t>
+</note>
