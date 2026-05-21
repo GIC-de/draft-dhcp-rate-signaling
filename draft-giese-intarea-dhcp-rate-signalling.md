@@ -19,29 +19,21 @@
 # Change the file extension to match the format (.xml for XML, etc...)
 #
 ###
-title: "TODO - Your title"
-abbrev: "TODO - Abbreviation"
+title: "DHCP Explicit Rate Signalling"
 category: info
 
-docname: draft-todo-yourname-protocol-latest
+docname: draft-giese-intarea-dhcp-rate-signalling-latest
 submissiontype: IETF  # also: "independent", "editorial", "IAB", or "IRTF"
-number:
-date:
+number: 
+date: 2026-05-21
 consensus: true
 v: 3
-area: AREA
-workgroup: WG Working Group
+area: Internet Area
+workgroup: Internet Area Working Group
 keyword:
  - next generation
  - unicorn
  - sparkling distributed ledger
-venue:
-  group: WG
-  type: Working Group
-  mail: WG@example.com
-  arch: https://example.com/WG
-  github: USER/REPO
-  latest: https://example.com/LATEST
 
 author:
  -
