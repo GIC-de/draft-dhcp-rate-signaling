@@ -8,7 +8,7 @@ on:
     inputs:
       email:
         description: "Submitter email"
-        default: ""
+        default: "christian@rtbrick.com"
         type: string
 
 jobs:
