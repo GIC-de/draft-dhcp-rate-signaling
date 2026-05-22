@@ -59,6 +59,8 @@ Low Loss, and Scalable Throughput (L4S) architecture.
 
 # Introduction
 
+## Problem Statement
+
 In typical broadband access networks, the Customer Premises Equipment (CPE)
 is often unaware of the actual available data rates. This lack of visibility
 often occurs when an external modem or Optical Network Terminal (ONT) {{G.984.1}}
@@ -76,6 +78,8 @@ Conversely, network performance improves significantly by performing intelligent
 and prioritization. When combined with AQM and the Low Latency, Low Loss, and
 Scalable Throughput (L4S) architecture {{?RFC9330}},
 these localized traffic management benefits are further amplified.
+
+## Architectural Context
 
 In many IP over Ethernet (IPoE) {{TR101}} architectures, the
 Broadband Network Gateway (BNG) operates strictly as a DHCP relay agent.
@@ -97,11 +101,13 @@ shapers. By distributing capacity awareness across the entire forwarding path, t
 in-band signaling mitigates buffer congestion within the access segment and significantly
 improves end-to-end transport performance.
 
-While auto-configuration protocols such as TR-069 {{TR069}} can provision rate
-information, they are not universally deployed by all service providers. Furthermore,
-the increasing prevalence of customer owned, unmanaged CPEs limits the effectiveness
-of operator-managed configuration servers. A standardized DHCP option addresses this
-gap by providing a universal mechanism to explicitly signal available data rates
+## Applicability and Benefits
+
+While auto-configuration protocols such as TR-069 {{TR069}} can provision rate information, they are
+not universally deployed by all service providers. Furthermore, the increasing prevalence of
+customer-owned, unmanaged CPEs, including devices running open-source firmware or custom projects,
+limits the effectiveness of operator-managed configuration servers. A standardized DHCP option
+addresses this gap by providing a universal mechanism to explicitly signal available data rates
 directly from the DHCP server, across BNGs and access nodes, down to the CPE.
 This localized approach is particularly advantageous because it serves the entire path,
 whereas auto-configuration servers exclusively target the end device. This method also
@@ -219,7 +225,7 @@ The available rate downstream defines the rate in Bits per second (bps) availabl
 ~~~
  SubOpt   Len     Available Rate Downstream
 +------+------+------+------+------+------+------+------+--
-|  1   |   8  |  64 Bit bps
+|  2   |   8  |  64 Bit bps
 +------+------+------+------+------+------+------+------+--
 ~~~
 
@@ -233,7 +239,7 @@ The rate type defines the networking layer to which the stated rates apply. The 
 ~~~
  SubOpt   Len   Rate Type
 +------+------+------+
-|  1   |   1  | i    |
+|  3   |   1  | i    |
 +------+------+------+
 ~~~
 
@@ -425,6 +431,29 @@ applied limits if it receives a valid DHCP message explicitly signaling rate rem
 empty Rate Option or a sub-option containing a rate value of zero. Second, the rate MUST be
 implicitly revoked if the underlying PPPoE session itself is terminated.
 
+# Interaction with AQM and L4S
+
+Active Queue Management (AQM) mechanisms, as recommended in {{?RFC7567}}, are most effective when
+they operate at or near the true bottleneck rate for a given service. In many broadband deployments
+today, Customer Premises Equipment (CPE) and intermediate access nodes configure shaping and AQM
+parameters against the physical port speed rather than the subscriber’s provisioned rate, which can
+lead either to persistent queues and excess latency when configured too high, or to underutilization
+when configured too low.
+
+By explicitly signaling per-subscriber upstream and downstream rates via the DHCP Rate Option, this
+document enables CPEs, relay agents, and snooping switches to instantiate shapers and AQM instances
+that closely track the actual bottleneck capacity for each subscriber. Placing the bottleneck queue
+under control of an AQM that follows the recommendations in {{?RFC7567}} allows operators to limit
+queue growth and reduce queuing delay while still efficiently utilizing the contracted bandwidth.
+The Low Latency, Low Loss, and Scalable Throughput (L4S) architecture {{?RFC9330}} relies on shallow
+queues under an L4S-compatible AQM and on congestion controllers that react promptly to Explicit
+Congestion Notification (ECN) signals. Providing accurate rate information to devices at or near the
+bottleneck link allows those devices to configure L4S-capable AQMs at the appropriate shaping rate,
+so that L4S flows can achieve consistently low queuing delay while still fully utilizing the
+subscriber’s provisioned service tier. The DHCP Rate Option defined in this document is therefore an
+enabler for deploying L4S and other modern AQM schemes in access networks, even though the detailed
+design of AQM and congestion control algorithms remains outside the scope of this specification.
+
 # Errors and Conflicts {#errors}
 
 Clients receiving conflicting rate information across DHCPv4 and DHCPv6 protocols SHOULD apply the
@@ -443,13 +472,15 @@ Queue Management (AQM) parameters to the maximum capacity of the physical link.
 # Operational or Manageability Considerations {#operations}
 
 Deploying explicit rate signaling via DHCP introduces several operational benefits and deployment
-considerations for network management.
+considerations for network management. When combined with appropriately configured AQM and, where
+deployed, L4S-compatible queue management, these per-subscriber rate parameters help to concentrate
+congestion control at a well-defined bottleneck and minimize queuing delay in the access segment.
 
 Implementations SHOULD expose the explicitly signaled, DHCP-learned rate parameters within
 Customer Premises Equipment (CPE) management interfaces, such as the local Web User Interface (UI)
 or remote management protocols. Providing end-users and operators with immediate visibility into the
-locally provisioned service tier drastically reduces support inquiries related to perceived bandwidth
-issues and improves overall user satisfaction.
+locally provisioned service tier significantly reduces support inquiries related to perceived
+bandwidth issues and improves overall user satisfaction.
 
 As noted in {{<<errors}}, a client may receive an OPTION_RATE indicating an available rate that
 exceeds the maximum physical link speed of its interfaces. In such scenarios, management interfaces
@@ -458,6 +489,21 @@ the device. Additionally, implementations SHOULD log this discrepancy if logging
 enabled. Capturing and exposing these specific events provides critical telemetry for network
 operators, as they frequently indicate a mismatch between the subscriber's provisioned service tier
 and their installed physical equipment.
+
+# Customer-Owned and Open Source CPE {#cpe}
+
+A key motivation for this option is to support customer-owned or subscriber-managed CPE, including
+retail routers and devices running open-source firmware (for example, OpenWrt) that are not
+integrated with operator auto-configuration systems such as TR-069. In these environments, the access
+network can expose the provisioned upstream and downstream rates via DHCP, and CPE implementations
+that understand this option MAY use the learned values to configure local shaping, policing, queue
+management, or simple rate indicators in their user interfaces.
+
+Because the option format is intentionally simple and identical for DHCPv4 and DHCPv6, it is
+straightforward for open-source projects and custom CPE implementations to add support without
+requiring coupling to any specific vendor management system. Even if no advanced AQM features are
+present, aligning any local rate limits with the signaled values helps avoid misconfiguration and
+reduces the likelihood of bufferbloat in the customer-owned equipment.
 
 # Security Considerations {#security}
 
