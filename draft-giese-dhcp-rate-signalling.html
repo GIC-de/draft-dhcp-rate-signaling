@@ -1167,16 +1167,27 @@ Low Loss, and Scalable Throughput (L4S) architecture.<a href="#section-abstract-
         </h2>
 <nav class="toc"><ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1">
-            <p id="section-toc.1-1.1.1" class="keepWithNext"><a href="#section-1" class="auto internal xref">1</a>.  <a href="#name-introduction" class="internal xref">Introduction</a></p>
+            <p id="section-toc.1-1.1.1"><a href="#section-1" class="auto internal xref">1</a>.  <a href="#name-introduction" class="internal xref">Introduction</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1.2.1">
+                <p id="section-toc.1-1.1.2.1.1" class="keepWithNext"><a href="#section-1.1" class="auto internal xref">1.1</a>.  <a href="#name-problem-statement" class="internal xref">Problem Statement</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1.2.2">
+                <p id="section-toc.1-1.1.2.2.1" class="keepWithNext"><a href="#section-1.2" class="auto internal xref">1.2</a>.  <a href="#name-architectural-context" class="internal xref">Architectural Context</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1.2.3">
+                <p id="section-toc.1-1.1.2.3.1" class="keepWithNext"><a href="#section-1.3" class="auto internal xref">1.3</a>.  <a href="#name-applicability-and-benefits" class="internal xref">Applicability and Benefits</a></p>
+</li>
+            </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2">
-            <p id="section-toc.1-1.2.1" class="keepWithNext"><a href="#section-2" class="auto internal xref">2</a>.  <a href="#name-conventions-and-definitions" class="internal xref">Conventions and Definitions</a></p>
+            <p id="section-toc.1-1.2.1"><a href="#section-2" class="auto internal xref">2</a>.  <a href="#name-conventions-and-definitions" class="internal xref">Conventions and Definitions</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3">
             <p id="section-toc.1-1.3.1"><a href="#section-3" class="auto internal xref">3</a>.  <a href="#name-dhcp-rate-option" class="internal xref">DHCP Rate Option</a></p>
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.1">
-                <p id="section-toc.1-1.3.2.1.1" class="keepWithNext"><a href="#section-3.1" class="auto internal xref">3.1</a>.  <a href="#name-sub-options-format" class="internal xref">Sub-Options Format</a></p>
+                <p id="section-toc.1-1.3.2.1.1"><a href="#section-3.1" class="auto internal xref">3.1</a>.  <a href="#name-sub-options-format" class="internal xref">Sub-Options Format</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.2">
                 <p id="section-toc.1-1.3.2.2.1"><a href="#section-3.2" class="auto internal xref">3.2</a>.  <a href="#name-sub-options" class="internal xref">Sub-Options</a></p>
@@ -1235,44 +1246,50 @@ Low Loss, and Scalable Throughput (L4S) architecture.<a href="#section-abstract-
             <p id="section-toc.1-1.7.1"><a href="#section-7" class="auto internal xref">7</a>.  <a href="#name-pppoe" class="internal xref">PPPoE</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8">
-            <p id="section-toc.1-1.8.1"><a href="#section-8" class="auto internal xref">8</a>.  <a href="#name-errors-and-conflicts" class="internal xref">Errors and Conflicts</a></p>
+            <p id="section-toc.1-1.8.1"><a href="#section-8" class="auto internal xref">8</a>.  <a href="#name-interaction-with-aqm-and-l4" class="internal xref">Interaction with AQM and L4S</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9">
-            <p id="section-toc.1-1.9.1"><a href="#section-9" class="auto internal xref">9</a>.  <a href="#name-operational-or-manageabilit" class="internal xref">Operational or Manageability Considerations</a></p>
+            <p id="section-toc.1-1.9.1"><a href="#section-9" class="auto internal xref">9</a>.  <a href="#name-errors-and-conflicts" class="internal xref">Errors and Conflicts</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10">
-            <p id="section-toc.1-1.10.1"><a href="#section-10" class="auto internal xref">10</a>. <a href="#name-security-considerations" class="internal xref">Security Considerations</a></p>
+            <p id="section-toc.1-1.10.1"><a href="#section-10" class="auto internal xref">10</a>. <a href="#name-operational-or-manageabilit" class="internal xref">Operational or Manageability Considerations</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11">
-            <p id="section-toc.1-1.11.1"><a href="#section-11" class="auto internal xref">11</a>. <a href="#name-iana-considerations" class="internal xref">IANA Considerations</a></p>
-<ul class="compact toc ulBare ulEmpty">
-<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11.2.1">
-                <p id="section-toc.1-1.11.2.1.1"><a href="#section-11.1" class="auto internal xref">11.1</a>.  <a href="#name-dhcpv4-option" class="internal xref">DHCPv4 Option</a></p>
-</li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11.2.2">
-                <p id="section-toc.1-1.11.2.2.1"><a href="#section-11.2" class="auto internal xref">11.2</a>.  <a href="#name-dhcpv6-option" class="internal xref">DHCPv6 Option</a></p>
-</li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11.2.3">
-                <p id="section-toc.1-1.11.2.3.1"><a href="#section-11.3" class="auto internal xref">11.3</a>.  <a href="#name-dhcp-rate-sub-options-regis" class="internal xref">DHCP Rate Sub-Options Registry</a></p>
-</li>
-            </ul>
+            <p id="section-toc.1-1.11.1"><a href="#section-11" class="auto internal xref">11</a>. <a href="#name-customer-owned-and-open-sou" class="internal xref">Customer-Owned and Open Source CPE</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12">
-            <p id="section-toc.1-1.12.1"><a href="#section-12" class="auto internal xref">12</a>. <a href="#name-references" class="internal xref">References</a></p>
-<ul class="compact toc ulBare ulEmpty">
-<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12.2.1">
-                <p id="section-toc.1-1.12.2.1.1"><a href="#section-12.1" class="auto internal xref">12.1</a>.  <a href="#name-normative-references" class="internal xref">Normative References</a></p>
+            <p id="section-toc.1-1.12.1"><a href="#section-12" class="auto internal xref">12</a>. <a href="#name-security-considerations" class="internal xref">Security Considerations</a></p>
 </li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12.2.2">
-                <p id="section-toc.1-1.12.2.2.1"><a href="#section-12.2" class="auto internal xref">12.2</a>.  <a href="#name-informative-references" class="internal xref">Informative References</a></p>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13">
+            <p id="section-toc.1-1.13.1"><a href="#section-13" class="auto internal xref">13</a>. <a href="#name-iana-considerations" class="internal xref">IANA Considerations</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13.2.1">
+                <p id="section-toc.1-1.13.2.1.1"><a href="#section-13.1" class="auto internal xref">13.1</a>.  <a href="#name-dhcpv4-option" class="internal xref">DHCPv4 Option</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13.2.2">
+                <p id="section-toc.1-1.13.2.2.1"><a href="#section-13.2" class="auto internal xref">13.2</a>.  <a href="#name-dhcpv6-option" class="internal xref">DHCPv6 Option</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13.2.3">
+                <p id="section-toc.1-1.13.2.3.1"><a href="#section-13.3" class="auto internal xref">13.3</a>.  <a href="#name-dhcp-rate-sub-options-regis" class="internal xref">DHCP Rate Sub-Options Registry</a></p>
 </li>
             </ul>
 </li>
-          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13">
-            <p id="section-toc.1-1.13.1"><a href="#appendix-A" class="auto internal xref"></a><a href="#name-acknowledgments" class="internal xref">Acknowledgments</a></p>
-</li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.14">
-            <p id="section-toc.1-1.14.1"><a href="#appendix-B" class="auto internal xref"></a><a href="#name-authors-addresses" class="internal xref">Authors' Addresses</a></p>
+            <p id="section-toc.1-1.14.1"><a href="#section-14" class="auto internal xref">14</a>. <a href="#name-references" class="internal xref">References</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.14.2.1">
+                <p id="section-toc.1-1.14.2.1.1"><a href="#section-14.1" class="auto internal xref">14.1</a>.  <a href="#name-normative-references" class="internal xref">Normative References</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.14.2.2">
+                <p id="section-toc.1-1.14.2.2.1"><a href="#section-14.2" class="auto internal xref">14.2</a>.  <a href="#name-informative-references" class="internal xref">Informative References</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.15">
+            <p id="section-toc.1-1.15.1"><a href="#appendix-A" class="auto internal xref"></a><a href="#name-acknowledgments" class="internal xref">Acknowledgments</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.16">
+            <p id="section-toc.1-1.16.1"><a href="#appendix-B" class="auto internal xref"></a><a href="#name-authors-addresses" class="internal xref">Authors' Addresses</a></p>
 </li>
         </ul>
 </nav>
@@ -1283,63 +1300,84 @@ Low Loss, and Scalable Throughput (L4S) architecture.<a href="#section-abstract-
       <h2 id="name-introduction">
 <a href="#section-1" class="section-number selfRef">1. </a><a href="#name-introduction" class="section-name selfRef">Introduction</a>
       </h2>
-<p id="section-1-1">In typical broadband access networks, the Customer Premises Equipment (CPE)
+<div id="problem-statement">
+<section id="section-1.1">
+        <h3 id="name-problem-statement">
+<a href="#section-1.1" class="section-number selfRef">1.1. </a><a href="#name-problem-statement" class="section-name selfRef">Problem Statement</a>
+        </h3>
+<p id="section-1.1-1">In typical broadband access networks, the Customer Premises Equipment (CPE)
 is often unaware of the actual available data rates. This lack of visibility
 often occurs when an external modem or Optical Network Terminal (ONT) <span>[<a href="#G.984.1" class="cite xref">G.984.1</a>]</span>
 connects to the CPE at a physical link speed that significantly exceeds the
 subscriber's provisioned service rate. Furthermore, operators commonly deploy
 unified access profiles where the available rate is artificially limited at
 the service edge, such as the Broadband Network Gateway (BNG) <span>[<a href="#TR101" class="cite xref">TR101</a>]</span>,
-to match the subscriber's purchased service tier.<a href="#section-1-1" class="pilcrow">¶</a></p>
-<p id="section-1-2">When the network bottleneck resides between the BNG and the CPE, intermediate
+to match the subscriber's purchased service tier.<a href="#section-1.1-1" class="pilcrow">¶</a></p>
+<p id="section-1.1-2">When the network bottleneck resides between the BNG and the CPE, intermediate
 devices are typically not well equipped to provide deep buffering, priority
 scheduling, or Active Queue Management (AQM) <span>[<a href="#RFC7567" class="cite xref">RFC7567</a>]</span>. Relying on indiscriminate
 packet dropping or policing at the service edge severely degrades the user experience.
 Conversely, network performance improves significantly by performing intelligent shaping
 and prioritization. When combined with AQM and the Low Latency, Low Loss, and
 Scalable Throughput (L4S) architecture <span>[<a href="#RFC9330" class="cite xref">RFC9330</a>]</span>,
-these localized traffic management benefits are further amplified.<a href="#section-1-2" class="pilcrow">¶</a></p>
-<p id="section-1-3">In many IP over Ethernet (IPoE) <span>[<a href="#TR101" class="cite xref">TR101</a>]</span> architectures, the
+these localized traffic management benefits are further amplified.<a href="#section-1.1-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="architectural-context">
+<section id="section-1.2">
+        <h3 id="name-architectural-context">
+<a href="#section-1.2" class="section-number selfRef">1.2. </a><a href="#name-architectural-context" class="section-name selfRef">Architectural Context</a>
+        </h3>
+<p id="section-1.2-1">In many IP over Ethernet (IPoE) <span>[<a href="#TR101" class="cite xref">TR101</a>]</span> architectures, the
 Broadband Network Gateway (BNG) operates strictly as a DHCP relay agent.
 While per-subscriber traffic management policies, such as queues, shapers,
 and policers, are typically provisioned out-of-band via
 Authentication, Authorization, and Accounting (AAA) protocols like RADIUS <span>[<a href="#RFC2865" class="cite xref">RFC2865</a>]</span>,
 deployments lacking direct AAA integration at the service edge require an in-band
-signaling alternative.<a href="#section-1-3" class="pilcrow">¶</a></p>
-<p id="section-1-4">Transporting available data rates natively within DHCP options addresses this
+signaling alternative.<a href="#section-1.2-1" class="pilcrow">¶</a></p>
+<p id="section-1.2-2">Transporting available data rates natively within DHCP options addresses this
 architectural constraint. This mechanism allows the BNG to dynamically instantiate
 downstream shapers and upstream policers based on the DHCP payload, while concurrently
 equipping the Customer Premises Equipment (CPE) with the parameters required to manage
-upstream traffic locally.<a href="#section-1-4" class="pilcrow">¶</a></p>
-<p id="section-1-5">Furthermore, intermediate Layer 2 access nodes performing DHCP snooping can passively
+upstream traffic locally.<a href="#section-1.2-2" class="pilcrow">¶</a></p>
+<p id="section-1.2-3">Furthermore, intermediate Layer 2 access nodes performing DHCP snooping can passively
 extract these explicitly signaled rate parameters to optimize their local queues and
 shapers. By distributing capacity awareness across the entire forwarding path, this
 in-band signaling mitigates buffer congestion within the access segment and significantly
-improves end-to-end transport performance.<a href="#section-1-5" class="pilcrow">¶</a></p>
-<p id="section-1-6">While auto-configuration protocols such as TR-069 <span>[<a href="#TR069" class="cite xref">TR069</a>]</span> can provision rate
-information, they are not universally deployed by all service providers. Furthermore,
-the increasing prevalence of customer owned, unmanaged CPEs limits the effectiveness
-of operator-managed configuration servers. A standardized DHCP option addresses this
-gap by providing a universal mechanism to explicitly signal available data rates
+improves end-to-end transport performance.<a href="#section-1.2-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="applicability-and-benefits">
+<section id="section-1.3">
+        <h3 id="name-applicability-and-benefits">
+<a href="#section-1.3" class="section-number selfRef">1.3. </a><a href="#name-applicability-and-benefits" class="section-name selfRef">Applicability and Benefits</a>
+        </h3>
+<p id="section-1.3-1">While auto-configuration protocols such as TR-069 <span>[<a href="#TR069" class="cite xref">TR069</a>]</span> can provision rate information, they are
+not universally deployed by all service providers. Furthermore, the increasing prevalence of
+customer-owned, unmanaged CPEs, including devices running open-source firmware or custom projects,
+limits the effectiveness of operator-managed configuration servers. A standardized DHCP option
+addresses this gap by providing a universal mechanism to explicitly signal available data rates
 directly from the DHCP server, across BNGs and access nodes, down to the CPE.
 This localized approach is particularly advantageous because it serves the entire path,
 whereas auto-configuration servers exclusively target the end device. This method also
-integrates seamlessly with architectures where RADIUS servers inject DHCP options.<a href="#section-1-6" class="pilcrow">¶</a></p>
-<p id="section-1-7">Although primarily designed for IPoE deployments, this mechanism is equally applicable
+integrates seamlessly with architectures where RADIUS servers inject DHCP options.<a href="#section-1.3-1" class="pilcrow">¶</a></p>
+<p id="section-1.3-2">Although primarily designed for IPoE deployments, this mechanism is equally applicable
 to Point-to-Point Protocol over Ethernet (PPPoE) <span>[<a href="#RFC2516" class="cite xref">RFC2516</a>]</span> environments. Since DHCP
 is frequently utilized over PPPoE, most notably for IPv6 Prefix Delegation. This option
 provides a standardized method for rate signaling. Consequently, this approach can supersede
 the fragmented, proprietary methods currently in use, such as embedding rate limits within
-PPP <span>[<a href="#RFC1661" class="cite xref">RFC1661</a>]</span> authentication reply messages.<a href="#section-1-7" class="pilcrow">¶</a></p>
-<p id="section-1-8">Conveying rates via DHCP natively supports dynamic updates through regular lease renewals
+PPP <span>[<a href="#RFC1661" class="cite xref">RFC1661</a>]</span> authentication reply messages.<a href="#section-1.3-2" class="pilcrow">¶</a></p>
+<p id="section-1.3-3">Conveying rates via DHCP natively supports dynamic updates through regular lease renewals
 or triggered reconfiguration requests. As an auxiliary benefit, this explicit rate
 information can be exposed in the CPE user interface to satisfy customer expectations
 regarding bandwidth visibility. Ultimately, introducing a DHCP option to signal available
 data rates represents a simple, standardized enhancement that yields widespread improvements
-in internet service delivery.<a href="#section-1-8" class="pilcrow">¶</a></p>
-<p id="section-1-9">Operational requirements necessitate the definition of this option for both DHCPv4 and DHCPv6.
+in internet service delivery.<a href="#section-1.3-3" class="pilcrow">¶</a></p>
+<p id="section-1.3-4">Operational requirements necessitate the definition of this option for both DHCPv4 and DHCPv6.
 This ensures coverage for networks lacking IPv6 support and prevents configuration gaps in
-dual-stack scenarios where DHCPv4 is established prior to DHCPv6.<a href="#section-1-9" class="pilcrow">¶</a></p>
+dual-stack scenarios where DHCPv4 is established prior to DHCPv6.<a href="#section-1.3-4" class="pilcrow">¶</a></p>
+</section>
+</div>
 </section>
 </div>
 <div id="conventions-and-definitions">
@@ -1490,7 +1528,7 @@ remove a previously set rate, thereby resetting to the device default configurat
 <pre>
  SubOpt   Len     Available Rate Downstream
 +------+------+------+------+------+------+------+------+--
-|  1   |   8  |  64 Bit bps
+|  2   |   8  |  64 Bit bps
 +------+------+------+------+------+------+------+------+--
 </pre><a href="#section-3.2.2-2" class="pilcrow">¶</a>
 </div>
@@ -1508,7 +1546,7 @@ remove a previously set rate, thereby resetting to the device default configurat
 <pre>
  SubOpt   Len   Rate Type
 +------+------+------+
-|  1   |   1  | i    |
+|  3   |   1  | i    |
 +------+------+------+
 </pre><a href="#section-3.2.3-2" class="pilcrow">¶</a>
 </div>
@@ -1739,106 +1777,152 @@ empty Rate Option or a sub-option containing a rate value of zero. Second, the r
 implicitly revoked if the underlying PPPoE session itself is terminated.<a href="#section-7-3" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="errors">
+<div id="interaction-with-aqm-and-l4s">
 <section id="section-8">
-      <h2 id="name-errors-and-conflicts">
-<a href="#section-8" class="section-number selfRef">8. </a><a href="#name-errors-and-conflicts" class="section-name selfRef">Errors and Conflicts</a>
+      <h2 id="name-interaction-with-aqm-and-l4">
+<a href="#section-8" class="section-number selfRef">8. </a><a href="#name-interaction-with-aqm-and-l4" class="section-name selfRef">Interaction with AQM and L4S</a>
       </h2>
-<p id="section-8-1">Clients receiving conflicting rate information across DHCPv4 and DHCPv6 protocols <span class="bcp14">SHOULD</span> apply the
-most recently received value.<a href="#section-8-1" class="pilcrow">¶</a></p>
-<p id="section-8-2">Clients and servers <span class="bcp14">MUST</span> ignore unrecognized sub-option codes and continue processing the rest of the
-Rate Option.<a href="#section-8-2" class="pilcrow">¶</a></p>
-<p id="section-8-3">If multiple instances of the same sub-option code are present, the last instance <span class="bcp14">MUST</span> be processed.<a href="#section-8-3" class="pilcrow">¶</a></p>
-<p id="section-8-4">A client may receive an OPTION_RATE indicating an Available Rate that exceeds the maximum physical
+<p id="section-8-1">Active Queue Management (AQM) mechanisms, as recommended in <span>[<a href="#RFC7567" class="cite xref">RFC7567</a>]</span>, are most effective when
+they operate at or near the true bottleneck rate for a given service. In many broadband deployments
+today, Customer Premises Equipment (CPE) and intermediate access nodes configure shaping and AQM
+parameters against the physical port speed rather than the subscriber’s provisioned rate, which can
+lead either to persistent queues and excess latency when configured too high, or to underutilization
+when configured too low.<a href="#section-8-1" class="pilcrow">¶</a></p>
+<p id="section-8-2">By explicitly signaling per-subscriber upstream and downstream rates via the DHCP Rate Option, this
+document enables CPEs, relay agents, and snooping switches to instantiate shapers and AQM instances
+that closely track the actual bottleneck capacity for each subscriber. Placing the bottleneck queue
+under control of an AQM that follows the recommendations in <span>[<a href="#RFC7567" class="cite xref">RFC7567</a>]</span> allows operators to limit
+queue growth and reduce queuing delay while still efficiently utilizing the contracted bandwidth.
+The Low Latency, Low Loss, and Scalable Throughput (L4S) architecture <span>[<a href="#RFC9330" class="cite xref">RFC9330</a>]</span> relies on shallow
+queues under an L4S-compatible AQM and on congestion controllers that react promptly to Explicit
+Congestion Notification (ECN) signals. Providing accurate rate information to devices at or near the
+bottleneck link allows those devices to configure L4S-capable AQMs at the appropriate shaping rate,
+so that L4S flows can achieve consistently low queuing delay while still fully utilizing the
+subscriber’s provisioned service tier. The DHCP Rate Option defined in this document is therefore an
+enabler for deploying L4S and other modern AQM schemes in access networks, even though the detailed
+design of AQM and congestion control algorithms remains outside the scope of this specification.<a href="#section-8-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="errors">
+<section id="section-9">
+      <h2 id="name-errors-and-conflicts">
+<a href="#section-9" class="section-number selfRef">9. </a><a href="#name-errors-and-conflicts" class="section-name selfRef">Errors and Conflicts</a>
+      </h2>
+<p id="section-9-1">Clients receiving conflicting rate information across DHCPv4 and DHCPv6 protocols <span class="bcp14">SHOULD</span> apply the
+most recently received value.<a href="#section-9-1" class="pilcrow">¶</a></p>
+<p id="section-9-2">Clients and servers <span class="bcp14">MUST</span> ignore unrecognized sub-option codes and continue processing the rest of the
+Rate Option.<a href="#section-9-2" class="pilcrow">¶</a></p>
+<p id="section-9-3">If multiple instances of the same sub-option code are present, the last instance <span class="bcp14">MUST</span> be processed.<a href="#section-9-3" class="pilcrow">¶</a></p>
+<p id="section-9-4">A client may receive an OPTION_RATE indicating an Available Rate that exceeds the maximum physical
 link speed of its upstream or downstream interfaces (e.g., signaling 2 Gbps to a CPE with a 1 Gbps
 WAN port). In such scenarios, the client <span class="bcp14">SHOULD</span> cap the applied traffic shaping, policing, or Active
-Queue Management (AQM) parameters to the maximum capacity of the physical link.<a href="#section-8-4" class="pilcrow">¶</a></p>
+Queue Management (AQM) parameters to the maximum capacity of the physical link.<a href="#section-9-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="operations">
-<section id="section-9">
+<section id="section-10">
       <h2 id="name-operational-or-manageabilit">
-<a href="#section-9" class="section-number selfRef">9. </a><a href="#name-operational-or-manageabilit" class="section-name selfRef">Operational or Manageability Considerations</a>
+<a href="#section-10" class="section-number selfRef">10. </a><a href="#name-operational-or-manageabilit" class="section-name selfRef">Operational or Manageability Considerations</a>
       </h2>
-<p id="section-9-1">Deploying explicit rate signaling via DHCP introduces several operational benefits and deployment
-considerations for network management.<a href="#section-9-1" class="pilcrow">¶</a></p>
-<p id="section-9-2">Implementations <span class="bcp14">SHOULD</span> expose the explicitly signaled, DHCP-learned rate parameters within
+<p id="section-10-1">Deploying explicit rate signaling via DHCP introduces several operational benefits and deployment
+considerations for network management. When combined with appropriately configured AQM and, where
+deployed, L4S-compatible queue management, these per-subscriber rate parameters help to concentrate
+congestion control at a well-defined bottleneck and minimize queuing delay in the access segment.<a href="#section-10-1" class="pilcrow">¶</a></p>
+<p id="section-10-2">Implementations <span class="bcp14">SHOULD</span> expose the explicitly signaled, DHCP-learned rate parameters within
 Customer Premises Equipment (CPE) management interfaces, such as the local Web User Interface (UI)
 or remote management protocols. Providing end-users and operators with immediate visibility into the
-locally provisioned service tier drastically reduces support inquiries related to perceived bandwidth
-issues and improves overall user satisfaction.<a href="#section-9-2" class="pilcrow">¶</a></p>
-<p id="section-9-3">As noted in <a href="#errors" class="internal xref">Errors and Conflicts</a>, a client may receive an OPTION_RATE indicating an available rate that
+locally provisioned service tier significantly reduces support inquiries related to perceived
+bandwidth issues and improves overall user satisfaction.<a href="#section-10-2" class="pilcrow">¶</a></p>
+<p id="section-10-3">As noted in <a href="#errors" class="internal xref">Errors and Conflicts</a>, a client may receive an OPTION_RATE indicating an available rate that
 exceeds the maximum physical link speed of its interfaces. In such scenarios, management interfaces
 <span class="bcp14">SHOULD</span> expose both the originally signaled rate value and the effective, capped rate value applied by
 the device. Additionally, implementations <span class="bcp14">SHOULD</span> log this discrepancy if logging facilities are
 enabled. Capturing and exposing these specific events provides critical telemetry for network
 operators, as they frequently indicate a mismatch between the subscriber's provisioned service tier
-and their installed physical equipment.<a href="#section-9-3" class="pilcrow">¶</a></p>
+and their installed physical equipment.<a href="#section-10-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="cpe">
+<section id="section-11">
+      <h2 id="name-customer-owned-and-open-sou">
+<a href="#section-11" class="section-number selfRef">11. </a><a href="#name-customer-owned-and-open-sou" class="section-name selfRef">Customer-Owned and Open Source CPE</a>
+      </h2>
+<p id="section-11-1">A key motivation for this option is to support customer-owned or subscriber-managed CPE, including
+retail routers and devices running open-source firmware (for example, OpenWrt) that are not
+integrated with operator auto-configuration systems such as TR-069. In these environments, the access
+network can expose the provisioned upstream and downstream rates via DHCP, and CPE implementations
+that understand this option <span class="bcp14">MAY</span> use the learned values to configure local shaping, policing, queue
+management, or simple rate indicators in their user interfaces.<a href="#section-11-1" class="pilcrow">¶</a></p>
+<p id="section-11-2">Because the option format is intentionally simple and identical for DHCPv4 and DHCPv6, it is
+straightforward for open-source projects and custom CPE implementations to add support without
+requiring coupling to any specific vendor management system. Even if no advanced AQM features are
+present, aligning any local rate limits with the signaled values helps avoid misconfiguration and
+reduces the likelihood of bufferbloat in the customer-owned equipment.<a href="#section-11-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="security">
-<section id="section-10">
+<section id="section-12">
       <h2 id="name-security-considerations">
-<a href="#section-10" class="section-number selfRef">10. </a><a href="#name-security-considerations" class="section-name selfRef">Security Considerations</a>
+<a href="#section-12" class="section-number selfRef">12. </a><a href="#name-security-considerations" class="section-name selfRef">Security Considerations</a>
       </h2>
-<p id="section-10-1">DHCP messages are typically transmitted as plaintext and are unauthenticated. Consequently, the DHCP
+<p id="section-12-1">DHCP messages are typically transmitted as plaintext and are unauthenticated. Consequently, the DHCP
 Rate Options defined in this document are vulnerable to interception, modification, or spoofing by
 on-path attackers. A malicious actor or a successfully deployed rogue DHCP server could inject
 artificially low rate limits to severely throttle a client's connection, resulting in a localized
-Denial of Service (DoS).<a href="#section-10-1" class="pilcrow">¶</a></p>
-<p id="section-10-2">The severity of this specific risk is generally no greater than standard DHCP threat vectors, such as
+Denial of Service (DoS).<a href="#section-12-1" class="pilcrow">¶</a></p>
+<p id="section-12-2">The severity of this specific risk is generally no greater than standard DHCP threat vectors, such as
 rogue default gateway assignment, DNS hijacking, or IP pool exhaustion, which typically yield a much
-more critical and immediate loss of service.<a href="#section-10-2" class="pilcrow">¶</a></p>
-<p id="section-10-3">To mitigate the impact of malicious or malformed options, clients <span class="bcp14">MAY</span> implement basic sanity checks
+more critical and immediate loss of service.<a href="#section-12-2" class="pilcrow">¶</a></p>
+<p id="section-12-3">To mitigate the impact of malicious or malformed options, clients <span class="bcp14">MAY</span> implement basic sanity checks
 and threshold validations before applying rate parameters. For example, clients <span class="bcp14">MAY</span> ignore downstream
 or upstream rates that fall below a basic operational minimum (e.g., 1000 bps) to prevent complete
 session starvation. Furthermore, as mandated in the client behavior specification, if a maliciously
 injected rate is impractically high, the client implicitly mitigates this by capping the applied rate
-to the physical link capacity.<a href="#section-10-3" class="pilcrow">¶</a></p>
+to the physical link capacity.<a href="#section-12-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="iana-considerations">
-<section id="section-11">
+<section id="section-13">
       <h2 id="name-iana-considerations">
-<a href="#section-11" class="section-number selfRef">11. </a><a href="#name-iana-considerations" class="section-name selfRef">IANA Considerations</a>
+<a href="#section-13" class="section-number selfRef">13. </a><a href="#name-iana-considerations" class="section-name selfRef">IANA Considerations</a>
       </h2>
-<p id="section-11-1">This document requests that IANA assign the same numeric value in both registries
-for DHCPv4 and DHCPv6, if feasible.<a href="#section-11-1" class="pilcrow">¶</a></p>
+<p id="section-13-1">This document requests that IANA assign the same numeric value in both registries
+for DHCPv4 and DHCPv6, if feasible.<a href="#section-13-1" class="pilcrow">¶</a></p>
 <div id="dhcpv4-option">
-<section id="section-11.1">
+<section id="section-13.1">
         <h3 id="name-dhcpv4-option">
-<a href="#section-11.1" class="section-number selfRef">11.1. </a><a href="#name-dhcpv4-option" class="section-name selfRef">DHCPv4 Option</a>
+<a href="#section-13.1" class="section-number selfRef">13.1. </a><a href="#name-dhcpv4-option" class="section-name selfRef">DHCPv4 Option</a>
         </h3>
-<p id="section-11.1-1">IANA is requested to assign a new DHCP Option Code (TBD1) in the "BOOTP Vendor Extensions and DHCP Options" registry for OPTION_RATE.<a href="#section-11.1-1" class="pilcrow">¶</a></p>
+<p id="section-13.1-1">IANA is requested to assign a new DHCP Option Code (TBD1) in the "BOOTP Vendor Extensions and DHCP Options" registry for OPTION_RATE.<a href="#section-13.1-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="dhcpv6-option">
-<section id="section-11.2">
+<section id="section-13.2">
         <h3 id="name-dhcpv6-option">
-<a href="#section-11.2" class="section-number selfRef">11.2. </a><a href="#name-dhcpv6-option" class="section-name selfRef">DHCPv6 Option</a>
+<a href="#section-13.2" class="section-number selfRef">13.2. </a><a href="#name-dhcpv6-option" class="section-name selfRef">DHCPv6 Option</a>
         </h3>
-<p id="section-11.2-1">IANA is requested to assign a new DHCPv6 Option Code (TBD1) in the "Option Codes" registry for OPTION_RATE.<a href="#section-11.2-1" class="pilcrow">¶</a></p>
+<p id="section-13.2-1">IANA is requested to assign a new DHCPv6 Option Code (TBD1) in the "Option Codes" registry for OPTION_RATE.<a href="#section-13.2-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="dhcp-rate-sub-options-registry">
-<section id="section-11.3">
+<section id="section-13.3">
         <h3 id="name-dhcp-rate-sub-options-regis">
-<a href="#section-11.3" class="section-number selfRef">11.3. </a><a href="#name-dhcp-rate-sub-options-regis" class="section-name selfRef">DHCP Rate Sub-Options Registry</a>
+<a href="#section-13.3" class="section-number selfRef">13.3. </a><a href="#name-dhcp-rate-sub-options-regis" class="section-name selfRef">DHCP Rate Sub-Options Registry</a>
         </h3>
-<p id="section-11.3-1">IANA is requested to create a new registry titled "DHCP Rate Sub-Options".<a href="#section-11.3-1" class="pilcrow">¶</a></p>
+<p id="section-13.3-1">IANA is requested to create a new registry titled "DHCP Rate Sub-Options".<a href="#section-13.3-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
 </div>
 <div id="sec-combined-references">
-<section id="section-12">
+<section id="section-14">
       <h2 id="name-references">
-<a href="#section-12" class="section-number selfRef">12. </a><a href="#name-references" class="section-name selfRef">References</a>
+<a href="#section-14" class="section-number selfRef">14. </a><a href="#name-references" class="section-name selfRef">References</a>
       </h2>
 <div id="sec-normative-references">
-<section id="section-12.1">
+<section id="section-14.1">
         <h3 id="name-normative-references">
-<a href="#section-12.1" class="section-number selfRef">12.1. </a><a href="#name-normative-references" class="section-name selfRef">Normative References</a>
+<a href="#section-14.1" class="section-number selfRef">14.1. </a><a href="#name-normative-references" class="section-name selfRef">Normative References</a>
         </h3>
 <dl class="references">
 <dt id="RFC2119">[RFC2119]</dt>
@@ -1865,9 +1949,9 @@ for DHCPv4 and DHCPv6, if feasible.<a href="#section-11-1" class="pilcrow">¶</a
 </section>
 </div>
 <div id="sec-informative-references">
-<section id="section-12.2">
+<section id="section-14.2">
         <h3 id="name-informative-references">
-<a href="#section-12.2" class="section-number selfRef">12.2. </a><a href="#name-informative-references" class="section-name selfRef">Informative References</a>
+<a href="#section-14.2" class="section-number selfRef">14.2. </a><a href="#name-informative-references" class="section-name selfRef">Informative References</a>
         </h3>
 <dl class="references">
 <dt id="G.984.1">[G.984.1]</dt>
