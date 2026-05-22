@@ -5,15 +5,24 @@
 <meta content="Common,Latin" name="scripts">
 <meta content="initial-scale=1.0" name="viewport">
 <title>DHCP Explicit Rate Signalling</title>
-<meta content="Your Name Here" name="author">
+<meta content="Christian Giese" name="author">
+<meta content="Richard Patterson" name="author">
 <meta content="
-       TODO Abstract 
+       This document defines new Dynamic Host Configuration Protocol (DHCP)
+options for both DHCPv4 and DHCPv6 to explicitly
+signal available upstream and downstream data rates. In many broadband
+access networks, Customer Premises Equipment (CPE) and intermediate
+nodes lack visibility into the subscriber's provisioned service tier.
+By communicating these capacities natively via DHCP, clients, relay agents,
+and snooping switches can dynamically configure localized traffic shaping
+and queuing. This explicit signaling improves overall network performance
+by reducing the reliance on indiscriminate packet dropping and policing at the
+service edge. Additionally, it provides the necessary capacity awareness
+to enable effective Active Queue Management (AQM) and the Low Latency,
+Low Loss, and Scalable Throughput (L4S) architecture. 
     " name="description">
 <meta content="xml2rfc 3.33.0" name="generator">
-<meta content="next generation" name="keyword">
-<meta content="unicorn" name="keyword">
-<meta content="sparkling distributed ledger" name="keyword">
-<meta content="draft-giese-intarea-dhcp-rate-signalling-latest" name="ietf.draft">
+<meta content="draft-giese-dhcp-rate-signalling-latest" name="ietf.draft">
 <!-- Generator version information:
   xml2rfc 3.33.0
     Python 3.12.13
@@ -28,7 +37,7 @@
     requests 2.33.1
     wcwidth 0.7.0
 -->
-<link href="draft-giese-intarea-dhcp-rate-signalling.xml" rel="alternate" type="application/rfc+xml">
+<link href="draft-giese-dhcp-rate-signalling.xml" rel="alternate" type="application/rfc+xml">
 <link href="#copyright" rel="license">
 <style type="text/css">@font-face {
   font-family: 'Lora';
@@ -1050,8 +1059,8 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <td class="right">May 2026</td>
 </tr></thead>
 <tfoot><tr>
-<td class="left">Here</td>
-<td class="center">Expires 22 November 2026</td>
+<td class="left">Giese &amp; Patterson</td>
+<td class="center">Expires 23 November 2026</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1059,22 +1068,26 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <div id="internal-metadata" class="document-information">
 <dl id="identifiers">
 <dt class="label-workgroup">Workgroup:</dt>
-<dd class="workgroup">Internet Area Working Group</dd>
+<dd class="workgroup">Network Working Group</dd>
 <dt class="label-internet-draft">Internet-Draft:</dt>
-<dd class="internet-draft">draft-giese-intarea-dhcp-rate-signalling-latest</dd>
+<dd class="internet-draft">draft-giese-dhcp-rate-signalling-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2026-05-21" class="published">21 May 2026</time>
+<time datetime="2026-05-22" class="published">22 May 2026</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Informational</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2026-11-22">22 November 2026</time></dd>
-<dt class="label-authors">Author:</dt>
+<dd class="expires"><time datetime="2026-11-23">23 November 2026</time></dd>
+<dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
-      <div class="author-name">Y. N. Here</div>
-<div class="org">Your Organization Here</div>
+      <div class="author-name">C. Giese</div>
+<div class="org">RtBrick</div>
+</div>
+<div class="author">
+      <div class="author-name">R. Patterson</div>
+<div class="org">Sky UK</div>
 </div>
 </dd>
 </dl>
@@ -1082,7 +1095,28 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <h1 id="title">DHCP Explicit Rate Signalling</h1>
 <section id="section-abstract">
       <h2 id="abstract"><a href="#abstract" class="selfRef">Abstract</a></h2>
-<p id="section-abstract-1">TODO Abstract<a href="#section-abstract-1" class="pilcrow">¶</a></p>
+<p id="section-abstract-1">This document defines new Dynamic Host Configuration Protocol (DHCP)
+options for both DHCPv4 and DHCPv6 to explicitly
+signal available upstream and downstream data rates. In many broadband
+access networks, Customer Premises Equipment (CPE) and intermediate
+nodes lack visibility into the subscriber's provisioned service tier.
+By communicating these capacities natively via DHCP, clients, relay agents,
+and snooping switches can dynamically configure localized traffic shaping
+and queuing. This explicit signaling improves overall network performance
+by reducing the reliance on indiscriminate packet dropping and policing at the
+service edge. Additionally, it provides the necessary capacity awareness
+to enable effective Active Queue Management (AQM) and the Low Latency,
+Low Loss, and Scalable Throughput (L4S) architecture.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
+</section>
+<section class="note rfcEditorRemove" id="section-note.1">
+      <h2 id="name-about-this-document">
+<a href="#name-about-this-document" class="section-name selfRef">About This Document</a>
+      </h2>
+<p id="section-note.1-1">This note is to be removed before publishing as an RFC.<a href="#section-note.1-1" class="pilcrow">¶</a></p>
+<p id="section-note.1-2">
+        Status information for this document may be found at <span><a href="https://datatracker.ietf.org/doc/draft-giese-dhcp-rate-signalling/">https://datatracker.ietf.org/doc/draft-giese-dhcp-rate-signalling/</a></span>.<a href="#section-note.1-2" class="pilcrow">¶</a></p>
+<p id="section-note.1-3">Source for this draft and an issue tracker can be found at
+        <span><a href="https://github.com/GIC-de/draft-dhcp-rate-signalling">https://github.com/GIC-de/draft-dhcp-rate-signalling</a></span>.<a href="#section-note.1-3" class="pilcrow">¶</a></p>
 </section>
 <div id="status-of-memo">
 <section id="section-boilerplate.1">
@@ -1103,7 +1137,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 22 November 2026.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 23 November 2026.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1139,19 +1173,30 @@ svg :is([fill="white"], [fill^="#fff"]) {
             <p id="section-toc.1-1.2.1" class="keepWithNext"><a href="#section-2" class="auto internal xref">2</a>.  <a href="#name-conventions-and-definitions" class="internal xref">Conventions and Definitions</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3">
-            <p id="section-toc.1-1.3.1" class="keepWithNext"><a href="#section-3" class="auto internal xref">3</a>.  <a href="#name-security-considerations" class="internal xref">Security Considerations</a></p>
+            <p id="section-toc.1-1.3.1" class="keepWithNext"><a href="#section-3" class="auto internal xref">3</a>.  <a href="#name-dhcp-rate-option" class="internal xref">DHCP Rate Option</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4">
-            <p id="section-toc.1-1.4.1"><a href="#section-4" class="auto internal xref">4</a>.  <a href="#name-iana-considerations" class="internal xref">IANA Considerations</a></p>
+            <p id="section-toc.1-1.4.1"><a href="#section-4" class="auto internal xref">4</a>.  <a href="#name-security-considerations" class="internal xref">Security Considerations</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5">
-            <p id="section-toc.1-1.5.1"><a href="#section-5" class="auto internal xref">5</a>.  <a href="#name-normative-references" class="internal xref">Normative References</a></p>
+            <p id="section-toc.1-1.5.1"><a href="#section-5" class="auto internal xref">5</a>.  <a href="#name-iana-considerations" class="internal xref">IANA Considerations</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6">
-            <p id="section-toc.1-1.6.1"><a href="#appendix-A" class="auto internal xref"></a><a href="#name-acknowledgments" class="internal xref">Acknowledgments</a></p>
+            <p id="section-toc.1-1.6.1"><a href="#section-6" class="auto internal xref">6</a>.  <a href="#name-references" class="internal xref">References</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.1">
+                <p id="section-toc.1-1.6.2.1.1"><a href="#section-6.1" class="auto internal xref">6.1</a>.  <a href="#name-normative-references" class="internal xref">Normative References</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.2">
+                <p id="section-toc.1-1.6.2.2.1"><a href="#section-6.2" class="auto internal xref">6.2</a>.  <a href="#name-informative-references" class="internal xref">Informative References</a></p>
+</li>
+            </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7">
-            <p id="section-toc.1-1.7.1"><a href="#appendix-B" class="auto internal xref"></a><a href="#name-authors-address" class="internal xref">Author's Address</a></p>
+            <p id="section-toc.1-1.7.1"><a href="#appendix-A" class="auto internal xref"></a><a href="#name-acknowledgments" class="internal xref">Acknowledgments</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8">
+            <p id="section-toc.1-1.8.1"><a href="#appendix-B" class="auto internal xref"></a><a href="#name-authors-addresses" class="internal xref">Authors' Addresses</a></p>
 </li>
         </ul>
 </nav>
@@ -1162,7 +1207,63 @@ svg :is([fill="white"], [fill^="#fff"]) {
       <h2 id="name-introduction">
 <a href="#section-1" class="section-number selfRef">1. </a><a href="#name-introduction" class="section-name selfRef">Introduction</a>
       </h2>
-<p id="section-1-1">TODO Introduction<a href="#section-1-1" class="pilcrow">¶</a></p>
+<p id="section-1-1">In typical broadband access networks, the Customer Premises Equipment (CPE)
+is often unaware of the actual available data rates. This lack of visibility
+often occurs when an external modem or Optical Network Terminal (ONT) <span>[<a href="#G.984.1" class="cite xref">G.984.1</a>]</span>
+connects to the CPE at a physical link speed that significantly exceeds the
+subscriber's provisioned service rate. Furthermore, operators commonly deploy
+unified access profiles where the available rate is artificially limited at
+the service edge, such as the Broadband Network Gateway (BNG) <span>[<a href="#TR101" class="cite xref">TR101</a>]</span>,
+to match the subscriber's purchased service tier.<a href="#section-1-1" class="pilcrow">¶</a></p>
+<p id="section-1-2">When the network bottleneck resides between the BNG and the CPE, intermediate
+devices are typically not well equipped to provide deep buffering, priority
+scheduling, or Active Queue Management (AQM) <span>[<a href="#RFC7567" class="cite xref">RFC7567</a>]</span>. Relying on traffic
+indiscriminate packet dropping or policing at the service edge severely degrades
+the user experience. Conversely, network performance improves significantly by
+performing intelligent shaping and prioritization. When combined with AQM and
+the Low Latency, Low Loss, and Scalable Throughput (L4S) architecture <span>[<a href="#RFC9330" class="cite xref">RFC9330</a>]</span>,
+these localized traffic management benefits are further amplified.<a href="#section-1-2" class="pilcrow">¶</a></p>
+<p id="section-1-3">In many IP over Ethernet (IPoE) <span>[<a href="#TR101" class="cite xref">TR101</a>]</span> architectures the
+Broadband Network Gateway (BNG) operates strictly as a DHCP relay agent.
+While per-subscriber traffic management policies, such as queues, shapers,
+and policers, are typically provisioned out-of-band via
+Authentication, Authorization, and Accounting (AAA) protocols like RADIUS <span>[<a href="#RFC2865" class="cite xref">RFC2865</a>]</span>,
+deployments lacking direct AAA integration at the service edge require an in-band
+signaling alternative.<a href="#section-1-3" class="pilcrow">¶</a></p>
+<p id="section-1-4">Transporting available data rates natively within DHCP options addresses this
+architectural constraint. This mechanism allows the BNG to dynamically instantiate
+downstream shapers and upstream policers based on the DHCP payload, while concurrently
+equipping the Customer Premises Equipment (CPE) with the parameters required to manage
+upstream traffic locally.<a href="#section-1-4" class="pilcrow">¶</a></p>
+<p id="section-1-5">Furthermore, intermediate Layer 2 access nodes performing DHCP snooping can passively
+extract these explicitly signaled rate parameters to optimize their local queues and
+shapers. By distributing capacity awareness across the entire forwarding path, this
+in-band signaling mitigates buffer congestion within the access segment and significantly
+improves end-to-end transport performance.<a href="#section-1-5" class="pilcrow">¶</a></p>
+<p id="section-1-6">While auto-configuration protocols such as TR-069 <span>[<a href="#TR069" class="cite xref">TR069</a>]</span> can provision rate
+information, they are not universally deployed by all service providers. Furthermore,
+the increasing prevalence of customer owned, unmanaged CPEs limits the effectiveness
+of operator-managed configuration servers. A standardized DHCP option addresses this
+gap by providing a universal mechanism to explicitly signal available data rates
+directly from the DHCP server, across BNGs and access nodes, down to the CPE.
+This localized approach is particularly advantageous because it serves the entire path,
+whereas auto-configuration servers exclusively target the end device. This method also
+integrates seamlessly with architectures where RADIUS servers inject DHCP options.<a href="#section-1-6" class="pilcrow">¶</a></p>
+<p id="section-1-7">Although primarily designed for IPoE deployments, this mechanism is equally applicable
+to Point-to-Point Protocol over Ethernet (PPPoE)<span>[<a href="#RFC2516" class="cite xref">RFC2516</a>]</span> environments. Since DHCP
+is frequently utilized over PPPoE, most notably for IPv6 Prefix Delegation. This option
+provides a standardized method for rate signaling. Consequently, this approach can supersede
+the fragmented, proprietary methods currently in use, such as embedding rate limits within
+PPP <span>[<a href="#RFC1661" class="cite xref">RFC1661</a>]</span> authentication reply messages.<a href="#section-1-7" class="pilcrow">¶</a></p>
+<p id="section-1-8">Conveying rates via DHCP natively supports dynamic updates through regular lease renewals
+or triggered reconfiguration requests. As an auxiliary benefit, this explicit rate
+information can be exposed in the CPE user interface to satisfy customer expectations
+regarding bandwidth visibility. Ultimately, introducing a DHCP option to signal available
+data rates represents a simple, standardized enhancement that yields widespread improvements
+in internet service delivery.<a href="#section-1-8" class="pilcrow">¶</a></p>
+<p id="section-1-9">Operational requirements necessitate the definition of this option for both DHCPv4 and DHCPv6.
+This ensures coverage for networks lacking IPv6 support and prevents configuration gaps in
+dual-stack scenarios where DHCPv4 is established prior to DHCPv6.<a href="#section-1-9" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="conventions-and-definitions">
@@ -1174,39 +1275,149 @@ svg :is([fill="white"], [fill^="#fff"]) {
 "<span class="bcp14">MAY</span>", and "<span class="bcp14">OPTIONAL</span>" in this document are to be interpreted as
 described in BCP 14 <span>[<a href="#RFC2119" class="cite xref">RFC2119</a>]</span> <span>[<a href="#RFC8174" class="cite xref">RFC8174</a>]</span> when, and only when, they
 appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶</a></p>
+<p id="section-2-2">This document makes use of the terms defined in <span>[<a href="#RFC2131" class="cite xref">RFC2131</a>]</span> and <span>[<a href="#RFC8415" class="cite xref">RFC8415</a>]</span>.
+The following additional terms are used:<a href="#section-2-2" class="pilcrow">¶</a></p>
+<span class="break"></span><dl class="dlParallel" id="section-2-3">
+        <dt id="section-2-3.1">DHCP</dt>
+        <dd style="margin-left: 1.5em" id="section-2-3.2">
+          <p id="section-2-3.2.1">The abbreviation DHCP is used throughout this document to refer to both DHCPv4 and DHCPv6 protocols.<a href="#section-2-3.2.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-2-3.3">DHCPv4</dt>
+        <dd style="margin-left: 1.5em" id="section-2-3.4">
+          <p id="section-2-3.4.1">Dynamic Host Configuration Protocol <span>[<a href="#RFC2131" class="cite xref">RFC2131</a>]</span><a href="#section-2-3.4.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-2-3.5">DHCPv6</dt>
+        <dd style="margin-left: 1.5em" id="section-2-3.6">
+          <p id="section-2-3.6.1">Dynamic Host Configuration Protocol for IPv6 <span>[<a href="#RFC8415" class="cite xref">RFC8415</a>]</span><a href="#section-2-3.6.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-2-3.7">Subscriber</dt>
+        <dd style="margin-left: 1.5em" id="section-2-3.8">
+          <ul class="normal ulEmpty">
+<li class="normal ulEmpty" id="section-2-3.8.1.1">
+              <p id="section-2-3.8.1.1.1">The individual, organization, or entity that maintains a contractual relationship with a
+ Broadband Service Provider for network access services. Within the network infrastructure.
+ A subscriber is typically represented by an authenticated logical session (e.g., IPoE or PPPoE)
+ and an associated policy profile that dictates service attributes, including provisioned
+ upstream and downstream data rates.<a href="#section-2-3.8.1.1.1" class="pilcrow">¶</a></p>
+</li>
+          </ul>
+</dd>
+      <dd class="break"></dd>
+</dl>
+</section>
+</div>
+<div id="dhcp-rate-option">
+<section id="section-3">
+      <h2 id="name-dhcp-rate-option">
+<a href="#section-3" class="section-number selfRef">3. </a><a href="#name-dhcp-rate-option" class="section-name selfRef">DHCP Rate Option</a>
+      </h2>
+<p id="section-3-1">The DHCP Rate Option specified in this document employs a unified sub-option structure for
+both DHCPv4 and DHCPv6, utilizing the format explicitly known from DHCPv4 Option 82
+(the Relay Agent Information Option) <span>[<a href="#RFC3046" class="cite xref">RFC3046</a>]</span>. The top-level option encapsulation strictly
+conforms to the requirements of each base protocol. To simplify cross-protocol implementation,
+this document proposes the uniform assignment of OPTION_RATE with the option code TBD1
+(value to be assigned by IANA) for both IP versions. Specifically, DHCPv4 utilizes an 8-bit option
+code set to TBD1 alongside an 8-bit length field, whereas DHCPv6 utilizes a 16-bit option code
+set to TBD1 alongside a 16-bit length field. Despite these differences in outer header sizing,
+the internal payload remains completely identical. The encapsulated sub-options maintain
+consistent 8-bit sub-option code and 8-bit length fields across both protocol versions,
+ensuring common parsing and processing logic regardless of the underlying IP version.<a href="#section-3-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="security-considerations">
-<section id="section-3">
+<section id="section-4">
       <h2 id="name-security-considerations">
-<a href="#section-3" class="section-number selfRef">3. </a><a href="#name-security-considerations" class="section-name selfRef">Security Considerations</a>
+<a href="#section-4" class="section-number selfRef">4. </a><a href="#name-security-considerations" class="section-name selfRef">Security Considerations</a>
       </h2>
-<p id="section-3-1">TODO Security<a href="#section-3-1" class="pilcrow">¶</a></p>
+<p id="section-4-1">TODO Security<a href="#section-4-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="iana-considerations">
-<section id="section-4">
+<section id="section-5">
       <h2 id="name-iana-considerations">
-<a href="#section-4" class="section-number selfRef">4. </a><a href="#name-iana-considerations" class="section-name selfRef">IANA Considerations</a>
+<a href="#section-5" class="section-number selfRef">5. </a><a href="#name-iana-considerations" class="section-name selfRef">IANA Considerations</a>
       </h2>
-<p id="section-4-1">This document has no IANA actions.<a href="#section-4-1" class="pilcrow">¶</a></p>
+<p id="section-5-1">This document has no IANA actions.<a href="#section-5-1" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="sec-normative-references">
-<section id="section-5">
-      <h2 id="name-normative-references">
-<a href="#section-5" class="section-number selfRef">5. </a><a href="#name-normative-references" class="section-name selfRef">Normative References</a>
+<div id="sec-combined-references">
+<section id="section-6">
+      <h2 id="name-references">
+<a href="#section-6" class="section-number selfRef">6. </a><a href="#name-references" class="section-name selfRef">References</a>
       </h2>
+<div id="sec-normative-references">
+<section id="section-6.1">
+        <h3 id="name-normative-references">
+<a href="#section-6.1" class="section-number selfRef">6.1. </a><a href="#name-normative-references" class="section-name selfRef">Normative References</a>
+        </h3>
 <dl class="references">
 <dt id="RFC2119">[RFC2119]</dt>
-      <dd>
+        <dd>
 <span class="refAuthor">Bradner, S.</span>, <span class="refTitle">"Key words for use in RFCs to Indicate Requirement Levels"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 2119</span>, <span class="seriesInfo">DOI 10.17487/RFC2119</span>, <time datetime="1997-03" class="refDate">March 1997</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc2119">https://www.rfc-editor.org/rfc/rfc2119</a>&gt;</span>. </dd>
 <dd class="break"></dd>
+<dt id="RFC2131">[RFC2131]</dt>
+        <dd>
+<span class="refAuthor">Droms, R.</span>, <span class="refTitle">"Dynamic Host Configuration Protocol"</span>, <span class="seriesInfo">RFC 2131</span>, <span class="seriesInfo">DOI 10.17487/RFC2131</span>, <time datetime="1997-03" class="refDate">March 1997</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc2131">https://www.rfc-editor.org/rfc/rfc2131</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC3046">[RFC3046]</dt>
+        <dd>
+<span class="refAuthor">Patrick, M.</span>, <span class="refTitle">"DHCP Relay Agent Information Option"</span>, <span class="seriesInfo">RFC 3046</span>, <span class="seriesInfo">DOI 10.17487/RFC3046</span>, <time datetime="2001-01" class="refDate">January 2001</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc3046">https://www.rfc-editor.org/rfc/rfc3046</a>&gt;</span>. </dd>
+<dd class="break"></dd>
 <dt id="RFC8174">[RFC8174]</dt>
-    <dd>
+        <dd>
 <span class="refAuthor">Leiba, B.</span>, <span class="refTitle">"Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 8174</span>, <span class="seriesInfo">DOI 10.17487/RFC8174</span>, <time datetime="2017-05" class="refDate">May 2017</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8174">https://www.rfc-editor.org/rfc/rfc8174</a>&gt;</span>. </dd>
 <dd class="break"></dd>
+<dt id="RFC8415">[RFC8415]</dt>
+      <dd>
+<span class="refAuthor">Mrugalski, T.</span>, <span class="refAuthor">Siodelski, M.</span>, <span class="refAuthor">Volz, B.</span>, <span class="refAuthor">Yourtchenko, A.</span>, <span class="refAuthor">Richardson, M.</span>, <span class="refAuthor">Jiang, S.</span>, <span class="refAuthor">Lemon, T.</span>, and <span class="refAuthor">T. Winters</span>, <span class="refTitle">"Dynamic Host Configuration Protocol for IPv6 (DHCPv6)"</span>, <span class="seriesInfo">RFC 8415</span>, <span class="seriesInfo">DOI 10.17487/RFC8415</span>, <time datetime="2018-11" class="refDate">November 2018</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8415">https://www.rfc-editor.org/rfc/rfc8415</a>&gt;</span>. </dd>
+<dd class="break"></dd>
 </dl>
+</section>
+</div>
+<div id="sec-informative-references">
+<section id="section-6.2">
+        <h3 id="name-informative-references">
+<a href="#section-6.2" class="section-number selfRef">6.2. </a><a href="#name-informative-references" class="section-name selfRef">Informative References</a>
+        </h3>
+<dl class="references">
+<dt id="G.984.1">[G.984.1]</dt>
+        <dd>
+<span class="refAuthor">ITU-T</span>, <span class="refTitle">"Gigabit-capable passive optical networks (GPON): General characteristics"</span>, <span class="seriesInfo">ITU-T Recommendation G.984.1</span>, <time datetime="2008-03" class="refDate">March 2008</time>. </dd>
+<dd class="break"></dd>
+<dt id="RFC1661">[RFC1661]</dt>
+        <dd>
+<span class="refAuthor">Simpson, W., Ed.</span>, <span class="refTitle">"The Point-to-Point Protocol (PPP)"</span>, <span class="seriesInfo">STD 51</span>, <span class="seriesInfo">RFC 1661</span>, <span class="seriesInfo">DOI 10.17487/RFC1661</span>, <time datetime="1994-07" class="refDate">July 1994</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc1661">https://www.rfc-editor.org/rfc/rfc1661</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC2516">[RFC2516]</dt>
+        <dd>
+<span class="refAuthor">Mamakos, L.</span>, <span class="refAuthor">Lidl, K.</span>, <span class="refAuthor">Evarts, J.</span>, <span class="refAuthor">Carrel, D.</span>, <span class="refAuthor">Simone, D.</span>, and <span class="refAuthor">R. Wheeler</span>, <span class="refTitle">"A Method for Transmitting PPP Over Ethernet (PPPoE)"</span>, <span class="seriesInfo">RFC 2516</span>, <span class="seriesInfo">DOI 10.17487/RFC2516</span>, <time datetime="1999-02" class="refDate">February 1999</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc2516">https://www.rfc-editor.org/rfc/rfc2516</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC2865">[RFC2865]</dt>
+        <dd>
+<span class="refAuthor">Rigney, C.</span>, <span class="refAuthor">Willens, S.</span>, <span class="refAuthor">Rubens, A.</span>, and <span class="refAuthor">W. Simpson</span>, <span class="refTitle">"Remote Authentication Dial In User Service (RADIUS)"</span>, <span class="seriesInfo">RFC 2865</span>, <span class="seriesInfo">DOI 10.17487/RFC2865</span>, <time datetime="2000-06" class="refDate">June 2000</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc2865">https://www.rfc-editor.org/rfc/rfc2865</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC7567">[RFC7567]</dt>
+        <dd>
+<span class="refAuthor">Baker, F., Ed.</span> and <span class="refAuthor">G. Fairhurst, Ed.</span>, <span class="refTitle">"IETF Recommendations Regarding Active Queue Management"</span>, <span class="seriesInfo">BCP 197</span>, <span class="seriesInfo">RFC 7567</span>, <span class="seriesInfo">DOI 10.17487/RFC7567</span>, <time datetime="2015-07" class="refDate">July 2015</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc7567">https://www.rfc-editor.org/rfc/rfc7567</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC9330">[RFC9330]</dt>
+        <dd>
+<span class="refAuthor">Briscoe, B., Ed.</span>, <span class="refAuthor">De Schepper, K.</span>, <span class="refAuthor">Bagnulo, M.</span>, and <span class="refAuthor">G. White</span>, <span class="refTitle">"Low Latency, Low Loss, and Scalable Throughput (L4S) Internet Service: Architecture"</span>, <span class="seriesInfo">RFC 9330</span>, <span class="seriesInfo">DOI 10.17487/RFC9330</span>, <time datetime="2023-01" class="refDate">January 2023</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9330">https://www.rfc-editor.org/rfc/rfc9330</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="TR069">[TR069]</dt>
+        <dd>
+<span class="refAuthor">Broadband Forum</span>, <span class="refTitle">"CPE WAN Management Protocol"</span>, <span class="seriesInfo">TR 069 Issue 6</span>, <time datetime="2020-06" class="refDate">June 2020</time>. </dd>
+<dd class="break"></dd>
+<dt id="TR101">[TR101]</dt>
+      <dd>
+<span class="refAuthor">Broadband Forum</span>, <span class="refTitle">"Migration to Ethernet-Based Broadband Aggregation"</span>, <span class="seriesInfo">TR 101 Issue 2</span>, <time datetime="2011-07" class="refDate">July 2011</time>. </dd>
+<dd class="break"></dd>
+</dl>
+</section>
+</div>
 </section>
 </div>
 <div id="acknowledgments">
@@ -1219,15 +1430,23 @@ appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶<
 </div>
 <div id="authors-addresses">
 <section id="appendix-B">
-      <h2 id="name-authors-address">
-<a href="#name-authors-address" class="section-name selfRef">Author's Address</a>
+      <h2 id="name-authors-addresses">
+<a href="#name-authors-addresses" class="section-name selfRef">Authors' Addresses</a>
       </h2>
 <address class="vcard">
-        <div dir="auto" class="left"><span class="fn nameRole">Your Name Here</span></div>
-<div dir="auto" class="left"><span class="org">Your Organization Here</span></div>
+        <div dir="auto" class="left"><span class="fn nameRole">Christian Giese</span></div>
+<div dir="auto" class="left"><span class="org">RtBrick</span></div>
 <div class="email">
 <span>Email:</span>
-<a href="mailto:your.email@example.com" class="email">your.email@example.com</a>
+<a href="mailto:christian@rtbrick.com" class="email">christian@rtbrick.com</a>
+</div>
+</address>
+<address class="vcard">
+        <div dir="auto" class="left"><span class="fn nameRole">Richard Patterson</span></div>
+<div dir="auto" class="left"><span class="org">Sky UK</span></div>
+<div class="email">
+<span>Email:</span>
+<a href="mailto:Richard.Patterson@sky.uk" class="email">Richard.Patterson@sky.uk</a>
 </div>
 </address>
 </section>

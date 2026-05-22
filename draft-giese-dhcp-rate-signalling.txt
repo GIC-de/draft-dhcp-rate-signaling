@@ -1,0 +1,297 @@
+
+
+
+
+Network Working Group                                           C. Giese
+Internet-Draft                                                   RtBrick
+Intended status: Informational                              R. Patterson
+Expires: 23 November 2026                                         Sky UK
+                                                             22 May 2026
+
+
+                     DHCP Explicit Rate Signalling
+                draft-giese-dhcp-rate-signalling-latest
+
+Abstract
+
+   This document defines new Dynamic Host Configuration Protocol (DHCP)
+   options for both DHCPv4 and DHCPv6 to explicitly signal available
+   upstream and downstream data rates.  In many broadband access
+   networks, Customer Premises Equipment (CPE) and intermediate nodes
+   lack visibility into the subscriber's provisioned service tier.  By
+   communicating these capacities natively via DHCP, clients, relay
+   agents, and snooping switches can dynamically configure localized
+   traffic shaping and queuing.  This explicit signaling improves
+   overall network performance by reducing the reliance on
+   indiscriminate packet dropping and policing at the service edge.
+   Additionally, it provides the necessary capacity awareness to enable
+   effective Active Queue Management (AQM) and the Low Latency, Low
+   Loss, and Scalable Throughput (L4S) architecture.
+
+About This Document
+
+   This note is to be removed before publishing as an RFC.
+
+   Status information for this document may be found at
+   https://datatracker.ietf.org/doc/draft-giese-dhcp-rate-signalling/.
+
+   Source for this draft and an issue tracker can be found at
+   https://github.com/GIC-de/draft-dhcp-rate-signalling.
+
+Status of This Memo
+
+   This Internet-Draft is submitted in full conformance with the
+   provisions of BCP 78 and BCP 79.
+
+   Internet-Drafts are working documents of the Internet Engineering
+   Task Force (IETF).  Note that other groups may also distribute
+   working documents as Internet-Drafts.  The list of current Internet-
+   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+   Internet-Drafts are draft documents valid for a maximum of six months
+   and may be updated, replaced, or obsoleted by other documents at any
+   time.  It is inappropriate to use Internet-Drafts as reference
+   material or to cite them other than as "work in progress."
+
+   This Internet-Draft will expire on 23 November 2026.
+
+Copyright Notice
+
+   Copyright (c) 2026 IETF Trust and the persons identified as the
+   document authors.  All rights reserved.
+
+   This document is subject to BCP 78 and the IETF Trust's Legal
+   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+   license-info) in effect on the date of publication of this document.
+   Please review these documents carefully, as they describe your rights
+   and restrictions with respect to this document.  Code Components
+   extracted from this document must include Revised BSD License text as
+   described in Section 4.e of the Trust Legal Provisions and are
+   provided without warranty as described in the Revised BSD License.
+
+Table of Contents
+
+   1.  Introduction
+   2.  Conventions and Definitions
+   3.  DHCP Rate Option
+   4.  Security Considerations
+   5.  IANA Considerations
+   6.  References
+     6.1.  Normative References
+     6.2.  Informative References
+   Acknowledgments
+   Authors' Addresses
+
+1.  Introduction
+
+   In typical broadband access networks, the Customer Premises Equipment
+   (CPE) is often unaware of the actual available data rates.  This lack
+   of visibility often occurs when an external modem or Optical Network
+   Terminal (ONT) [G.984.1] connects to the CPE at a physical link speed
+   that significantly exceeds the subscriber's provisioned service rate.
+   Furthermore, operators commonly deploy unified access profiles where
+   the available rate is artificially limited at the service edge, such
+   as the Broadband Network Gateway (BNG) [TR101], to match the
+   subscriber's purchased service tier.
+
+   When the network bottleneck resides between the BNG and the CPE,
+   intermediate devices are typically not well equipped to provide deep
+   buffering, priority scheduling, or Active Queue Management (AQM)
+   [RFC7567].  Relying on traffic indiscriminate packet dropping or
+   policing at the service edge severely degrades the user experience.
+   Conversely, network performance improves significantly by performing
+   intelligent shaping and prioritization.  When combined with AQM and
+   the Low Latency, Low Loss, and Scalable Throughput (L4S) architecture
+   [RFC9330], these localized traffic management benefits are further
+   amplified.
+
+   In many IP over Ethernet (IPoE) [TR101] architectures the Broadband
+   Network Gateway (BNG) operates strictly as a DHCP relay agent.  While
+   per-subscriber traffic management policies, such as queues, shapers,
+   and policers, are typically provisioned out-of-band via
+   Authentication, Authorization, and Accounting (AAA) protocols like
+   RADIUS [RFC2865], deployments lacking direct AAA integration at the
+   service edge require an in-band signaling alternative.
+
+   Transporting available data rates natively within DHCP options
+   addresses this architectural constraint.  This mechanism allows the
+   BNG to dynamically instantiate downstream shapers and upstream
+   policers based on the DHCP payload, while concurrently equipping the
+   Customer Premises Equipment (CPE) with the parameters required to
+   manage upstream traffic locally.
+
+   Furthermore, intermediate Layer 2 access nodes performing DHCP
+   snooping can passively extract these explicitly signaled rate
+   parameters to optimize their local queues and shapers.  By
+   distributing capacity awareness across the entire forwarding path,
+   this in-band signaling mitigates buffer congestion within the access
+   segment and significantly improves end-to-end transport performance.
+
+   While auto-configuration protocols such as TR-069 [TR069] can
+   provision rate information, they are not universally deployed by all
+   service providers.  Furthermore, the increasing prevalence of
+   customer owned, unmanaged CPEs limits the effectiveness of operator-
+   managed configuration servers.  A standardized DHCP option addresses
+   this gap by providing a universal mechanism to explicitly signal
+   available data rates directly from the DHCP server, across BNGs and
+   access nodes, down to the CPE.  This localized approach is
+   particularly advantageous because it serves the entire path, whereas
+   auto-configuration servers exclusively target the end device.  This
+   method also integrates seamlessly with architectures where RADIUS
+   servers inject DHCP options.
+
+   Although primarily designed for IPoE deployments, this mechanism is
+   equally applicable to Point-to-Point Protocol over Ethernet
+   (PPPoE)[RFC2516] environments.  Since DHCP is frequently utilized
+   over PPPoE, most notably for IPv6 Prefix Delegation.  This option
+   provides a standardized method for rate signaling.  Consequently,
+   this approach can supersede the fragmented, proprietary methods
+   currently in use, such as embedding rate limits within PPP [RFC1661]
+   authentication reply messages.
+
+   Conveying rates via DHCP natively supports dynamic updates through
+   regular lease renewals or triggered reconfiguration requests.  As an
+   auxiliary benefit, this explicit rate information can be exposed in
+   the CPE user interface to satisfy customer expectations regarding
+   bandwidth visibility.  Ultimately, introducing a DHCP option to
+   signal available data rates represents a simple, standardized
+   enhancement that yields widespread improvements in internet service
+   delivery.
+
+   Operational requirements necessitate the definition of this option
+   for both DHCPv4 and DHCPv6.  This ensures coverage for networks
+   lacking IPv6 support and prevents configuration gaps in dual-stack
+   scenarios where DHCPv4 is established prior to DHCPv6.
+
+2.  Conventions and Definitions
+
+   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+   "OPTIONAL" in this document are to be interpreted as described in
+   BCP 14 [RFC2119] [RFC8174] when, and only when, they appear in all
+   capitals, as shown here.
+
+   This document makes use of the terms defined in [RFC2131] and
+   [RFC8415].  The following additional terms are used:
+
+   DHCP  The abbreviation DHCP is used throughout this document to refer
+      to both DHCPv4 and DHCPv6 protocols.
+
+   DHCPv4  Dynamic Host Configuration Protocol [RFC2131]
+
+   DHCPv6  Dynamic Host Configuration Protocol for IPv6 [RFC8415]
+
+   Subscriber
+         The individual, organization, or entity that maintains a
+         contractual relationship with a Broadband Service Provider for
+         network access services.  Within the network infrastructure.  A
+         subscriber is typically represented by an authenticated logical
+         session (e.g., IPoE or PPPoE) and an associated policy profile
+         that dictates service attributes, including provisioned
+         upstream and downstream data rates.
+
+3.  DHCP Rate Option
+
+   The DHCP Rate Option specified in this document employs a unified
+   sub-option structure for both DHCPv4 and DHCPv6, utilizing the format
+   explicitly known from DHCPv4 Option 82 (the Relay Agent Information
+   Option) [RFC3046].  The top-level option encapsulation strictly
+   conforms to the requirements of each base protocol.  To simplify
+   cross-protocol implementation, this document proposes the uniform
+   assignment of OPTION_RATE with the option code TBD1 (value to be
+   assigned by IANA) for both IP versions.  Specifically, DHCPv4
+   utilizes an 8-bit option code set to TBD1 alongside an 8-bit length
+   field, whereas DHCPv6 utilizes a 16-bit option code set to TBD1
+   alongside a 16-bit length field.  Despite these differences in outer
+   header sizing, the internal payload remains completely identical.
+   The encapsulated sub-options maintain consistent 8-bit sub-option
+   code and 8-bit length fields across both protocol versions, ensuring
+   common parsing and processing logic regardless of the underlying IP
+   version.
+
+4.  Security Considerations
+
+   TODO Security
+
+5.  IANA Considerations
+
+   This document has no IANA actions.
+
+6.  References
+
+6.1.  Normative References
+
+   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+              Requirement Levels", BCP 14, RFC 2119,
+              DOI 10.17487/RFC2119, March 1997,
+              <https://www.rfc-editor.org/rfc/rfc2119>.
+
+   [RFC2131]  Droms, R., "Dynamic Host Configuration Protocol",
+              RFC 2131, DOI 10.17487/RFC2131, March 1997,
+              <https://www.rfc-editor.org/rfc/rfc2131>.
+
+   [RFC3046]  Patrick, M., "DHCP Relay Agent Information Option",
+              RFC 3046, DOI 10.17487/RFC3046, January 2001,
+              <https://www.rfc-editor.org/rfc/rfc3046>.
+
+   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+              May 2017, <https://www.rfc-editor.org/rfc/rfc8174>.
+
+   [RFC8415]  Mrugalski, T., Siodelski, M., Volz, B., Yourtchenko, A.,
+              Richardson, M., Jiang, S., Lemon, T., and T. Winters,
+              "Dynamic Host Configuration Protocol for IPv6 (DHCPv6)",
+              RFC 8415, DOI 10.17487/RFC8415, November 2018,
+              <https://www.rfc-editor.org/rfc/rfc8415>.
+
+6.2.  Informative References
+
+   [G.984.1]  ITU-T, "Gigabit-capable passive optical networks (GPON):
+              General characteristics", ITU-T Recommendation G.984.1,
+              March 2008.
+
+   [RFC1661]  Simpson, W., Ed., "The Point-to-Point Protocol (PPP)",
+              STD 51, RFC 1661, DOI 10.17487/RFC1661, July 1994,
+              <https://www.rfc-editor.org/rfc/rfc1661>.
+
+   [RFC2516]  Mamakos, L., Lidl, K., Evarts, J., Carrel, D., Simone, D.,
+              and R. Wheeler, "A Method for Transmitting PPP Over
+              Ethernet (PPPoE)", RFC 2516, DOI 10.17487/RFC2516,
+              February 1999, <https://www.rfc-editor.org/rfc/rfc2516>.
+
+   [RFC2865]  Rigney, C., Willens, S., Rubens, A., and W. Simpson,
+              "Remote Authentication Dial In User Service (RADIUS)",
+              RFC 2865, DOI 10.17487/RFC2865, June 2000,
+              <https://www.rfc-editor.org/rfc/rfc2865>.
+
+   [RFC7567]  Baker, F., Ed. and G. Fairhurst, Ed., "IETF
+              Recommendations Regarding Active Queue Management",
+              BCP 197, RFC 7567, DOI 10.17487/RFC7567, July 2015,
+              <https://www.rfc-editor.org/rfc/rfc7567>.
+
+   [RFC9330]  Briscoe, B., Ed., De Schepper, K., Bagnulo, M., and G.
+              White, "Low Latency, Low Loss, and Scalable Throughput
+              (L4S) Internet Service: Architecture", RFC 9330,
+              DOI 10.17487/RFC9330, January 2023,
+              <https://www.rfc-editor.org/rfc/rfc9330>.
+
+   [TR069]    Broadband Forum, "CPE WAN Management Protocol", TR 069
+              Issue 6, June 2020.
+
+   [TR101]    Broadband Forum, "Migration to Ethernet-Based Broadband
+              Aggregation", TR 101 Issue 2, July 2011.
+
+Acknowledgments
+
+   TODO acknowledge.
+
+Authors' Addresses
+
+   Christian Giese
+   RtBrick
+   Email: christian@rtbrick.com
+
+
+   Richard Patterson
+   Sky UK
+   Email: Richard.Patterson@sky.uk
