@@ -1293,13 +1293,13 @@ the service edge, such as the Broadband Network Gateway (BNG) <span>[<a href="#T
 to match the subscriber's purchased service tier.<a href="#section-1-1" class="pilcrow">¶</a></p>
 <p id="section-1-2">When the network bottleneck resides between the BNG and the CPE, intermediate
 devices are typically not well equipped to provide deep buffering, priority
-scheduling, or Active Queue Management (AQM) <span>[<a href="#RFC7567" class="cite xref">RFC7567</a>]</span>. Relying on traffic
-indiscriminate packet dropping or policing at the service edge severely degrades
-the user experience. Conversely, network performance improves significantly by
-performing intelligent shaping and prioritization. When combined with AQM and
-the Low Latency, Low Loss, and Scalable Throughput (L4S) architecture <span>[<a href="#RFC9330" class="cite xref">RFC9330</a>]</span>,
+scheduling, or Active Queue Management (AQM) <span>[<a href="#RFC7567" class="cite xref">RFC7567</a>]</span>. Relying on indiscriminate
+packet dropping or policing at the service edge severely degrades the user experience.
+Conversely, network performance improves significantly by performing intelligent shaping
+and prioritization. When combined with AQM and the Low Latency, Low Loss, and
+Scalable Throughput (L4S) architecture <span>[<a href="#RFC9330" class="cite xref">RFC9330</a>]</span>,
 these localized traffic management benefits are further amplified.<a href="#section-1-2" class="pilcrow">¶</a></p>
-<p id="section-1-3">In many IP over Ethernet (IPoE) <span>[<a href="#TR101" class="cite xref">TR101</a>]</span> architectures the
+<p id="section-1-3">In many IP over Ethernet (IPoE) <span>[<a href="#TR101" class="cite xref">TR101</a>]</span> architectures, the
 Broadband Network Gateway (BNG) operates strictly as a DHCP relay agent.
 While per-subscriber traffic management policies, such as queues, shapers,
 and policers, are typically provisioned out-of-band via
@@ -1374,8 +1374,8 @@ The following additional terms are used:<a href="#section-2-2" class="pilcrow">�
           <ul class="normal ulEmpty">
 <li class="normal ulEmpty" id="section-2-3.8.1.1">
               <p id="section-2-3.8.1.1.1">The individual, organization, or entity that maintains a contractual relationship with a
- Broadband Service Provider for network access services. Within the network infrastructure.
- A subscriber is typically represented by an authenticated logical session (e.g., IPoE or PPPoE)
+ Broadband Service Provider for network access services. Within the network infrastructure,
+ a subscriber is typically represented by an authenticated logical session (e.g., IPoE or PPPoE)
  and an associated policy profile that dictates service attributes, including provisioned
  upstream and downstream data rates.<a href="#section-2-3.8.1.1.1" class="pilcrow">¶</a></p>
 </li>
@@ -1506,9 +1506,9 @@ remove a previously set rate, thereby resetting to the device default configurat
 <p id="section-3.2.3-1">The rate type defines the networking layer to which the stated rates apply. The default value of 2 is defined as the Layer 2 rate, which signifies that the rate encompasses the entire Ethernet frame. Implementations <span class="bcp14">SHOULD</span> calculate this rate using the Ethernet header and all payload, excluding the Ethernet Frame Check Sequence (FCS) and Inter-Packet Gap (IPG).<a href="#section-3.2.3-1" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="section-3.2.3-2">
 <pre>
- SubOpt   Len   Unit
+ SubOpt   Len   Rate Type
 +------+------+------+
-|  1   |   1  | Unit |
+|  1   |   1  | i    |
 +------+------+------+
 </pre><a href="#section-3.2.3-2" class="pilcrow">¶</a>
 </div>
@@ -1585,15 +1585,15 @@ selection criterion to prefer one server's offer over another.<a href="#section-
         </h3>
 <p id="section-4.3-1">When a DHCPv4 server is configured to support the DHCP Rate Option and receives a client request
 (e.g., DHCPDISCOVER or DHCPREQUEST) that includes the OPTION_RATE within the Parameter Request List
-(PRL), the server <span class="bcp14">MUST</span> include the OPTION_RATE in the resulting DHCPOFFER and DHCPACK messages. The
-server <span class="bcp14">MAY</span> derive the specific, upstream and downstream rate and type from local configuration
-profiles, centralized Authentication, Authorization, and Accounting (AAA) systems such as RADIUS, or
-external policy servers or return rate values of 0 when no other non-zero values are configured or
-signalled to be used.<a href="#section-4.3-1" class="pilcrow">¶</a></p>
-<p id="section-4.3-2">A server <span class="bcp14">MAY</span> include the OPTION_RATE in its responses if the client did not explicitly request it via
-the PRL if the operator has explicitly configured the server to forcefully inject the option to
-provision intermediate nodes, such as DHCP relay agents or Layer 2 snooping switches who <span class="bcp14">MAY</span> drop
-those options before forwarding to the client.<a href="#section-4.3-2" class="pilcrow">¶</a></p>
+(PRL), the server <span class="bcp14">MUST</span> include the OPTION_RATE in the resulting DHCPOFFER and DHCPACK messages.<a href="#section-4.3-1" class="pilcrow">¶</a></p>
+<p id="section-4.3-2">The server <span class="bcp14">MAY</span> derive the specific upstream and downstream rates and rate type from local
+configuration profiles, centralized Authentication, Authorization, and Accounting (AAA) systems such
+as RADIUS, or external policy servers. If no non-zero values are configured or signaled to be used,
+the server <span class="bcp14">MAY</span> return rate values of 0.<a href="#section-4.3-2" class="pilcrow">¶</a></p>
+<p id="section-4.3-3">A server <span class="bcp14">MAY</span> include the OPTION_RATE in its responses even if the client did not explicitly request
+it via the Parameter Request List (PRL), provided the operator has explicitly configured the server
+to forcefully inject the option to provision intermediate nodes, such as DHCP relay agents or Layer 2
+snooping switches, which <span class="bcp14">MAY</span> drop these options before forwarding the message to the client.<a href="#section-4.3-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="dhcpv4-relay-agent-behavior">
@@ -1601,7 +1601,7 @@ those options before forwarding to the client.<a href="#section-4.3-2" class="pi
         <h3 id="name-dhcpv4-relay-agent-behavior">
 <a href="#section-4.4" class="section-number selfRef">4.4. </a><a href="#name-dhcpv4-relay-agent-behavior" class="section-name selfRef">DHCPv4 Relay Agent Behavior</a>
         </h3>
-<p id="section-4.4-1">DHCPv4 Relay Agents including L2 DHCPv4 Relay Agents <span>[<a href="#TR101" class="cite xref">TR101</a>]</span>, <span class="bcp14">MAY</span> extract the OPTION_RATE from
+<p id="section-4.4-1">DHCPv4 Relay Agents, including L2 DHCPv4 Relay Agents <span>[<a href="#TR101" class="cite xref">TR101</a>]</span>, <span class="bcp14">MAY</span> extract the OPTION_RATE from
 DHCPACK messages traversing the network. Relay agents that perform localized traffic management <span class="bcp14">MAY</span>
 utilize these extracted values to dynamically instantiate shapers and policers on their
 subscriber-facing interfaces.<a href="#section-4.4-1" class="pilcrow">¶</a></p>
@@ -1643,7 +1643,8 @@ or longer than 2 bytes, which is the sub-options header length.<a href="#section
 <a href="#section-5.2" class="section-number selfRef">5.2. </a><a href="#name-dhcpv6-client-behavior" class="section-name selfRef">DHCPv6 Client Behavior</a>
         </h3>
 <p id="section-5.2-1">DHCPv6 clients that support the DHCP Rate Option <span class="bcp14">SHOULD</span> include the corresponding OPTION_RATE code in
-the Option Request Option (ORO) <span>[<a href="#RFC8415" class="cite xref">RFC8415</a>]</span>. This inclusion explicitly signals client support,enabling the DHCPv6 server to determine whether to include the rate parameters in its response.
+the Option Request Option (ORO) <span>[<a href="#RFC8415" class="cite xref">RFC8415</a>]</span>. This inclusion explicitly signals client support,
+enabling the DHCPv6 server to determine whether to include the rate parameters in its response.
 Furthermore, this signaling provides network operators with visibility into client capabilities,
 which aids in troubleshooting and resolving customer service quality complaints.<a href="#section-5.2-1" class="pilcrow">¶</a></p>
 <p id="section-5.2-2">A client <span class="bcp14">MAY</span> include the OPTION_RATE with any or all sub-options within its DHCPv6 Request messages
@@ -1651,7 +1652,7 @@ to serve as a hint to the server proposing their maximum data rates or preferred
 (L2 or L3 rates).<a href="#section-5.2-2" class="pilcrow">¶</a></p>
 <p id="section-5.2-3">Providing this hint is <span class="bcp14">OPTIONAL</span>. The manner in which a DHCPv6 server processes these client-provided
 hints is implementation-specific. Because the server remains authoritative, the client <span class="bcp14">MUST</span> accept
-and apply the rate type ultimately provided by the server in the REPLY  message, regardless of the
+and apply the rate type ultimately provided by the server in the REPLY message, regardless of the
 hint it originally sent.<a href="#section-5.2-3" class="pilcrow">¶</a></p>
 <p id="section-5.2-4">Clients <span class="bcp14">MUST</span> ignore the OPTION_RATE when received within a message other than REPLY. If the
 OPTION_RATE is present in an ADVERTISE message, the client <span class="bcp14">MUST NOT</span> apply the specified rate limits
@@ -1679,10 +1680,9 @@ minor traffic burstiness from the CPE and prevents premature packet drops at the
 node. This capability to independently target different nodes along the forwarding path is unique to
 the nested relay header architecture of DHCPv6, as DHCPv4 lacks a comparable mechanism for addressing
 multiple relay agents distinctly.<a href="#section-5.3-2" class="pilcrow">¶</a></p>
-<p id="section-5.3-3">Furthermore, to dynamically update a client's rate limits mid-lease during renewal or <span class="bcp14">MAY</span> utilize
-RECONFIGURE messages to apply updates before T1 timer expires. By triggering the client to initiate a
-Renew or Information-request transaction, this mechanism allows the server to push newly modified
-rate parameters without waiting for natural lease expiration.<a href="#section-5.3-3" class="pilcrow">¶</a></p>
+<p id="section-5.3-3">Furthermore, to dynamically update a client’s rate limits mid-lease, the server <span class="bcp14">MAY</span> utilize
+RECONFIGURE messages to apply updates before the T1 timer expires. By triggering the client to
+initiate a Renew or Information-request transaction, this mechanism allows the server to push newly modified rate parameters without waiting for timer expiration.<a href="#section-5.3-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="dhcpv6-relay-agent-behavior">
@@ -1727,20 +1727,19 @@ client-facing ports.<a href="#section-6-1" class="pilcrow">¶</a></p>
       </h2>
 <p id="section-7-1">In Point-to-Point Protocol over Ethernet (PPPoE) <span>[<a href="#RFC2516" class="cite xref">RFC2516</a>]</span> architectures, the Customer Premises
 Equipment (CPE) typically employs DHCPv6 over the PPP <span>[<a href="#RFC1661" class="cite xref">RFC1661</a>]</span> link to request an IPv6
-Delegated Prefix (IA_PD) <span>[<a href="#RFC8415" class="cite xref">RFC8415</a>]</span>.
-This encapsulated DHCPv6 exchange provides a standardized transport mechanism for the explicit DHCP
-Rate Option. While less prevalent in modern deployments, DHCPv4 transactions operating within a PPPoE
-session <span class="bcp14">MAY</span> similarly convey these rate options.<a href="#section-7-1" class="pilcrow">¶</a></p>
+Delegated Prefix (IA_PD) <span>[<a href="#RFC8415" class="cite xref">RFC8415</a>]</span>. This encapsulated DHCPv6 exchange provides a standardized
+transport mechanism for the explicit DHCP Rate Option. While less prevalent in modern deployments,
+DHCPv4 transactions operating within a PPPoE session <span class="bcp14">MAY</span> similarly convey these rate options.<a href="#section-7-1" class="pilcrow">¶</a></p>
 <p id="section-7-2">The foundational processing rules and client behavior for rate options received over PPPoE are
 identical to those defined for IP over Ethernet (IPoE) environments.<a href="#section-7-2" class="pilcrow">¶</a></p>
-<p id="section-7-3">Because the PPP session dictates the primary logical link state, the applied rate <span class="bcp14">MUST</span> ONLY revert to
+<p id="section-7-3">Because the PPP session dictates the primary logical link state, the applied rate <span class="bcp14">MUST</span> revert to
 the device's default configuration under two specific conditions. First, the client <span class="bcp14">MUST</span> reset the
 applied limits if it receives a valid DHCP message explicitly signaling rate removal, such as an
 empty Rate Option or a sub-option containing a rate value of zero. Second, the rate <span class="bcp14">MUST</span> be
 implicitly revoked if the underlying PPPoE session itself is terminated.<a href="#section-7-3" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="errors-and-conflicts">
+<div id="errors">
 <section id="section-8">
       <h2 id="name-errors-and-conflicts">
 <a href="#section-8" class="section-number selfRef">8. </a><a href="#name-errors-and-conflicts" class="section-name selfRef">Errors and Conflicts</a>
@@ -1756,7 +1755,7 @@ WAN port). In such scenarios, the client <span class="bcp14">SHOULD</span> cap t
 Queue Management (AQM) parameters to the maximum capacity of the physical link.<a href="#section-8-4" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="operational-or-manageability-considerations">
+<div id="operations">
 <section id="section-9">
       <h2 id="name-operational-or-manageabilit">
 <a href="#section-9" class="section-number selfRef">9. </a><a href="#name-operational-or-manageabilit" class="section-name selfRef">Operational or Manageability Considerations</a>
@@ -1768,16 +1767,16 @@ Customer Premises Equipment (CPE) management interfaces, such as the local Web U
 or remote management protocols. Providing end-users and operators with immediate visibility into the
 locally provisioned service tier drastically reduces support inquiries related to perceived bandwidth
 issues and improves overall user satisfaction.<a href="#section-9-2" class="pilcrow">¶</a></p>
-<p id="section-9-3">As noted in errors and conflicts, a client may receive an OPTION_RATE  indicating an available rate
-that exceeds the maximum physical link speed of its interfaces. In such scenarios, management
-interfaces <span class="bcp14">SHOULD</span> expose both the originally signaled rate value and the effective, capped rate value
-applied by the device. Additionally, implementations <span class="bcp14">SHOULD</span> log this discrepancy if logging
-facilities are enabled. Capturing and exposing these specific events provides critical telemetry for
-network operators, as they frequently indicate a mismatch between the subscriber's provisioned
-service tier and their installed physical equipment.<a href="#section-9-3" class="pilcrow">¶</a></p>
+<p id="section-9-3">As noted in <a href="#errors" class="internal xref">Errors and Conflicts</a>, a client may receive an OPTION_RATE indicating an available rate that
+exceeds the maximum physical link speed of its interfaces. In such scenarios, management interfaces
+<span class="bcp14">SHOULD</span> expose both the originally signaled rate value and the effective, capped rate value applied by
+the device. Additionally, implementations <span class="bcp14">SHOULD</span> log this discrepancy if logging facilities are
+enabled. Capturing and exposing these specific events provides critical telemetry for network
+operators, as they frequently indicate a mismatch between the subscriber's provisioned service tier
+and their installed physical equipment.<a href="#section-9-3" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="security-considerations">
+<div id="security">
 <section id="section-10">
       <h2 id="name-security-considerations">
 <a href="#section-10" class="section-number selfRef">10. </a><a href="#name-security-considerations" class="section-name selfRef">Security Considerations</a>
@@ -1803,6 +1802,8 @@ to the physical link capacity.<a href="#section-10-3" class="pilcrow">¶</a></p>
       <h2 id="name-iana-considerations">
 <a href="#section-11" class="section-number selfRef">11. </a><a href="#name-iana-considerations" class="section-name selfRef">IANA Considerations</a>
       </h2>
+<p id="section-11-1">This document requests that IANA assign the same numeric value in both registries
+for DHCPv4 and DHCPv6, if feasible.<a href="#section-11-1" class="pilcrow">¶</a></p>
 <div id="dhcpv4-option">
 <section id="section-11.1">
         <h3 id="name-dhcpv4-option">

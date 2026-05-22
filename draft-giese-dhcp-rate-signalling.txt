@@ -119,15 +119,15 @@ Table of Contents
    When the network bottleneck resides between the BNG and the CPE,
    intermediate devices are typically not well equipped to provide deep
    buffering, priority scheduling, or Active Queue Management (AQM)
-   [RFC7567].  Relying on traffic indiscriminate packet dropping or
-   policing at the service edge severely degrades the user experience.
-   Conversely, network performance improves significantly by performing
-   intelligent shaping and prioritization.  When combined with AQM and
-   the Low Latency, Low Loss, and Scalable Throughput (L4S) architecture
+   [RFC7567].  Relying on indiscriminate packet dropping or policing at
+   the service edge severely degrades the user experience.  Conversely,
+   network performance improves significantly by performing intelligent
+   shaping and prioritization.  When combined with AQM and the Low
+   Latency, Low Loss, and Scalable Throughput (L4S) architecture
    [RFC9330], these localized traffic management benefits are further
    amplified.
 
-   In many IP over Ethernet (IPoE) [TR101] architectures the Broadband
+   In many IP over Ethernet (IPoE) [TR101] architectures, the Broadband
    Network Gateway (BNG) operates strictly as a DHCP relay agent.  While
    per-subscriber traffic management policies, such as queues, shapers,
    and policers, are typically provisioned out-of-band via
@@ -206,7 +206,7 @@ Table of Contents
    Subscriber
          The individual, organization, or entity that maintains a
          contractual relationship with a Broadband Service Provider for
-         network access services.  Within the network infrastructure.  A
+         network access services.  Within the network infrastructure, a
          subscriber is typically represented by an authenticated logical
          session (e.g., IPoE or PPPoE) and an associated policy profile
          that dictates service attributes, including provisioned
@@ -312,9 +312,9 @@ Table of Contents
    and all payload, excluding the Ethernet Frame Check Sequence (FCS)
    and Inter-Packet Gap (IPG).
 
-    SubOpt   Len   Unit
+    SubOpt   Len   Rate Type
    +------+------+------+
-   |  1   |   1  | Unit |
+   |  1   |   1  | i    |
    +------+------+------+
 
    If the rate type is set to 3, the rate applies to Layer 3,
@@ -389,23 +389,25 @@ Table of Contents
    and receives a client request (e.g., DHCPDISCOVER or DHCPREQUEST)
    that includes the OPTION_RATE within the Parameter Request List
    (PRL), the server MUST include the OPTION_RATE in the resulting
-   DHCPOFFER and DHCPACK messages.  The server MAY derive the specific,
-   upstream and downstream rate and type from local configuration
-   profiles, centralized Authentication, Authorization, and Accounting
-   (AAA) systems such as RADIUS, or external policy servers or return
-   rate values of 0 when no other non-zero values are configured or
-   signalled to be used.
+   DHCPOFFER and DHCPACK messages.
 
-   A server MAY include the OPTION_RATE in its responses if the client
-   did not explicitly request it via the PRL if the operator has
-   explicitly configured the server to forcefully inject the option to
-   provision intermediate nodes, such as DHCP relay agents or Layer 2
-   snooping switches who MAY drop those options before forwarding to the
-   client.
+   The server MAY derive the specific upstream and downstream rates and
+   rate type from local configuration profiles, centralized
+   Authentication, Authorization, and Accounting (AAA) systems such as
+   RADIUS, or external policy servers.  If no non-zero values are
+   configured or signaled to be used, the server MAY return rate values
+   of 0.
+
+   A server MAY include the OPTION_RATE in its responses even if the
+   client did not explicitly request it via the Parameter Request List
+   (PRL), provided the operator has explicitly configured the server to
+   forcefully inject the option to provision intermediate nodes, such as
+   DHCP relay agents or Layer 2 snooping switches, which MAY drop these
+   options before forwarding the message to the client.
 
 4.4.  DHCPv4 Relay Agent Behavior
 
-   DHCPv4 Relay Agents including L2 DHCPv4 Relay Agents [TR101], MAY
+   DHCPv4 Relay Agents, including L2 DHCPv4 Relay Agents [TR101], MAY
    extract the OPTION_RATE from DHCPACK messages traversing the network.
    Relay agents that perform localized traffic management MAY utilize
    these extracted values to dynamically instantiate shapers and
@@ -438,11 +440,12 @@ Table of Contents
 
    DHCPv6 clients that support the DHCP Rate Option SHOULD include the
    corresponding OPTION_RATE code in the Option Request Option (ORO)
-   [RFC8415].  This inclusion explicitly signals client support,enabling
-   the DHCPv6 server to determine whether to include the rate parameters
-   in its response.  Furthermore, this signaling provides network
-   operators with visibility into client capabilities, which aids in
-   troubleshooting and resolving customer service quality complaints.
+   [RFC8415].  This inclusion explicitly signals client support,
+   enabling the DHCPv6 server to determine whether to include the rate
+   parameters in its response.  Furthermore, this signaling provides
+   network operators with visibility into client capabilities, which
+   aids in troubleshooting and resolving customer service quality
+   complaints.
 
    A client MAY include the OPTION_RATE with any or all sub-options
    within its DHCPv6 Request messages to serve as a hint to the server
@@ -487,12 +490,12 @@ Table of Contents
    DHCPv6, as DHCPv4 lacks a comparable mechanism for addressing
    multiple relay agents distinctly.
 
-   Furthermore, to dynamically update a client's rate limits mid-lease
-   during renewal or MAY utilize RECONFIGURE messages to apply updates
-   before T1 timer expires.  By triggering the client to initiate a
-   Renew or Information-request transaction, this mechanism allows the
-   server to push newly modified rate parameters without waiting for
-   natural lease expiration.
+   Furthermore, to dynamically update a client’s rate limits mid-lease,
+   the server MAY utilize RECONFIGURE messages to apply updates before
+   the T1 timer expires.  By triggering the client to initiate a Renew
+   or Information-request transaction, this mechanism allows the server
+   to push newly modified rate parameters without waiting for timer
+   expiration.
 
 5.4.  DHCPv6 Relay Agent Behavior
 
@@ -543,12 +546,12 @@ Table of Contents
    over Ethernet (IPoE) environments.
 
    Because the PPP session dictates the primary logical link state, the
-   applied rate MUST ONLY revert to the device's default configuration
-   under two specific conditions.  First, the client MUST reset the
-   applied limits if it receives a valid DHCP message explicitly
-   signaling rate removal, such as an empty Rate Option or a sub-option
-   containing a rate value of zero.  Second, the rate MUST be implicitly
-   revoked if the underlying PPPoE session itself is terminated.
+   applied rate MUST revert to the device's default configuration under
+   two specific conditions.  First, the client MUST reset the applied
+   limits if it receives a valid DHCP message explicitly signaling rate
+   removal, such as an empty Rate Option or a sub-option containing a
+   rate value of zero.  Second, the rate MUST be implicitly revoked if
+   the underlying PPPoE session itself is terminated.
 
 8.  Errors and Conflicts
 
@@ -582,7 +585,7 @@ Table of Contents
    drastically reduces support inquiries related to perceived bandwidth
    issues and improves overall user satisfaction.
 
-   As noted in errors and conflicts, a client may receive an OPTION_RATE
+   As noted in Errors and Conflicts, a client may receive an OPTION_RATE
    indicating an available rate that exceeds the maximum physical link
    speed of its interfaces.  In such scenarios, management interfaces
    SHOULD expose both the originally signaled rate value and the
@@ -618,6 +621,9 @@ Table of Contents
    this by capping the applied rate to the physical link capacity.
 
 11.  IANA Considerations
+
+   This document requests that IANA assign the same numeric value in
+   both registries for DHCPv4 and DHCPv6, if feasible.
 
 11.1.  DHCPv4 Option
 
