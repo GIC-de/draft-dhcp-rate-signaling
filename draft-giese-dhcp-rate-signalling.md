@@ -70,14 +70,14 @@ to match the subscriber's purchased service tier.
 
 When the network bottleneck resides between the BNG and the CPE, intermediate
 devices are typically not well equipped to provide deep buffering, priority
-scheduling, or Active Queue Management (AQM) {{?RFC7567}}. Relying on traffic
-indiscriminate packet dropping or policing at the service edge severely degrades
-the user experience. Conversely, network performance improves significantly by
-performing intelligent shaping and prioritization. When combined with AQM and
-the Low Latency, Low Loss, and Scalable Throughput (L4S) architecture {{?RFC9330}},
+scheduling, or Active Queue Management (AQM) {{?RFC7567}}. Relying on indiscriminate
+packet dropping or policing at the service edge severely degrades the user experience.
+Conversely, network performance improves significantly by performing intelligent shaping
+and prioritization. When combined with AQM and the Low Latency, Low Loss, and
+Scalable Throughput (L4S) architecture {{?RFC9330}},
 these localized traffic management benefits are further amplified.
 
-In many IP over Ethernet (IPoE) {{TR101}} architectures the
+In many IP over Ethernet (IPoE) {{TR101}} architectures, the
 Broadband Network Gateway (BNG) operates strictly as a DHCP relay agent.
 While per-subscriber traffic management policies, such as queues, shapers,
 and policers, are typically provisioned out-of-band via
@@ -144,8 +144,8 @@ DHCPv6
 Subscriber
 : >
    The individual, organization, or entity that maintains a contractual relationship with a
-   Broadband Service Provider for network access services. Within the network infrastructure.
-   A subscriber is typically represented by an authenticated logical session (e.g., IPoE or PPPoE)
+   Broadband Service Provider for network access services. Within the network infrastructure,
+   a subscriber is typically represented by an authenticated logical session (e.g., IPoE or PPPoE)
    and an associated policy profile that dictates service attributes, including provisioned
    upstream and downstream data rates.
 
@@ -231,9 +231,9 @@ remove a previously set rate, thereby resetting to the device default configurat
 The rate type defines the networking layer to which the stated rates apply. The default value of 2 is defined as the Layer 2 rate, which signifies that the rate encompasses the entire Ethernet frame. Implementations SHOULD calculate this rate using the Ethernet header and all payload, excluding the Ethernet Frame Check Sequence (FCS) and Inter-Packet Gap (IPG).
 
 ~~~
- SubOpt   Len   Unit
+ SubOpt   Len   Rate Type
 +------+------+------+
-|  1   |   1  | Unit |
+|  1   |   1  | i    |
 +------+------+------+
 ~~~
 
@@ -296,20 +296,21 @@ selection criterion to prefer one server's offer over another.
 
 When a DHCPv4 server is configured to support the DHCP Rate Option and receives a client request
 (e.g., DHCPDISCOVER or DHCPREQUEST) that includes the OPTION_RATE within the Parameter Request List
-(PRL), the server MUST include the OPTION_RATE in the resulting DHCPOFFER and DHCPACK messages. The
-server MAY derive the specific, upstream and downstream rate and type from local configuration
-profiles, centralized Authentication, Authorization, and Accounting (AAA) systems such as RADIUS, or
-external policy servers or return rate values of 0 when no other non-zero values are configured or
-signalled to be used.
+(PRL), the server MUST include the OPTION_RATE in the resulting DHCPOFFER and DHCPACK messages.
 
-A server MAY include the OPTION_RATE in its responses if the client did not explicitly request it via
-the PRL if the operator has explicitly configured the server to forcefully inject the option to
-provision intermediate nodes, such as DHCP relay agents or Layer 2 snooping switches who MAY drop
-those options before forwarding to the client.
+The server MAY derive the specific upstream and downstream rates and rate type from local
+configuration profiles, centralized Authentication, Authorization, and Accounting (AAA) systems such
+as RADIUS, or external policy servers. If no non-zero values are configured or signaled to be used,
+the server MAY return rate values of 0.
+
+A server MAY include the OPTION_RATE in its responses even if the client did not explicitly request
+it via the Parameter Request List (PRL), provided the operator has explicitly configured the server
+to forcefully inject the option to provision intermediate nodes, such as DHCP relay agents or Layer 2
+snooping switches, which MAY drop these options before forwarding the message to the client.
 
 ## DHCPv4 Relay Agent Behavior
 
-DHCPv4 Relay Agents including L2 DHCPv4 Relay Agents {{TR101}}, MAY extract the OPTION_RATE from
+DHCPv4 Relay Agents, including L2 DHCPv4 Relay Agents {{TR101}}, MAY extract the OPTION_RATE from
 DHCPACK messages traversing the network. Relay agents that perform localized traffic management MAY
 utilize these extracted values to dynamically instantiate shapers and policers on their
 subscriber-facing interfaces.
@@ -339,7 +340,8 @@ or longer than 2 bytes, which is the sub-options header length.
 ## DHCPv6 Client Behavior
 
 DHCPv6 clients that support the DHCP Rate Option SHOULD include the corresponding OPTION_RATE code in
-the Option Request Option (ORO) {{!RFC8415}}. This inclusion explicitly signals client support,enabling the DHCPv6 server to determine whether to include the rate parameters in its response.
+the Option Request Option (ORO) {{!RFC8415}}. This inclusion explicitly signals client support,
+enabling the DHCPv6 server to determine whether to include the rate parameters in its response.
 Furthermore, this signaling provides network operators with visibility into client capabilities,
 which aids in troubleshooting and resolving customer service quality complaints.
 
@@ -349,7 +351,7 @@ to serve as a hint to the server proposing their maximum data rates or preferred
 
 Providing this hint is OPTIONAL. The manner in which a DHCPv6 server processes these client-provided
 hints is implementation-specific. Because the server remains authoritative, the client MUST accept
-and apply the rate type ultimately provided by the server in the REPLY  message, regardless of the
+and apply the rate type ultimately provided by the server in the REPLY message, regardless of the
 hint it originally sent.
 
 Clients MUST ignore the OPTION_RATE when received within a message other than REPLY. If the
@@ -376,10 +378,9 @@ node. This capability to independently target different nodes along the forwardi
 the nested relay header architecture of DHCPv6, as DHCPv4 lacks a comparable mechanism for addressing
 multiple relay agents distinctly.
 
-Furthermore, to dynamically update a client's rate limits mid-lease during renewal or MAY utilize
-RECONFIGURE messages to apply updates before T1 timer expires. By triggering the client to initiate a
-Renew or Information-request transaction, this mechanism allows the server to push newly modified
-rate parameters without waiting for natural lease expiration.
+Furthermore, to dynamically update a client’s rate limits mid-lease, the server MAY utilize
+RECONFIGURE messages to apply updates before the T1 timer expires. By triggering the client to
+initiate a Renew or Information-request transaction, this mechanism allows the server to push newly modified rate parameters without waiting for timer expiration.
 
 ## DHCPv6 Relay Agent Behavior
 
@@ -411,21 +412,20 @@ client-facing ports.
 
 In Point-to-Point Protocol over Ethernet (PPPoE) {{?RFC2516}} architectures, the Customer Premises
 Equipment (CPE) typically employs DHCPv6 over the PPP {{RFC1661}} link to request an IPv6
-Delegated Prefix (IA_PD) {{!RFC8415}}.
-This encapsulated DHCPv6 exchange provides a standardized transport mechanism for the explicit DHCP
-Rate Option. While less prevalent in modern deployments, DHCPv4 transactions operating within a PPPoE
-session MAY similarly convey these rate options.
+Delegated Prefix (IA_PD) {{!RFC8415}}. This encapsulated DHCPv6 exchange provides a standardized
+transport mechanism for the explicit DHCP Rate Option. While less prevalent in modern deployments,
+DHCPv4 transactions operating within a PPPoE session MAY similarly convey these rate options.
 
 The foundational processing rules and client behavior for rate options received over PPPoE are
 identical to those defined for IP over Ethernet (IPoE) environments.
 
-Because the PPP session dictates the primary logical link state, the applied rate MUST ONLY revert to
+Because the PPP session dictates the primary logical link state, the applied rate MUST revert to
 the device's default configuration under two specific conditions. First, the client MUST reset the
 applied limits if it receives a valid DHCP message explicitly signaling rate removal, such as an
 empty Rate Option or a sub-option containing a rate value of zero. Second, the rate MUST be
 implicitly revoked if the underlying PPPoE session itself is terminated.
 
-# Errors and Conflicts
+# Errors and Conflicts {#errors}
 
 Clients receiving conflicting rate information across DHCPv4 and DHCPv6 protocols SHOULD apply the
 most recently received value.
@@ -440,7 +440,7 @@ link speed of its upstream or downstream interfaces (e.g., signaling 2 Gbps to a
 WAN port). In such scenarios, the client SHOULD cap the applied traffic shaping, policing, or Active
 Queue Management (AQM) parameters to the maximum capacity of the physical link.
 
-# Operational or Manageability Considerations
+# Operational or Manageability Considerations {#operations}
 
 Deploying explicit rate signaling via DHCP introduces several operational benefits and deployment
 considerations for network management.
@@ -451,15 +451,15 @@ or remote management protocols. Providing end-users and operators with immediate
 locally provisioned service tier drastically reduces support inquiries related to perceived bandwidth
 issues and improves overall user satisfaction.
 
-As noted in errors and conflicts, a client may receive an OPTION_RATE  indicating an available rate
-that exceeds the maximum physical link speed of its interfaces. In such scenarios, management
-interfaces SHOULD expose both the originally signaled rate value and the effective, capped rate value
-applied by the device. Additionally, implementations SHOULD log this discrepancy if logging
-facilities are enabled. Capturing and exposing these specific events provides critical telemetry for
-network operators, as they frequently indicate a mismatch between the subscriber's provisioned
-service tier and their installed physical equipment.
+As noted in {{<<errors}}, a client may receive an OPTION_RATE indicating an available rate that
+exceeds the maximum physical link speed of its interfaces. In such scenarios, management interfaces
+SHOULD expose both the originally signaled rate value and the effective, capped rate value applied by
+the device. Additionally, implementations SHOULD log this discrepancy if logging facilities are
+enabled. Capturing and exposing these specific events provides critical telemetry for network
+operators, as they frequently indicate a mismatch between the subscriber's provisioned service tier
+and their installed physical equipment.
 
-# Security Considerations
+# Security Considerations {#security}
 
 DHCP messages are typically transmitted as plaintext and are unauthenticated. Consequently, the DHCP
 Rate Options defined in this document are vulnerable to interception, modification, or spoofing by
@@ -479,6 +479,9 @@ injected rate is impractically high, the client implicitly mitigates this by cap
 to the physical link capacity.
 
 # IANA Considerations
+
+This document requests that IANA assign the same numeric value in both registries
+for DHCPv4 and DHCPv6, if feasible.
 
 ## DHCPv4 Option
 
