@@ -1,6 +1,6 @@
 ---
 title: "DHCP Explicit Rate Signalling"
-docname: draft-giese-dhcp-rate-signalling-00
+docname: draft-giese-dhcp-rate-signalling-latest
 submissiontype: IETF
 date: 2026-05-22
 category: info
