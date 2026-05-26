@@ -175,15 +175,15 @@ ensuring common parsing and processing logic regardless of the underlying IP ver
 The rate information field consists of a sequence of SubOpt/Length/Value tuples for each
 sub-option, encoded in the following manner:
 
-~~~
+~~~ aasvg
  SubOpt  Len     Sub-option Value
-+------+------+------+------+------+------+--...-+------+
-|  1   |   N  |  s1  |  s2  |  s3  |  s4  |      |  sN  |
-+------+------+------+------+------+------+--...-+------+
++------+------+------+------+------+--...-+------+
+|  1   |   N  |  s1  |  s2  |  s3  |      |  sN  |
++------+------+------+------+------+--...-+------+
  SubOpt  Len     Sub-option Value
-+------+------+------+------+------+------+--...-+------+
-|  2   |   N  |  i1  |  i2  |  i3  |  i4  |      |  iN  |
-+------+------+------+------+------+------+--...-+------+
++------+------+------+------+------+--...-+------+
+|  2   |   N  |  i1  |  i2  |  i3  |      |  iN  |
++------+------+------+------+------+--...-+------+
 ~~~
 
 No "pad" sub-option is defined, and the rate information field SHALL NOT be terminated with a 255 sub-option.
@@ -207,7 +207,7 @@ The sub-option Available Rate Upstream defines the rate in bits per second (bps)
 DHCP client towards the DHCP server direction. The rate format is a 64-bit unsigned integer in
 network byte order.
 
-~~~
+~~~ aasvg
  SubOpt   Len     Available Rate Upstream
 +------+------+------+------+------+------+------+------+--
 |  1   |   8  |  64 Bit bps
@@ -222,7 +222,7 @@ remove a previously set rate, thereby resetting to the device default configurat
 The available rate downstream defines the rate in bits per second (bps) available from the DHCP
 server towards the DHCP client direction. The rate format is a 64-bit unsigned integer in network byte order.
 
-~~~
+~~~ aasvg
  SubOpt   Len     Available Rate Downstream
 +------+------+------+------+------+------+------+------+--
 |  2   |   8  |  64 Bit bps
@@ -239,7 +239,7 @@ is defined as the Layer 2 rate, which signifies that the rate encompasses the en
 Implementations SHOULD calculate this rate using the Ethernet header and all payload, excluding the
 Ethernet Frame Check Sequence (FCS) and Inter-Packet Gap (IPG).
 
-~~~
+~~~ aasvg
  SubOpt   Len   Rate Type
 +------+------+------+
 |  3   |   1  | i    |
@@ -278,11 +278,11 @@ for the server.
 
 The DHCPv4 OPTION_RATE code is TBD1.
 
-~~~
+~~~ aasvg
  Code   Len     Rate Information Field
-+------+------+------+------+------+------+--...-+------+
-| TBD1 | N    |  i1  |  i2  |  i3  |  i4  |      |  iN  |
-+------+------+------+------+------+------+--...-+------+
++------+------+------+------+------+--...-+------+
+| TBD1 | N    |  i1  |  i2  |  i3  |      |  iN  |
++------+------+------+------+------+--...-+------+
 ~~~
 
 The length (N) gives the total number of octets in the Rate Information Field, which is either zero
@@ -349,7 +349,7 @@ server, such as RADIUS.
 
 The DHCPv6 OPTION_RATE code is TBD1.
 
-~~~
+~~~ aasvg
  Code          Len            Rate Information Field
 +------+------+------+------+------+------+------+--...-+------+
 | TBD1        | N           |  i1  |  i2  |  i3  |      |  iN  |
