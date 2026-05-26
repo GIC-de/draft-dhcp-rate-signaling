@@ -115,7 +115,7 @@ integrates seamlessly with architectures where RADIUS servers inject DHCP option
 
 Although primarily designed for IPoE deployments, this mechanism is equally applicable
 to Point-to-Point Protocol over Ethernet (PPPoE) {{?RFC2516}} environments. Since DHCP
-is frequently utilized over PPPoE, most notably for IPv6 Prefix Delegation. This option
+is frequently utilized over PPPoE, most notably for IPv6 Prefix Delegation, this option
 provides a standardized method for rate signaling. Consequently, this approach can supersede
 the fragmented, proprietary methods currently in use, such as embedding rate limits within
 PPP {{?RFC1661}} authentication reply messages.
@@ -219,7 +219,8 @@ remove a previously set rate, thereby resetting to the device default configurat
 
 ### Available Rate Downstream
 
-The available rate downstream defines the rate in Bits per second (bps) available from the DHCP server towards the DHCP client direction. The rate format is a 64-bit unsigned integer in network byte order.
+The available rate downstream defines the rate in Bits per second (bps) available from the DHCP
+server towards the DHCP client direction. The rate format is a 64-bit unsigned integer in network byte order.
 
 ~~~
  SubOpt   Len     Available Rate Downstream
@@ -233,7 +234,10 @@ remove a previously set rate, thereby resetting to the device default configurat
 
 ### Rate Type
 
-The rate type defines the networking layer to which the stated rates apply. The default value of 2 is defined as the Layer 2 rate, which signifies that the rate encompasses the entire Ethernet frame. Implementations SHOULD calculate this rate using the Ethernet header and all payload, excluding the Ethernet Frame Check Sequence (FCS) and Inter-Packet Gap (IPG).
+The rate type defines the networking layer to which the stated rates apply. The default value of 2
+is defined as the Layer 2 rate, which signifies that the rate encompasses the entire Ethernet frame.
+Implementations SHOULD calculate this rate using the Ethernet header and all payload, excluding the
+Ethernet Frame Check Sequence (FCS) and Inter-Packet Gap (IPG).
 
 ~~~
  SubOpt   Len   Rate Type
@@ -241,6 +245,12 @@ The rate type defines the networking layer to which the stated rates apply. The 
 |  3   |   1  | i    |
 +------+------+------+
 ~~~
+
+If the rate type is set to 0, the explicitly signaled rates are informational only. Devices receiving this
+rate type MUST NOT apply the specified rate limits to their physical interfaces, traffic shapers, policers,
+or Active Queue Management (AQM) parameters. This value accommodates deployments where the network exposes
+the provisioned service tier to the Customer Premises Equipment (CPE) solely to populate user interfaces
+or for telemetry purposes, without altering the device's localized forwarding behavior.
 
 If the rate type is set to 3, the rate applies to Layer 3, encompassing only the IP header and its
 payload. This rate calculation is frequently utilized by end-user speed test applications and is
@@ -250,10 +260,12 @@ the variable overhead introduced by differing numbers of VLAN tags or tunnel enc
 In the absence of the Rate Type sub-option, the client MUST assume that the signaled values are
 defined as the Layer 2 rate.
 
-The values 0, 1, and 4-255 are currently unassigned and reserved for future use. If a client, server,
-or relay agent receives a Rate Type sub-option containing an unrecognized or reserved value, it MUST ignore
-that specific sub-option. In such cases, adhering to the default behavior for an absent Rate Type,
-the device MUST assume that the explicitly signaled upstream and downstream values are defined as Layer 2 rates.
+The values 1 and 4-255 are currently unassigned and reserved for future use. If a client, server,
+or relay agent receives a Rate Type sub-option containing an unrecognized or reserved value,
+it MUST ignore the entire OPTION_RATE. Applying explicitly signaled rate limits without understanding
+the intended networking layer could result in incorrect localized traffic management. Therefore,
+to fail safely, the receiving device MUST discard the option entirely and rely on its default
+rate configuration.
 
 A client MAY include the Rate Type sub-option within its initial requests to serve as a hint to the
 server regarding its preferred calculation method (e.g., requesting a Layer 3 rate instead of a
@@ -390,7 +402,8 @@ multiple relay agents distinctly.
 
 Furthermore, to dynamically update a client’s rate limits mid-lease, the server MAY utilize
 RECONFIGURE messages to apply updates before the T1 timer expires. By triggering the client to
-initiate a Renew or Information-request transaction, this mechanism allows the server to push newly modified rate parameters without waiting for timer expiration.
+initiate a Renew or Information-request transaction, this mechanism allows the server to push newly
+modified rate parameters without waiting for timer expiration.
 
 ## DHCPv6 Relay Agent Behavior
 
@@ -429,11 +442,16 @@ DHCPv4 transactions operating within a PPPoE session MAY similarly convey these 
 The foundational processing rules and client behavior for rate options received over PPPoE are
 identical to those defined for IP over Ethernet (IPoE) environments.
 
+If a client receives rate limits embedded within the PPP authentication reply message and concurrently
+receives the DHCP OPTION_RATE, the explicitly signaled DHCP OPTION_RATE MUST take priority. This
+precedence ensures that the standardized, dynamic DHCP signaling supersedes fragmented or proprietary
+rate limits previously negotiated during the PPP authentication phase.
+
 Because the PPP session dictates the primary logical link state, the applied rate MUST revert to
 the device's default configuration under two specific conditions. First, the client MUST reset the
-applied limits if it receives a valid DHCP message explicitly signaling rate removal, such as an
-empty Rate Option or a sub-option containing a rate value of zero. Second, the rate MUST be
-implicitly revoked if the underlying PPPoE session itself is terminated.
+applied limits if it receives a valid DHCP message explicitly signaling rate removal with a
+sub-option containing a rate value of zero. Second, the rate MUST be implicitly revoked if the
+underlying PPPoE session itself is terminated.
 
 # Interaction with AQM and L4S
 
@@ -463,8 +481,14 @@ design of AQM and congestion control algorithms remains outside the scope of thi
 Clients receiving conflicting rate information across DHCPv4 and DHCPv6 protocols SHOULD apply the
 most recently received value.
 
-Clients and servers MUST ignore unrecognized sub-option codes and continue processing the rest of the
-Rate Option.
+To ensure forward compatibility, clients, servers, and relay agents MUST ignore unrecognized sub-option
+codes and continue processing the remainder of the Rate Option.
+
+Conversely, if a device receives a recognized sub-option containing an unrecognized or reserved value
+that dictates the fundamental interpretation of the rate parameters (such as an unassigned Rate Type),
+it MUST discard the entire OPTION_RATE. Applying explicitly signaled rates without understanding the
+intended networking layer could result in incorrect localized traffic management. In such cases,
+the device MUST rely on its default rate configuration.
 
 If multiple instances of the same sub-option code are present, the last instance MUST be processed.
 
@@ -535,7 +559,8 @@ for DHCPv4 and DHCPv6, if feasible.
 
 ## DHCPv4 Option
 
-IANA is requested to assign a new DHCP Option Code (TBD1) in the "BOOTP Vendor Extensions and DHCP Options" registry for OPTION_RATE.
+IANA is requested to assign a new DHCP Option Code (TBD1) in the "BOOTP Vendor Extensions and
+DHCP Options" registry for OPTION_RATE.
 
 ## DHCPv6 Option
 
@@ -544,6 +569,14 @@ IANA is requested to assign a new DHCPv6 Option Code (TBD1) in the "Option Codes
 ## DHCP Rate Sub-Options Registry
 
 IANA is requested to create a new registry titled "DHCP Rate Sub-Options".
+
+| Value | Description                                        | Reference |
+| ----: | :------------------------------------------------- | :-------- |
+|     0 | Unassigned                                         |           |
+|     1 | Available Rate Upstream in Bits per second (bps)   | [RFC-TBD] |
+|     2 | Available Rate Downstream in Bits per second (bps) | [RFC-TBD] |
+|     3 | Rate Type (L2, L3 or informational)                | [RFC-TBD] |
+| 4-255 | Unassigned                                         |           |
 
 --- back
 
