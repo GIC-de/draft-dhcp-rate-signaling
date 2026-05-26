@@ -1,13 +1,13 @@
 ---
-title: "DHCP Explicit Rate Signalling"
-docname: draft-giese-dhcp-rate-signalling-latest
+title: "DHCP Explicit Rate Signaling"
+docname: draft-giese-dhcp-rate-signaling-latest
 submissiontype: IETF
-date: 2026-05-22
+date: 2026-05-26
 category: info
 v: 3
 
 venue:
-   github: GIC-de/draft-dhcp-rate-signalling
+   github: GIC-de/draft-dhcp-rate-signaling
 
 author:
 -  fullname: "Christian Giese"
@@ -105,7 +105,7 @@ improves end-to-end transport performance.
 
 While auto-configuration protocols such as TR-069 {{TR069}} can provision rate information, they are
 not universally deployed by all service providers. Furthermore, the increasing prevalence of
-customer-owned, unmanaged CPEs, including devices running open-source firmware or custom projects,
+customer-owned, unmanaged CPE devices, including devices running open-source firmware or custom projects,
 limits the effectiveness of operator-managed configuration servers. A standardized DHCP option
 addresses this gap by providing a universal mechanism to explicitly signal available data rates
 directly from the DHCP server, across BNGs and access nodes, down to the CPE.
@@ -186,11 +186,10 @@ sub-option, encoded in the following manner:
 +------+------+------+------+------+------+--...-+------+
 ~~~
 
-No "pad" sub-option is defined, and the Information field shall NOT be terminated with a 255
-sub-option.  The length N of the Rate Information Option shall include all bytes of the sub-option
-code/length/value tuples. The length N of the sub-options shall be the number of octets in only that
-sub-option's value field.  A sub-option length may be zero.  The sub-options need not appear in
-sub-option code order.
+No "pad" sub-option is defined, and the rate information field SHALL NOT be terminated with a 255 sub-option.
+The length of OPTION_RATE MUST include all bytes of the sub-option code/length/value tuples.
+The length N of the sub-options MUST be the number of octets in only that sub-option's value field.
+A sub-option length MAY be zero. The sub-options need not appear in sub-option code order.
 
 The initial assignment of DHCP Rate Sub-options is as follows:
 
@@ -250,6 +249,11 @@ the variable overhead introduced by differing numbers of VLAN tags or tunnel enc
 
 In the absence of the Rate Type sub-option, the client MUST assume that the signaled values are
 defined as the Layer 2 rate.
+
+The values 0, 1, and 4-255 are currently unassigned and reserved for future use. If a client, server,
+or relay agent receives a Rate Type sub-option containing an unrecognized or reserved value, it MUST ignore
+that specific sub-option. In such cases, adhering to the default behavior for an absent Rate Type,
+the device MUST assume that the explicitly signaled upstream and downstream values are defined as Layer 2 rates.
 
 A client MAY include the Rate Type sub-option within its initial requests to serve as a hint to the
 server regarding its preferred calculation method (e.g., requesting a Layer 3 rate instead of a
@@ -322,7 +326,7 @@ utilize these extracted values to dynamically instantiate shapers and policers o
 subscriber-facing interfaces.
 
 Furthermore, a relay agent MAY add, modify, or remove the OPTION_RATE before forwarding the DHCP
-message to the client. This accommodates deployments where the relay agent (e.g. a BNG) is
+message to the client. This accommodates deployments where the relay agent (e.g., a BNG) is
 responsible for policy enforcement and populates or overrides the OPTION_RATE based on subscriber
 attributes retrieved directly from an external Authentication, Authorization, and Accounting (AAA)
 server, such as RADIUS.
@@ -441,7 +445,7 @@ lead either to persistent queues and excess latency when configured too high, or
 when configured too low.
 
 By explicitly signaling per-subscriber upstream and downstream rates via the DHCP Rate Option, this
-document enables CPEs, relay agents, and snooping switches to instantiate shapers and AQM instances
+document enables CPE devices, relay agents, and snooping switches to instantiate shapers and AQM instances
 that closely track the actual bottleneck capacity for each subscriber. Placing the bottleneck queue
 under control of an AQM that follows the recommendations in {{?RFC7567}} allows operators to limit
 queue growth and reduce queuing delay while still efficiently utilizing the contracted bandwidth.
@@ -546,4 +550,6 @@ IANA is requested to create a new registry titled "DHCP Rate Sub-Options".
 # Acknowledgments
 {:numbered="false"}
 
-TODO acknowledge.
+The authors would like to thank Glenn Deen and Jason Livingood for their valuable
+review comments and discussion, which helped to significantly improve the clarity,
+applicability, and operational guidance of this document.
