@@ -1730,7 +1730,7 @@ minor traffic burstiness from the CPE and prevents premature packet drops at the
 node. This capability to independently target different nodes along the forwarding path is unique to
 the nested relay header architecture of DHCPv6, as DHCPv4 lacks a comparable mechanism for addressing
 multiple relay agents distinctly.<a href="#section-5.3-2" class="pilcrow">¶</a></p>
-<p id="section-5.3-3">Furthermore, to dynamically update a client’s rate limits mid-lease, the server <span class="bcp14">MAY</span> utilize
+<p id="section-5.3-3">Furthermore, to dynamically update a client's rate limits mid-lease, the server <span class="bcp14">MAY</span> utilize
 RECONFIGURE messages to apply updates before the T1 timer expires. By triggering the client to
 initiate a Renew or Information-request transaction, this mechanism allows the server to push newly
 modified rate parameters without waiting for timer expiration.<a href="#section-5.3-3" class="pilcrow">¶</a></p>
@@ -1802,7 +1802,7 @@ underlying PPPoE session itself is terminated.<a href="#section-7-4" class="pilc
 <p id="section-8-1">Active Queue Management (AQM) mechanisms, as recommended in <span>[<a href="#RFC7567" class="cite xref">RFC7567</a>]</span>, are most effective when
 they operate at or near the true bottleneck rate for a given service. In many broadband deployments
 today, Customer Premises Equipment (CPE) and intermediate access nodes configure shaping and AQM
-parameters against the physical port speed rather than the subscriber’s provisioned rate, which can
+parameters against the physical port speed rather than the subscriber's provisioned rate, which can
 lead either to persistent queues and excess latency when configured too high, or to underutilization
 when configured too low.<a href="#section-8-1" class="pilcrow">¶</a></p>
 <p id="section-8-2">By explicitly signaling per-subscriber upstream and downstream rates via the DHCP Rate Option, this
@@ -1815,7 +1815,7 @@ queues under an L4S-compatible AQM and on congestion controllers that react prom
 Congestion Notification (ECN) signals. Providing accurate rate information to devices at or near the
 bottleneck link allows those devices to configure L4S-capable AQMs at the appropriate shaping rate,
 so that L4S flows can achieve consistently low queuing delay while still fully utilizing the
-subscriber’s provisioned service tier. The DHCP Rate Option defined in this document is therefore an
+subscriber's provisioned service tier. The DHCP Rate Option defined in this document is therefore an
 enabler for deploying L4S and other modern AQM schemes in access networks, even though the detailed
 design of AQM and congestion control algorithms remains outside the scope of this specification.<a href="#section-8-2" class="pilcrow">¶</a></p>
 </section>
@@ -1951,17 +1951,17 @@ DHCP Options" registry for OPTION_RATE.<a href="#section-13.1-1" class="pilcrow"
             <tr>
               <td class="text-right" rowspan="1" colspan="1">1</td>
               <td class="text-left" rowspan="1" colspan="1">Available Rate Upstream in Bits per second (bps)</td>
-              <td class="text-left" rowspan="1" colspan="1">[RFC-TBD]</td>
+              <td class="text-left" rowspan="1" colspan="1">RFC TBD2</td>
             </tr>
             <tr>
               <td class="text-right" rowspan="1" colspan="1">2</td>
               <td class="text-left" rowspan="1" colspan="1">Available Rate Downstream in Bits per second (bps)</td>
-              <td class="text-left" rowspan="1" colspan="1">[RFC-TBD]</td>
+              <td class="text-left" rowspan="1" colspan="1">RFC TBD2</td>
             </tr>
             <tr>
               <td class="text-right" rowspan="1" colspan="1">3</td>
               <td class="text-left" rowspan="1" colspan="1">Rate Type (L2, L3 or informational)</td>
-              <td class="text-left" rowspan="1" colspan="1">[RFC-TBD]</td>
+              <td class="text-left" rowspan="1" colspan="1">RFC TBD2</td>
             </tr>
             <tr>
               <td class="text-right" rowspan="1" colspan="1">4-255</td>

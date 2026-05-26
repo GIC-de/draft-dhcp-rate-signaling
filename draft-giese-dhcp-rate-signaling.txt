@@ -519,7 +519,7 @@ Table of Contents
    DHCPv6, as DHCPv4 lacks a comparable mechanism for addressing
    multiple relay agents distinctly.
 
-   Furthermore, to dynamically update a client’s rate limits mid-lease,
+   Furthermore, to dynamically update a client's rate limits mid-lease,
    the server MAY utilize RECONFIGURE messages to apply updates before
    the T1 timer expires.  By triggering the client to initiate a Renew
    or Information-request transaction, this mechanism allows the server
@@ -596,7 +596,7 @@ Table of Contents
    bottleneck rate for a given service.  In many broadband deployments
    today, Customer Premises Equipment (CPE) and intermediate access
    nodes configure shaping and AQM parameters against the physical port
-   speed rather than the subscriber’s provisioned rate, which can lead
+   speed rather than the subscriber's provisioned rate, which can lead
    either to persistent queues and excess latency when configured too
    high, or to underutilization when configured too low.
 
@@ -615,7 +615,7 @@ Table of Contents
    bottleneck link allows those devices to configure L4S-capable AQMs at
    the appropriate shaping rate, so that L4S flows can achieve
    consistently low queuing delay while still fully utilizing the
-   subscriber’s provisioned service tier.  The DHCP Rate Option defined
+   subscriber's provisioned service tier.  The DHCP Rate Option defined
    in this document is therefore an enabler for deploying L4S and other
    modern AQM schemes in access networks, even though the detailed
    design of AQM and congestion control algorithms remains outside the
@@ -745,13 +745,13 @@ Table of Contents
              +=======+===========================+===========+
              |     0 | Unassigned                |           |
              +-------+---------------------------+-----------+
-             |     1 | Available Rate Upstream   | [RFC-TBD] |
+             |     1 | Available Rate Upstream   | RFC TBD2  |
              |       | in Bits per second (bps)  |           |
              +-------+---------------------------+-----------+
-             |     2 | Available Rate Downstream | [RFC-TBD] |
+             |     2 | Available Rate Downstream | RFC TBD2  |
              |       | in Bits per second (bps)  |           |
              +-------+---------------------------+-----------+
-             |     3 | Rate Type (L2, L3 or      | [RFC-TBD] |
+             |     3 | Rate Type (L2, L3 or      | RFC TBD2  |
              |       | informational)            |           |
              +-------+---------------------------+-----------+
              | 4-255 | Unassigned                |           |
