@@ -195,15 +195,15 @@ The initial assignment of DHCP Rate Sub-options is as follows:
 
 | Sub-option Code | Length | Description                                        |
 | ---------------:| ------:| -------------------------------------------------- |
-|               1 |      8 | Available Rate Upstream in Bits per second (bps)   |
-|               2 |      8 | Available Rate Downstream in Bits per second (bps) |
+|               1 |      8 | Available Rate Upstream in bits per second (bps)   |
+|               2 |      8 | Available Rate Downstream in bits per second (bps) |
 |               3 |      1 | Rate Type (L2 or L3)                               |
 
 ## Sub-Options
 
 ### Available Rate Upstream
 
-The sub-option Available Rate Upstream defines the rate in Bits per second (bps) available from the
+The sub-option Available Rate Upstream defines the rate in bits per second (bps) available from the
 DHCP client towards the DHCP server direction. The rate format is a 64-bit unsigned integer in
 network byte order.
 
@@ -219,7 +219,7 @@ remove a previously set rate, thereby resetting to the device default configurat
 
 ### Available Rate Downstream
 
-The available rate downstream defines the rate in Bits per second (bps) available from the DHCP
+The available rate downstream defines the rate in bits per second (bps) available from the DHCP
 server towards the DHCP client direction. The rate format is a 64-bit unsigned integer in network byte order.
 
 ~~~
@@ -378,7 +378,7 @@ hint it originally sent.
 
 Clients MUST ignore the OPTION_RATE when received within a message other than REPLY. If the
 OPTION_RATE is present in an ADVERTISE message, the client MUST NOT apply the specified rate limits
-to its interfaces, however, the client MAY evaluate this early rate visibility as a selection
+to its interfaces. However, the client MAY evaluate this early rate visibility as a selection
 criterion to prefer one server's advertisement over another.
 
 ## DHCPv6 Server Behavior
@@ -573,8 +573,8 @@ IANA is requested to create a new registry titled "DHCP Rate Sub-Options".
 | Value | Description                                        | Reference |
 | ----: | :------------------------------------------------- | :-------- |
 |     0 | Unassigned                                         |           |
-|     1 | Available Rate Upstream in Bits per second (bps)   | RFC TBD2  |
-|     2 | Available Rate Downstream in Bits per second (bps) | RFC TBD2  |
+|     1 | Available Rate Upstream in bits per second (bps)   | RFC TBD2  |
+|     2 | Available Rate Downstream in bits per second (bps) | RFC TBD2  |
 |     3 | Rate Type (L2, L3 or informational)                | RFC TBD2  |
 | 4-255 | Unassigned                                         |           |
 
