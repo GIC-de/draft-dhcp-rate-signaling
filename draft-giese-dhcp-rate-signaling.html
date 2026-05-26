@@ -1361,7 +1361,7 @@ whereas auto-configuration servers exclusively target the end device. This metho
 integrates seamlessly with architectures where RADIUS servers inject DHCP options.<a href="#section-1.3-1" class="pilcrow">¶</a></p>
 <p id="section-1.3-2">Although primarily designed for IPoE deployments, this mechanism is equally applicable
 to Point-to-Point Protocol over Ethernet (PPPoE) <span>[<a href="#RFC2516" class="cite xref">RFC2516</a>]</span> environments. Since DHCP
-is frequently utilized over PPPoE, most notably for IPv6 Prefix Delegation. This option
+is frequently utilized over PPPoE, most notably for IPv6 Prefix Delegation, this option
 provides a standardized method for rate signaling. Consequently, this approach can supersede
 the fragmented, proprietary methods currently in use, such as embedding rate limits within
 PPP <span>[<a href="#RFC1661" class="cite xref">RFC1661</a>]</span> authentication reply messages.<a href="#section-1.3-2" class="pilcrow">¶</a></p>
@@ -1520,7 +1520,8 @@ remove a previously set rate, thereby resetting to the device default configurat
           <h4 id="name-available-rate-downstream">
 <a href="#section-3.2.2" class="section-number selfRef">3.2.2. </a><a href="#name-available-rate-downstream" class="section-name selfRef">Available Rate Downstream</a>
           </h4>
-<p id="section-3.2.2-1">The available rate downstream defines the rate in Bits per second (bps) available from the DHCP server towards the DHCP client direction. The rate format is a 64-bit unsigned integer in network byte order.<a href="#section-3.2.2-1" class="pilcrow">¶</a></p>
+<p id="section-3.2.2-1">The available rate downstream defines the rate in Bits per second (bps) available from the DHCP
+server towards the DHCP client direction. The rate format is a 64-bit unsigned integer in network byte order.<a href="#section-3.2.2-1" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="section-3.2.2-2">
 <pre>
  SubOpt   Len     Available Rate Downstream
@@ -1538,7 +1539,10 @@ remove a previously set rate, thereby resetting to the device default configurat
           <h4 id="name-rate-type">
 <a href="#section-3.2.3" class="section-number selfRef">3.2.3. </a><a href="#name-rate-type" class="section-name selfRef">Rate Type</a>
           </h4>
-<p id="section-3.2.3-1">The rate type defines the networking layer to which the stated rates apply. The default value of 2 is defined as the Layer 2 rate, which signifies that the rate encompasses the entire Ethernet frame. Implementations <span class="bcp14">SHOULD</span> calculate this rate using the Ethernet header and all payload, excluding the Ethernet Frame Check Sequence (FCS) and Inter-Packet Gap (IPG).<a href="#section-3.2.3-1" class="pilcrow">¶</a></p>
+<p id="section-3.2.3-1">The rate type defines the networking layer to which the stated rates apply. The default value of 2
+is defined as the Layer 2 rate, which signifies that the rate encompasses the entire Ethernet frame.
+Implementations <span class="bcp14">SHOULD</span> calculate this rate using the Ethernet header and all payload, excluding the
+Ethernet Frame Check Sequence (FCS) and Inter-Packet Gap (IPG).<a href="#section-3.2.3-1" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="section-3.2.3-2">
 <pre>
  SubOpt   Len   Rate Type
@@ -1547,20 +1551,27 @@ remove a previously set rate, thereby resetting to the device default configurat
 +------+------+------+
 </pre><a href="#section-3.2.3-2" class="pilcrow">¶</a>
 </div>
-<p id="section-3.2.3-3">If the rate type is set to 3, the rate applies to Layer 3, encompassing only the IP header and its
+<p id="section-3.2.3-3">If the rate type is set to 0, the explicitly signaled rates are informational only. Devices receiving this
+rate type <span class="bcp14">MUST NOT</span> apply the specified rate limits to their physical interfaces, traffic shapers, policers,
+or Active Queue Management (AQM) parameters. This value accommodates deployments where the network exposes
+the provisioned service tier to the Customer Premises Equipment (CPE) solely to populate user interfaces
+or for telemetry purposes, without altering the device's localized forwarding behavior.<a href="#section-3.2.3-3" class="pilcrow">¶</a></p>
+<p id="section-3.2.3-4">If the rate type is set to 3, the rate applies to Layer 3, encompassing only the IP header and its
 payload. This rate calculation is frequently utilized by end-user speed test applications and is
 often regarded as the marketable "product bandwidth". Its primary advantage is its independence from
-the variable overhead introduced by differing numbers of VLAN tags or tunnel encapsulations.<a href="#section-3.2.3-3" class="pilcrow">¶</a></p>
-<p id="section-3.2.3-4">In the absence of the Rate Type sub-option, the client <span class="bcp14">MUST</span> assume that the signaled values are
-defined as the Layer 2 rate.<a href="#section-3.2.3-4" class="pilcrow">¶</a></p>
-<p id="section-3.2.3-5">The values 0, 1, and 4-255 are currently unassigned and reserved for future use. If a client, server,
-or relay agent receives a Rate Type sub-option containing an unrecognized or reserved value, it <span class="bcp14">MUST</span> ignore
-that specific sub-option. In such cases, adhering to the default behavior for an absent Rate Type,
-the device <span class="bcp14">MUST</span> assume that the explicitly signaled upstream and downstream values are defined as Layer 2 rates.<a href="#section-3.2.3-5" class="pilcrow">¶</a></p>
-<p id="section-3.2.3-6">A client <span class="bcp14">MAY</span> include the Rate Type sub-option within its initial requests to serve as a hint to the
+the variable overhead introduced by differing numbers of VLAN tags or tunnel encapsulations.<a href="#section-3.2.3-4" class="pilcrow">¶</a></p>
+<p id="section-3.2.3-5">In the absence of the Rate Type sub-option, the client <span class="bcp14">MUST</span> assume that the signaled values are
+defined as the Layer 2 rate.<a href="#section-3.2.3-5" class="pilcrow">¶</a></p>
+<p id="section-3.2.3-6">The values 1 and 4-255 are currently unassigned and reserved for future use. If a client, server,
+or relay agent receives a Rate Type sub-option containing an unrecognized or reserved value,
+it <span class="bcp14">MUST</span> ignore the entire OPTION_RATE. Applying explicitly signaled rate limits without understanding
+the intended networking layer could result in incorrect localized traffic management. Therefore,
+to fail safely, the receiving device <span class="bcp14">MUST</span> discard the option entirely and rely on its default
+rate configuration.<a href="#section-3.2.3-6" class="pilcrow">¶</a></p>
+<p id="section-3.2.3-7">A client <span class="bcp14">MAY</span> include the Rate Type sub-option within its initial requests to serve as a hint to the
 server regarding its preferred calculation method (e.g., requesting a Layer 3 rate instead of a
 Layer 2 rate). Sending this hint is <span class="bcp14">OPTIONAL</span> for the client, and honoring the hint is <span class="bcp14">OPTIONAL</span>
-for the server.<a href="#section-3.2.3-6" class="pilcrow">¶</a></p>
+for the server.<a href="#section-3.2.3-7" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -1721,7 +1732,8 @@ the nested relay header architecture of DHCPv6, as DHCPv4 lacks a comparable mec
 multiple relay agents distinctly.<a href="#section-5.3-2" class="pilcrow">¶</a></p>
 <p id="section-5.3-3">Furthermore, to dynamically update a client’s rate limits mid-lease, the server <span class="bcp14">MAY</span> utilize
 RECONFIGURE messages to apply updates before the T1 timer expires. By triggering the client to
-initiate a Renew or Information-request transaction, this mechanism allows the server to push newly modified rate parameters without waiting for timer expiration.<a href="#section-5.3-3" class="pilcrow">¶</a></p>
+initiate a Renew or Information-request transaction, this mechanism allows the server to push newly
+modified rate parameters without waiting for timer expiration.<a href="#section-5.3-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="dhcpv6-relay-agent-behavior">
@@ -1771,11 +1783,15 @@ transport mechanism for the explicit DHCP Rate Option. While less prevalent in m
 DHCPv4 transactions operating within a PPPoE session <span class="bcp14">MAY</span> similarly convey these rate options.<a href="#section-7-1" class="pilcrow">¶</a></p>
 <p id="section-7-2">The foundational processing rules and client behavior for rate options received over PPPoE are
 identical to those defined for IP over Ethernet (IPoE) environments.<a href="#section-7-2" class="pilcrow">¶</a></p>
-<p id="section-7-3">Because the PPP session dictates the primary logical link state, the applied rate <span class="bcp14">MUST</span> revert to
+<p id="section-7-3">If a client receives rate limits embedded within the PPP authentication reply message and concurrently
+receives the DHCP OPTION_RATE, the explicitly signaled DHCP OPTION_RATE <span class="bcp14">MUST</span> take priority. This
+precedence ensures that the standardized, dynamic DHCP signaling supersedes fragmented or proprietary
+rate limits previously negotiated during the PPP authentication phase.<a href="#section-7-3" class="pilcrow">¶</a></p>
+<p id="section-7-4">Because the PPP session dictates the primary logical link state, the applied rate <span class="bcp14">MUST</span> revert to
 the device's default configuration under two specific conditions. First, the client <span class="bcp14">MUST</span> reset the
-applied limits if it receives a valid DHCP message explicitly signaling rate removal, such as an
-empty Rate Option or a sub-option containing a rate value of zero. Second, the rate <span class="bcp14">MUST</span> be
-implicitly revoked if the underlying PPPoE session itself is terminated.<a href="#section-7-3" class="pilcrow">¶</a></p>
+applied limits if it receives a valid DHCP message explicitly signaling rate removal with a
+sub-option containing a rate value of zero. Second, the rate <span class="bcp14">MUST</span> be implicitly revoked if the
+underlying PPPoE session itself is terminated.<a href="#section-7-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="interaction-with-aqm-and-l4s">
@@ -1811,13 +1827,18 @@ design of AQM and congestion control algorithms remains outside the scope of thi
       </h2>
 <p id="section-9-1">Clients receiving conflicting rate information across DHCPv4 and DHCPv6 protocols <span class="bcp14">SHOULD</span> apply the
 most recently received value.<a href="#section-9-1" class="pilcrow">¶</a></p>
-<p id="section-9-2">Clients and servers <span class="bcp14">MUST</span> ignore unrecognized sub-option codes and continue processing the rest of the
-Rate Option.<a href="#section-9-2" class="pilcrow">¶</a></p>
-<p id="section-9-3">If multiple instances of the same sub-option code are present, the last instance <span class="bcp14">MUST</span> be processed.<a href="#section-9-3" class="pilcrow">¶</a></p>
-<p id="section-9-4">A client may receive an OPTION_RATE indicating an Available Rate that exceeds the maximum physical
+<p id="section-9-2">To ensure forward compatibility, clients, servers, and relay agents <span class="bcp14">MUST</span> ignore unrecognized sub-option
+codes and continue processing the remainder of the Rate Option.<a href="#section-9-2" class="pilcrow">¶</a></p>
+<p id="section-9-3">Conversely, if a device receives a recognized sub-option containing an unrecognized or reserved value
+that dictates the fundamental interpretation of the rate parameters (such as an unassigned Rate Type),
+it <span class="bcp14">MUST</span> discard the entire OPTION_RATE. Applying explicitly signaled rates without understanding the
+intended networking layer could result in incorrect localized traffic management. In such cases,
+the device <span class="bcp14">MUST</span> rely on its default rate configuration.<a href="#section-9-3" class="pilcrow">¶</a></p>
+<p id="section-9-4">If multiple instances of the same sub-option code are present, the last instance <span class="bcp14">MUST</span> be processed.<a href="#section-9-4" class="pilcrow">¶</a></p>
+<p id="section-9-5">A client may receive an OPTION_RATE indicating an Available Rate that exceeds the maximum physical
 link speed of its upstream or downstream interfaces (e.g., signaling 2 Gbps to a CPE with a 1 Gbps
 WAN port). In such scenarios, the client <span class="bcp14">SHOULD</span> cap the applied traffic shaping, policing, or Active
-Queue Management (AQM) parameters to the maximum capacity of the physical link.<a href="#section-9-4" class="pilcrow">¶</a></p>
+Queue Management (AQM) parameters to the maximum capacity of the physical link.<a href="#section-9-5" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="operations">
@@ -1894,7 +1915,8 @@ for DHCPv4 and DHCPv6, if feasible.<a href="#section-13-1" class="pilcrow">¶</a
         <h3 id="name-dhcpv4-option">
 <a href="#section-13.1" class="section-number selfRef">13.1. </a><a href="#name-dhcpv4-option" class="section-name selfRef">DHCPv4 Option</a>
         </h3>
-<p id="section-13.1-1">IANA is requested to assign a new DHCP Option Code (TBD1) in the "BOOTP Vendor Extensions and DHCP Options" registry for OPTION_RATE.<a href="#section-13.1-1" class="pilcrow">¶</a></p>
+<p id="section-13.1-1">IANA is requested to assign a new DHCP Option Code (TBD1) in the "BOOTP Vendor Extensions and
+DHCP Options" registry for OPTION_RATE.<a href="#section-13.1-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="dhcpv6-option">
@@ -1911,6 +1933,43 @@ for DHCPv4 and DHCPv6, if feasible.<a href="#section-13-1" class="pilcrow">¶</a
 <a href="#section-13.3" class="section-number selfRef">13.3. </a><a href="#name-dhcp-rate-sub-options-regis" class="section-name selfRef">DHCP Rate Sub-Options Registry</a>
         </h3>
 <p id="section-13.3-1">IANA is requested to create a new registry titled "DHCP Rate Sub-Options".<a href="#section-13.3-1" class="pilcrow">¶</a></p>
+<table class="center" id="table-2">
+          <caption><a href="#table-2" class="selfRef">Table 2</a></caption>
+<thead>
+            <tr>
+              <th class="text-right" rowspan="1" colspan="1">Value</th>
+              <th class="text-left" rowspan="1" colspan="1">Description</th>
+              <th class="text-left" rowspan="1" colspan="1">Reference</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="text-right" rowspan="1" colspan="1">0</td>
+              <td class="text-left" rowspan="1" colspan="1">Unassigned</td>
+              <td class="text-left" rowspan="1" colspan="1"> </td>
+            </tr>
+            <tr>
+              <td class="text-right" rowspan="1" colspan="1">1</td>
+              <td class="text-left" rowspan="1" colspan="1">Available Rate Upstream in Bits per second (bps)</td>
+              <td class="text-left" rowspan="1" colspan="1">[RFC-TBD]</td>
+            </tr>
+            <tr>
+              <td class="text-right" rowspan="1" colspan="1">2</td>
+              <td class="text-left" rowspan="1" colspan="1">Available Rate Downstream in Bits per second (bps)</td>
+              <td class="text-left" rowspan="1" colspan="1">[RFC-TBD]</td>
+            </tr>
+            <tr>
+              <td class="text-right" rowspan="1" colspan="1">3</td>
+              <td class="text-left" rowspan="1" colspan="1">Rate Type (L2, L3 or informational)</td>
+              <td class="text-left" rowspan="1" colspan="1">[RFC-TBD]</td>
+            </tr>
+            <tr>
+              <td class="text-right" rowspan="1" colspan="1">4-255</td>
+              <td class="text-left" rowspan="1" colspan="1">Unassigned</td>
+              <td class="text-left" rowspan="1" colspan="1"> </td>
+            </tr>
+          </tbody>
+        </table>
 </section>
 </div>
 </section>
