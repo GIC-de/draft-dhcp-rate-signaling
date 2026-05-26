@@ -10,12 +10,12 @@ venue:
    github: GIC-de/draft-dhcp-rate-signaling
 
 author:
--  fullname: "Christian Giese"
-   organization: "RtBrick"
-   email: "christian@rtbrick.com"
--  fullname: "Richard Patterson"
-   organization: "Sky UK"
-   email: "Richard.Patterson@sky.uk"
+- fullname: "Christian Giese"
+  organization: "RtBrick"
+  email: "christian@rtbrick.com"
+- fullname: "Richard Patterson"
+  organization: "Sky UK"
+  email: "Richard.Patterson@sky.uk"
 
 informative:
    TR101:
@@ -400,7 +400,7 @@ node. This capability to independently target different nodes along the forwardi
 the nested relay header architecture of DHCPv6, as DHCPv4 lacks a comparable mechanism for addressing
 multiple relay agents distinctly.
 
-Furthermore, to dynamically update a client’s rate limits mid-lease, the server MAY utilize
+Furthermore, to dynamically update a client's rate limits mid-lease, the server MAY utilize
 RECONFIGURE messages to apply updates before the T1 timer expires. By triggering the client to
 initiate a Renew or Information-request transaction, this mechanism allows the server to push newly
 modified rate parameters without waiting for timer expiration.
@@ -458,7 +458,7 @@ underlying PPPoE session itself is terminated.
 Active Queue Management (AQM) mechanisms, as recommended in {{?RFC7567}}, are most effective when
 they operate at or near the true bottleneck rate for a given service. In many broadband deployments
 today, Customer Premises Equipment (CPE) and intermediate access nodes configure shaping and AQM
-parameters against the physical port speed rather than the subscriber’s provisioned rate, which can
+parameters against the physical port speed rather than the subscriber's provisioned rate, which can
 lead either to persistent queues and excess latency when configured too high, or to underutilization
 when configured too low.
 
@@ -472,7 +472,7 @@ queues under an L4S-compatible AQM and on congestion controllers that react prom
 Congestion Notification (ECN) signals. Providing accurate rate information to devices at or near the
 bottleneck link allows those devices to configure L4S-capable AQMs at the appropriate shaping rate,
 so that L4S flows can achieve consistently low queuing delay while still fully utilizing the
-subscriber’s provisioned service tier. The DHCP Rate Option defined in this document is therefore an
+subscriber's provisioned service tier. The DHCP Rate Option defined in this document is therefore an
 enabler for deploying L4S and other modern AQM schemes in access networks, even though the detailed
 design of AQM and congestion control algorithms remains outside the scope of this specification.
 
@@ -573,9 +573,9 @@ IANA is requested to create a new registry titled "DHCP Rate Sub-Options".
 | Value | Description                                        | Reference |
 | ----: | :------------------------------------------------- | :-------- |
 |     0 | Unassigned                                         |           |
-|     1 | Available Rate Upstream in Bits per second (bps)   | [RFC-TBD] |
-|     2 | Available Rate Downstream in Bits per second (bps) | [RFC-TBD] |
-|     3 | Rate Type (L2, L3 or informational)                | [RFC-TBD] |
+|     1 | Available Rate Upstream in Bits per second (bps)   | RFC TBD2  |
+|     2 | Available Rate Downstream in Bits per second (bps) | RFC TBD2  |
+|     3 | Rate Type (L2, L3 or informational)                | RFC TBD2  |
 | 4-255 | Unassigned                                         |           |
 
 --- back
