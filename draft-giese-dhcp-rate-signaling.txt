@@ -270,10 +270,10 @@ Table of Contents
          | Sub-option Code | Length | Description               |
          +=================+========+===========================+
          |               1 |      8 | Available Rate Upstream   |
-         |                 |        | in Bits per second (bps)  |
+         |                 |        | in bits per second (bps)  |
          +-----------------+--------+---------------------------+
          |               2 |      8 | Available Rate Downstream |
-         |                 |        | in Bits per second (bps)  |
+         |                 |        | in bits per second (bps)  |
          +-----------------+--------+---------------------------+
          |               3 |      1 | Rate Type (L2 or L3)      |
          +-----------------+--------+---------------------------+
@@ -284,7 +284,7 @@ Table of Contents
 
 3.2.1.  Available Rate Upstream
 
-   The sub-option Available Rate Upstream defines the rate in Bits per
+   The sub-option Available Rate Upstream defines the rate in bits per
    second (bps) available from the DHCP client towards the DHCP server
    direction.  The rate format is a 64-bit unsigned integer in network
    byte order.
@@ -300,7 +300,7 @@ Table of Contents
 
 3.2.2.  Available Rate Downstream
 
-   The available rate downstream defines the rate in Bits per second
+   The available rate downstream defines the rate in bits per second
    (bps) available from the DHCP server towards the DHCP client
    direction.  The rate format is a 64-bit unsigned integer in network
    byte order.
@@ -490,7 +490,7 @@ Table of Contents
    Clients MUST ignore the OPTION_RATE when received within a message
    other than REPLY.  If the OPTION_RATE is present in an ADVERTISE
    message, the client MUST NOT apply the specified rate limits to its
-   interfaces, however, the client MAY evaluate this early rate
+   interfaces.  However, the client MAY evaluate this early rate
    visibility as a selection criterion to prefer one server's
    advertisement over another.
 
@@ -746,10 +746,10 @@ Table of Contents
              |     0 | Unassigned                |           |
              +-------+---------------------------+-----------+
              |     1 | Available Rate Upstream   | RFC TBD2  |
-             |       | in Bits per second (bps)  |           |
+             |       | in bits per second (bps)  |           |
              +-------+---------------------------+-----------+
              |     2 | Available Rate Downstream | RFC TBD2  |
-             |       | in Bits per second (bps)  |           |
+             |       | in bits per second (bps)  |           |
              +-------+---------------------------+-----------+
              |     3 | Rate Type (L2, L3 or      | RFC TBD2  |
              |       | informational)            |           |

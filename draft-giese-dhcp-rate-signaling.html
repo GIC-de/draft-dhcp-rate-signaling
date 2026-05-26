@@ -1474,12 +1474,12 @@ A sub-option length <span class="bcp14">MAY</span> be zero. The sub-options need
             <tr>
               <td class="text-right" rowspan="1" colspan="1">1</td>
               <td class="text-right" rowspan="1" colspan="1">8</td>
-              <td class="text-left" rowspan="1" colspan="1">Available Rate Upstream in Bits per second (bps)</td>
+              <td class="text-left" rowspan="1" colspan="1">Available Rate Upstream in bits per second (bps)</td>
             </tr>
             <tr>
               <td class="text-right" rowspan="1" colspan="1">2</td>
               <td class="text-right" rowspan="1" colspan="1">8</td>
-              <td class="text-left" rowspan="1" colspan="1">Available Rate Downstream in Bits per second (bps)</td>
+              <td class="text-left" rowspan="1" colspan="1">Available Rate Downstream in bits per second (bps)</td>
             </tr>
             <tr>
               <td class="text-right" rowspan="1" colspan="1">3</td>
@@ -1500,7 +1500,7 @@ A sub-option length <span class="bcp14">MAY</span> be zero. The sub-options need
           <h4 id="name-available-rate-upstream">
 <a href="#section-3.2.1" class="section-number selfRef">3.2.1. </a><a href="#name-available-rate-upstream" class="section-name selfRef">Available Rate Upstream</a>
           </h4>
-<p id="section-3.2.1-1">The sub-option Available Rate Upstream defines the rate in Bits per second (bps) available from the
+<p id="section-3.2.1-1">The sub-option Available Rate Upstream defines the rate in bits per second (bps) available from the
 DHCP client towards the DHCP server direction. The rate format is a 64-bit unsigned integer in
 network byte order.<a href="#section-3.2.1-1" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="section-3.2.1-2">
@@ -1520,7 +1520,7 @@ remove a previously set rate, thereby resetting to the device default configurat
           <h4 id="name-available-rate-downstream">
 <a href="#section-3.2.2" class="section-number selfRef">3.2.2. </a><a href="#name-available-rate-downstream" class="section-name selfRef">Available Rate Downstream</a>
           </h4>
-<p id="section-3.2.2-1">The available rate downstream defines the rate in Bits per second (bps) available from the DHCP
+<p id="section-3.2.2-1">The available rate downstream defines the rate in bits per second (bps) available from the DHCP
 server towards the DHCP client direction. The rate format is a 64-bit unsigned integer in network byte order.<a href="#section-3.2.2-1" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="section-3.2.2-2">
 <pre>
@@ -1706,7 +1706,7 @@ and apply the rate type ultimately provided by the server in the REPLY message, 
 hint it originally sent.<a href="#section-5.2-3" class="pilcrow">¶</a></p>
 <p id="section-5.2-4">Clients <span class="bcp14">MUST</span> ignore the OPTION_RATE when received within a message other than REPLY. If the
 OPTION_RATE is present in an ADVERTISE message, the client <span class="bcp14">MUST NOT</span> apply the specified rate limits
-to its interfaces, however, the client <span class="bcp14">MAY</span> evaluate this early rate visibility as a selection
+to its interfaces. However, the client <span class="bcp14">MAY</span> evaluate this early rate visibility as a selection
 criterion to prefer one server's advertisement over another.<a href="#section-5.2-4" class="pilcrow">¶</a></p>
 </section>
 </div>
@@ -1950,12 +1950,12 @@ DHCP Options" registry for OPTION_RATE.<a href="#section-13.1-1" class="pilcrow"
             </tr>
             <tr>
               <td class="text-right" rowspan="1" colspan="1">1</td>
-              <td class="text-left" rowspan="1" colspan="1">Available Rate Upstream in Bits per second (bps)</td>
+              <td class="text-left" rowspan="1" colspan="1">Available Rate Upstream in bits per second (bps)</td>
               <td class="text-left" rowspan="1" colspan="1">RFC TBD2</td>
             </tr>
             <tr>
               <td class="text-right" rowspan="1" colspan="1">2</td>
-              <td class="text-left" rowspan="1" colspan="1">Available Rate Downstream in Bits per second (bps)</td>
+              <td class="text-left" rowspan="1" colspan="1">Available Rate Downstream in bits per second (bps)</td>
               <td class="text-left" rowspan="1" colspan="1">RFC TBD2</td>
             </tr>
             <tr>
