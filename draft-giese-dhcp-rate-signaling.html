@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta content="Common,Latin" name="scripts">
 <meta content="initial-scale=1.0" name="viewport">
-<title>DHCP Explicit Rate Signalling</title>
+<title>DHCP Explicit Rate Signaling</title>
 <meta content="Christian Giese" name="author">
 <meta content="Richard Patterson" name="author">
 <meta content="
@@ -22,7 +22,7 @@ to enable effective Active Queue Management (AQM) and the Low Latency,
 Low Loss, and Scalable Throughput (L4S) architecture. 
     " name="description">
 <meta content="xml2rfc 3.33.0" name="generator">
-<meta content="draft-giese-dhcp-rate-signalling-latest" name="ietf.draft">
+<meta content="draft-giese-dhcp-rate-signaling-latest" name="ietf.draft">
 <!-- Generator version information:
   xml2rfc 3.33.0
     Python 3.12.13
@@ -37,7 +37,7 @@ Low Loss, and Scalable Throughput (L4S) architecture.
     requests 2.33.1
     wcwidth 0.7.0
 -->
-<link href="draft-giese-dhcp-rate-signalling.xml" rel="alternate" type="application/rfc+xml">
+<link href="draft-giese-dhcp-rate-signaling.xml" rel="alternate" type="application/rfc+xml">
 <link href="#copyright" rel="license">
 <style type="text/css">@font-face {
   font-family: 'Lora';
@@ -302,16 +302,19 @@ h1, h2, h3, h4, h5, h6 {
   font-size-adjust: 0.5;
   color: var(--title-color);
 }
-h1#title {
-  font-size: 32px;
-  line-height: 40px;
-  clear: both;
-}
-h1#title, h1#rfcnum {
-  margin: 1.5em 0 0.2em;
-}
-h1#rfcnum + h1#title {
-  margin: 0.2em 0;
+h1 {
+  &#title {
+    font-size: 32px;
+    line-height: 40px;
+    clear: both;
+    margin: 1.5em 0 0.2em;
+  }
+  &#rfcnum {
+    margin: 1.5em 0 0.2em;
+    & + h1#title {
+      margin: 0.2em 0;
+    }
+  }
 }
 
 h1, h2, h3 {
@@ -331,10 +334,10 @@ h4, h5, h6 {
 #abstract+p {
   font-size: 18px;
   line-height: 24px;
-}
-#abstract+p code, #abstract+p samp, #abstract+p tt {
-  font-size: 16px;
-  line-height: 0;
+  & code, & samp, & tt {
+    font-size: 16px;
+    line-height: 0;
+  }
 }
 
 p {
@@ -345,59 +348,59 @@ p {
 div {
   margin: 0;
 }
-.alignRight.art-text {
-  background-color: var(--highlight-color);
-  border: 1px solid var(--line-color);
-  border-radius: 3px;
-  padding: 0.5em 1em 0;
-  margin-bottom: 0.5em;
-}
-.alignRight.art-text pre {
-  padding: 0;
-  width: auto;
-}
 .alignRight {
   margin: 1em 0;
-}
-.alignRight > *:first-child {
-  border: none;
-  margin: 0;
-  float: right;
-  clear: both;
-}
-.alignRight > *:nth-child(2) {
-  clear: both;
-  display: block;
-  border: none;
+  &.art-text {
+    background-color: var(--highlight-color);
+    border: 1px solid var(--line-color);
+    border-radius: 3px;
+    padding: 0.5em 1em 0;
+    margin-bottom: 0.5em;
+    & pre {
+      padding: 0;
+      width: auto;
+    }
+  }
+  & > *:first-child {
+    border: none;
+    margin: 0;
+    float: right;
+    clear: both;
+  }
+  & > *:nth-child(2) {
+    clear: both;
+    display: block;
+    border: none;
+  }
 }
 svg {
   display: block;
-}
-/* font-family isn't space-separated, but =~ will have to do */
-svg[font-family~="monospace" i], svg [font-family~="monospace" i] {
-  font-family: var(--font-mono);
-}
-.alignCenter.art-text {
-  background-color: var(--highlight-color);
-  border: 1px solid var(--line-color);
-  border-radius: 3px;
-  padding: 0.5em 1em 0;
-  margin-bottom: 0.5em;
-}
-.alignCenter.art-text pre {
-  padding: 0;
-  width: auto;
+  /* font-family isn't space-separated, but =~ will have to do */
+  &[font-family~="monospace" i], & [font-family~="monospace" i] {
+    font-family: var(--font-mono);
+  }
 }
 .alignCenter {
   margin: 1em 0;
-}
-.alignCenter > *:first-child {
-  border: none;
-  /* this isn't optimal, but it's an existence proof.  PrinceXML doesn't
-     support flexbox yet.
-  */
-  display: table;
-  margin: 0 auto;
+  &.art-text {
+    background-color: var(--highlight-color);
+    border: 1px solid var(--line-color);
+    border-radius: 3px;
+    padding: 0.5em 1em 0;
+    margin-bottom: 0.5em;
+    & pre {
+      padding: 0;
+      width: auto;
+    }
+  }
+  & > *:first-child {
+    border: none;
+    /* this isn't optimal, but it's an existence proof.  PrinceXML doesn't
+       support flexbox yet.
+    */
+    display: table;
+    margin: 0 auto;
+  }
 }
 
 /* lists */
@@ -435,26 +438,25 @@ dl {
     --indent: 5ch;
     & > dt {
       min-width: calc(var(--indent) - 2ch);
+      float: none;
     }
-  }
-  &.olPercent > dt {
-    float: none;
   }
 
   dl > dd > & {
     margin-top: 0.5em;
     margin-bottom: 0;
   }
-}
-dl:not(.dlNewline) > dt {
-  float: left;
-  margin-right: 2ch;
-  min-width: 8ch;
-}
-dl > dd {
-  margin-bottom: .8em;
-  margin-left: var(--indent) !important; /* stupid element overrides */
-  min-height: 2ex;
+
+  &:not(.dlNewline) > dt {
+    float: left;
+    margin-right: 2ch;
+    min-width: 8ch;
+  }
+  & > dd {
+    margin-bottom: .8em;
+    margin-left: var(--indent) !important; /* stupid element overrides */
+    min-height: 2ex;
+  }
 }
 :is(dl.compact, .dlCompact) > dd {
   margin-bottom: 0;
@@ -470,20 +472,22 @@ dl > dd {
 }
 
 /* links */
-a, a[href].selfRef:hover {
+a {
   text-decoration: none;
+  &[href] {
+    color: var(--link-color);
+    &:hover { text-decoration: underline; }
+    &.selfRef {
+      color: var(--text-color);
+      &:hover {
+        text-decoration: none;
+        background-color: var(--highlight-color);
+      }
+    }
+  }
 }
-a[href] {
-  color: var(--link-color);
-}
-a[href].selfRef, .iref + a[href].internal {
+.iref + a[href].internal {
   color: var(--text-color);
-}
-a[href]:hover {
-  text-decoration: underline;
-}
-a[href].selfRef:hover {
-  background-color: var(--highlight-color);
 }
 a.xref:is(.cite, .auto), :is(#status-of-memo, #copyright) a {
   white-space: nowrap;
@@ -519,9 +523,9 @@ img {
 figure {
   margin: 0.5em 0;
   padding: 0;
-}
-figure blockquote {
-  margin: 0.8em 0.4em 0.4em;
+  & blockquote {
+    margin: 0.8em 0.4em 0.4em;
+  }
 }
 figcaption, caption {
   font-style: italic;
@@ -531,17 +535,19 @@ figcaption, caption {
 }
 @media screen {
   /* Auto-collapse boilerplate. */
-  :is(#status-of-memo, #copyright) p {
-    margin: -2px 0;
-    max-height: 0;
-    transition: max-height 2s ease, margin 0.5s ease 0.5s;
-    overflow: hidden;
-  }
-  :is(#status-of-memo, #copyright):hover p,
-  :is(#status-of-memo, #copyright) h2:target ~ p {
-    margin: 0.5em 0;
-    max-height: 500px;
-    overflow: auto;
+  :is(#status-of-memo, #copyright) {
+    & p {
+      margin: -2px 0;
+      max-height: 0;
+      transition: max-height 2s ease, margin 0.5s ease 0.5s;
+      overflow: hidden;
+    }
+    &:hover p,
+    & h2:target ~ p {
+      margin: 0.5em 0;
+      max-height: 500px;
+      overflow: auto;
+    }
   }
   pre, svg {
     display: inline-block;
@@ -591,25 +597,17 @@ table {
   max-width: 100%;
   margin: 0 0 1em;
   border-collapse: collapse;
-}
-table.right {
-  margin-left: auto;
-}
-table.center {
-  margin-left: auto;
-  margin-right: auto;
-}
-table.left {
-  margin-right: auto;
-}
-table .text-left {
-  text-align: left;
-}
-table .text-center {
-  text-align: center;
-}
-table .text-right {
-  text-align: right;
+  &.right { margin-left: auto; }
+  &.center { margin-left: auto; margin-right: auto; }
+  &.left { margin-right: auto; }
+  & .text-left { text-align: left; }
+  & .text-center { text-align: center; }
+  & .text-right { text-align: right; }
+  & caption {
+    margin: 0;
+    padding: 3px 0 3px 1em;
+  }
+  & p { margin: 0; }
 }
 
 thead, tbody {
@@ -629,13 +627,6 @@ th {
 :is(tr:nth-child(2n+1), thead+tbody > tr:nth-child(2n)) > td {
   background-color: var(--highlight-color);
 }
-table caption {
-  margin: 0;
-  padding: 3px 0 3px 1em;
-}
-table p {
-  margin: 0;
-}
 
 /* pilcrow */
 a.pilcrow {
@@ -646,18 +637,16 @@ a.pilcrow {
     color: var(--pilcrow-weak);
     &:hover { text-decoration: none; }
   }
-}
-@media not print {
-  :hover > a.pilcrow, a.pilcrow:focus {
-    opacity: 1;
+  @media not print {
+    :hover > &, &:focus {
+      opacity: 1;
+    }
+    &[href]:hover {
+      color: var(--pilcrow-strong);
+      background-color: transparent;
+    }
   }
-  a.pilcrow[href]:hover {
-    color: var(--pilcrow-strong);
-    background-color: transparent;
-  }
-}
-@media print {
-  a.pilcrow {
+  @media print {
     display: none;
   }
 }
@@ -716,9 +705,9 @@ sub, sup {
   font-size: 0.9em;
   font-style: italic;
   margin-top: 2em;
-}
-.docInfo .prepared {
-  float: right;
+  & .prepared {
+    float: right;
+  }
 }
 
 /* table of contents */
@@ -808,23 +797,27 @@ hr.addr {
   max-width: calc(100% - 16px);
 }
 @media (min-width: 500px) {
-  #authors-addresses > section {
-    column-count: 2;
-    column-gap: 20px;
-  }
-  #authors-addresses > section > h2 {
-    column-span: all;
-  }
-  /* hack for break-inside: avoid-column */
-  #authors-addresses address {
-    display: inline-block;
-    break-inside: avoid-column;
+  #authors-addresses {
+    & > section {
+      column-count: 2;
+      column-gap: 20px;
+    }
+    & > section > h2 {
+      column-span: all;
+    }
+    /* hack for break-inside: avoid-column */
+    & address {
+      display: inline-block;
+      break-inside: avoid-column;
+    }
   }
 }
 
 /* Comments */
-.rfcEditorRemove p:first-of-type {
-  font-style: italic;
+.rfcEditorRemove {
+  & p:first-of-type {
+    font-style: italic;
+  }
 }
 .cref {
   background-color: rgba(249, 232, 105, 0.3);
@@ -835,19 +828,21 @@ hr.addr {
 }
 
 @media screen {
-  #toc nav {
-    font-family: var(--font-title);
-    font-weight: 360;
-    & > ul { margin-bottom: 2em; }
-    & ul {
-      margin: 0 0 0 4px;
-      & :is(p, li) {
-        margin: 2px 0;
+  #toc {
+    & nav {
+      font-family: var(--font-title);
+      font-weight: 360;
+      & > ul { margin-bottom: 2em; }
+      & ul {
+        margin: 0 0 0 4px;
+        & :is(p, li) {
+          margin: 2px 0;
+        }
       }
     }
-  }
-  #toc a.toplink {
-    float: right;
+    & a.toplink {
+      float: right;
+    }
   }
 }
 @media not screen {
@@ -868,54 +863,54 @@ hr.addr {
     margin: 0;
     border-bottom: 1px solid #ccc;
     opacity: 0.6;
-  }
-  #toc h2 {
-    margin: 0;
-    padding: 2px 0 2px 6px;
-    padding-right: 1em;
-    font-size: 18px;
-    line-height: 24px;
-    min-width: 190px;
-    text-align: right;
-    background-color: #444;
-    color: white;
-    cursor: pointer;
-    &::before { /* css hamburger */
-      float: right;
-      position: relative;
-      width: 1em;
-      height: 1px;
-      left: -164px;
-      margin: 8px 0 0 0;
-      background: white none repeat scroll 0 0;
-      box-shadow: 0 4px 0 0 white, 0 8px 0 0 white;
-      content: "";
+    & h2 {
+      margin: 0;
+      padding: 2px 0 2px 6px;
+      padding-right: 1em;
+      font-size: 18px;
+      line-height: 24px;
+      min-width: 190px;
+      text-align: right;
+      background-color: #444;
+      color: white;
+      cursor: pointer;
+      &::before { /* css hamburger */
+        float: right;
+        position: relative;
+        width: 1em;
+        height: 1px;
+        left: -164px;
+        margin: 8px 0 0 0;
+        background: white none repeat scroll 0 0;
+        box-shadow: 0 4px 0 0 white, 0 8px 0 0 white;
+        content: "";
+      }
     }
-  }
-  #toc nav {
-    display: none;
-    background-color: var(--background-color);
-    padding: 0.5em 1em 1em;
-    overflow: auto;
-    overscroll-behavior: contain;
-    height: calc(100vh - 48px);
-    border-left: 1px solid #ddd;
-  }
-  #toc.active {
-    opacity: 1;
-    & nav { display: block; }
-  }
-  /* Make the collapsed ToC header render white on gray also when it's a link */
-  #toc h2 a,
-  #toc h2 a:is(:link, :focus, :hover),
-  #toc a.toplink,
-  #toc a.toplink:hover {
-    color: white;
-    background-color: #444;
-    text-decoration: none;
-  }
-  #toc a.toplink {
-    margin: 2px 0.5em 0;
+    & nav {
+      display: none;
+      background-color: var(--background-color);
+      padding: 0.5em 1em 1em;
+      overflow: auto;
+      overscroll-behavior: contain;
+      height: calc(100vh - 48px);
+      border-left: 1px solid #ddd;
+    }
+    &.active {
+      opacity: 1;
+      & nav { display: block; }
+    }
+    /* Make the collapsed ToC header render white on gray also when it's a link */
+    & h2 a,
+    & h2 a:is(:link, :focus, :hover),
+    & a.toplink,
+    & a.toplink:hover {
+      color: white;
+      background-color: #444;
+      text-decoration: none;
+    }
+    & a.toplink {
+      margin: 2px 0.5em 0;
+    }
   }
 }
 
@@ -934,26 +929,26 @@ hr.addr {
     margin: 0;
     padding: 0;
     z-index: 1;
-  }
-  #toc h2 {
-    margin: 0;
-    padding: 0.25em 1em 1em 0;
-  }
-  #toc nav {
-    display: block;
-    height: calc(90vh - 84px);
-    bottom: 0;
-    padding: 0.5em 0 2em;
-    overflow: auto;
-    overscroll-behavior: contain;
-    scrollbar-width: thin;
+    & h2 {
+      margin: 0;
+      padding: 0.25em 1em 1em 0;
+    }
+    & nav {
+      display: block;
+      height: calc(90vh - 84px);
+      bottom: 0;
+      padding: 0.5em 0 2em;
+      overflow: auto;
+      overscroll-behavior: contain;
+      scrollbar-width: thin;
+    }
+    & a.toplink {
+      margin: 8px 0.5em 0;
+    }
   }
   img { /* future proofing */
     max-width: 100%;
     height: auto;
-  }
-  #toc a.toplink {
-    margin: 8px 0.5em 0;
   }
 }
 
@@ -969,12 +964,13 @@ hr.addr {
   #n-copyright-notice {
     border-bottom: none;
   }
-  #toc, #n-introduction {
-    page-break-before: always;
-  }
   #toc {
+    page-break-before: always;
     border-top: none;
     padding-top: 0;
+  }
+  #n-introduction {
+    page-break-before: always;
   }
   figure, pre, .vcard {
     page-break-inside: avoid;
@@ -1036,17 +1032,19 @@ hr.addr {
 }
 
 /* SVG Trick: a prefix match works because only black and white are allowed */
-svg :is([stroke="black"], [stroke^="#000"]) {
-  stroke: var(--text-color);
-}
-svg :is([stroke="white"], [stroke^="#fff"]) {
-  stroke: var(--background-color);
-}
-svg :is([fill="black"], [fill^="#000"], :not([fill])) {
-  fill: var(--text-color);
-}
-svg :is([fill="white"], [fill^="#fff"]) {
-  fill: var(--background-color);
+svg {
+  & :is([stroke="black"], [stroke^="#000"]) {
+    stroke: var(--text-color);
+  }
+  & :is([stroke="white"], [stroke^="#fff"]) {
+    stroke: var(--background-color);
+  }
+  & :is([fill="black"], [fill^="#000"], :not([fill])) {
+    fill: var(--text-color);
+  }
+  & :is([fill="white"], [fill^="#fff"]) {
+    fill: var(--background-color);
+  }
 }
 </style>
 
@@ -1055,12 +1053,12 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <table class="ears">
 <thead><tr>
 <td class="left">Internet-Draft</td>
-<td class="center">DHCP Explicit Rate Signalling</td>
+<td class="center">DHCP Explicit Rate Signaling</td>
 <td class="right">May 2026</td>
 </tr></thead>
 <tfoot><tr>
 <td class="left">Giese &amp; Patterson</td>
-<td class="center">Expires 23 November 2026</td>
+<td class="center">Expires 27 November 2026</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1070,15 +1068,15 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <dt class="label-workgroup">Workgroup:</dt>
 <dd class="workgroup">Network Working Group</dd>
 <dt class="label-internet-draft">Internet-Draft:</dt>
-<dd class="internet-draft">draft-giese-dhcp-rate-signalling-latest</dd>
+<dd class="internet-draft">draft-giese-dhcp-rate-signaling-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2026-05-22" class="published">22 May 2026</time>
+<time datetime="2026-05-26" class="published">26 May 2026</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Informational</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2026-11-23">23 November 2026</time></dd>
+<dd class="expires"><time datetime="2026-11-27">27 November 2026</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1092,7 +1090,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
 </dd>
 </dl>
 </div>
-<h1 id="title">DHCP Explicit Rate Signalling</h1>
+<h1 id="title">DHCP Explicit Rate Signaling</h1>
 <section id="section-abstract">
       <h2 id="abstract"><a href="#abstract" class="selfRef">Abstract</a></h2>
 <p id="section-abstract-1">This document defines new Dynamic Host Configuration Protocol (DHCP)
@@ -1114,9 +1112,9 @@ Low Loss, and Scalable Throughput (L4S) architecture.<a href="#section-abstract-
       </h2>
 <p id="section-note.1-1">This note is to be removed before publishing as an RFC.<a href="#section-note.1-1" class="pilcrow">¶</a></p>
 <p id="section-note.1-2">
-        Status information for this document may be found at <span><a href="https://datatracker.ietf.org/doc/draft-giese-dhcp-rate-signalling/">https://datatracker.ietf.org/doc/draft-giese-dhcp-rate-signalling/</a></span>.<a href="#section-note.1-2" class="pilcrow">¶</a></p>
+        Status information for this document may be found at <span><a href="https://datatracker.ietf.org/doc/draft-giese-dhcp-rate-signaling/">https://datatracker.ietf.org/doc/draft-giese-dhcp-rate-signaling/</a></span>.<a href="#section-note.1-2" class="pilcrow">¶</a></p>
 <p id="section-note.1-3">Source for this draft and an issue tracker can be found at
-        <span><a href="https://github.com/GIC-de/draft-dhcp-rate-signalling">https://github.com/GIC-de/draft-dhcp-rate-signalling</a></span>.<a href="#section-note.1-3" class="pilcrow">¶</a></p>
+        <span><a href="https://github.com/GIC-de/draft-dhcp-rate-signaling">https://github.com/GIC-de/draft-dhcp-rate-signaling</a></span>.<a href="#section-note.1-3" class="pilcrow">¶</a></p>
 </section>
 <div id="status-of-memo">
 <section id="section-boilerplate.1">
@@ -1137,7 +1135,7 @@ Low Loss, and Scalable Throughput (L4S) architecture.<a href="#section-abstract-
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 23 November 2026.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 27 November 2026.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1354,7 +1352,7 @@ improves end-to-end transport performance.<a href="#section-1.2-3" class="pilcro
         </h3>
 <p id="section-1.3-1">While auto-configuration protocols such as TR-069 <span>[<a href="#TR069" class="cite xref">TR069</a>]</span> can provision rate information, they are
 not universally deployed by all service providers. Furthermore, the increasing prevalence of
-customer-owned, unmanaged CPEs, including devices running open-source firmware or custom projects,
+customer-owned, unmanaged CPE devices, including devices running open-source firmware or custom projects,
 limits the effectiveness of operator-managed configuration servers. A standardized DHCP option
 addresses this gap by providing a universal mechanism to explicitly signal available data rates
 directly from the DHCP server, across BNGs and access nodes, down to the CPE.
@@ -1458,11 +1456,10 @@ sub-option, encoded in the following manner:<a href="#section-3.1-1" class="pilc
 +------+------+------+------+------+------+--...-+------+
 </pre><a href="#section-3.1-2" class="pilcrow">¶</a>
 </div>
-<p id="section-3.1-3">No "pad" sub-option is defined, and the Information field shall NOT be terminated with a 255
-sub-option.  The length N of the Rate Information Option shall include all bytes of the sub-option
-code/length/value tuples. The length N of the sub-options shall be the number of octets in only that
-sub-option's value field.  A sub-option length may be zero.  The sub-options need not appear in
-sub-option code order.<a href="#section-3.1-3" class="pilcrow">¶</a></p>
+<p id="section-3.1-3">No "pad" sub-option is defined, and the rate information field <span class="bcp14">SHALL NOT</span> be terminated with a 255 sub-option.
+The length of OPTION_RATE <span class="bcp14">MUST</span> include all bytes of the sub-option code/length/value tuples.
+The length N of the sub-options <span class="bcp14">MUST</span> be the number of octets in only that sub-option's value field.
+A sub-option length <span class="bcp14">MAY</span> be zero. The sub-options need not appear in sub-option code order.<a href="#section-3.1-3" class="pilcrow">¶</a></p>
 <p id="section-3.1-4">The initial assignment of DHCP Rate Sub-options is as follows:<a href="#section-3.1-4" class="pilcrow">¶</a></p>
 <table class="center" id="table-1">
           <caption><a href="#table-1" class="selfRef">Table 1</a></caption>
@@ -1556,10 +1553,14 @@ often regarded as the marketable "product bandwidth". Its primary advantage is i
 the variable overhead introduced by differing numbers of VLAN tags or tunnel encapsulations.<a href="#section-3.2.3-3" class="pilcrow">¶</a></p>
 <p id="section-3.2.3-4">In the absence of the Rate Type sub-option, the client <span class="bcp14">MUST</span> assume that the signaled values are
 defined as the Layer 2 rate.<a href="#section-3.2.3-4" class="pilcrow">¶</a></p>
-<p id="section-3.2.3-5">A client <span class="bcp14">MAY</span> include the Rate Type sub-option within its initial requests to serve as a hint to the
+<p id="section-3.2.3-5">The values 0, 1, and 4-255 are currently unassigned and reserved for future use. If a client, server,
+or relay agent receives a Rate Type sub-option containing an unrecognized or reserved value, it <span class="bcp14">MUST</span> ignore
+that specific sub-option. In such cases, adhering to the default behavior for an absent Rate Type,
+the device <span class="bcp14">MUST</span> assume that the explicitly signaled upstream and downstream values are defined as Layer 2 rates.<a href="#section-3.2.3-5" class="pilcrow">¶</a></p>
+<p id="section-3.2.3-6">A client <span class="bcp14">MAY</span> include the Rate Type sub-option within its initial requests to serve as a hint to the
 server regarding its preferred calculation method (e.g., requesting a Layer 3 rate instead of a
 Layer 2 rate). Sending this hint is <span class="bcp14">OPTIONAL</span> for the client, and honoring the hint is <span class="bcp14">OPTIONAL</span>
-for the server.<a href="#section-3.2.3-5" class="pilcrow">¶</a></p>
+for the server.<a href="#section-3.2.3-6" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -1644,7 +1645,7 @@ DHCPACK messages traversing the network. Relay agents that perform localized tra
 utilize these extracted values to dynamically instantiate shapers and policers on their
 subscriber-facing interfaces.<a href="#section-4.4-1" class="pilcrow">¶</a></p>
 <p id="section-4.4-2">Furthermore, a relay agent <span class="bcp14">MAY</span> add, modify, or remove the OPTION_RATE before forwarding the DHCP
-message to the client. This accommodates deployments where the relay agent (e.g. a BNG) is
+message to the client. This accommodates deployments where the relay agent (e.g., a BNG) is
 responsible for policy enforcement and populates or overrides the OPTION_RATE based on subscriber
 attributes retrieved directly from an external Authentication, Authorization, and Accounting (AAA)
 server, such as RADIUS.<a href="#section-4.4-2" class="pilcrow">¶</a></p>
@@ -1789,7 +1790,7 @@ parameters against the physical port speed rather than the subscriber’s provis
 lead either to persistent queues and excess latency when configured too high, or to underutilization
 when configured too low.<a href="#section-8-1" class="pilcrow">¶</a></p>
 <p id="section-8-2">By explicitly signaling per-subscriber upstream and downstream rates via the DHCP Rate Option, this
-document enables CPEs, relay agents, and snooping switches to instantiate shapers and AQM instances
+document enables CPE devices, relay agents, and snooping switches to instantiate shapers and AQM instances
 that closely track the actual bottleneck capacity for each subscriber. Placing the bottleneck queue
 under control of an AQM that follows the recommendations in <span>[<a href="#RFC7567" class="cite xref">RFC7567</a>]</span> allows operators to limit
 queue growth and reduce queuing delay while still efficiently utilizing the contracted bandwidth.
@@ -2000,7 +2001,9 @@ for DHCPv4 and DHCPv6, if feasible.<a href="#section-13-1" class="pilcrow">¶</a
       <h2 id="name-acknowledgments">
 <a href="#name-acknowledgments" class="section-name selfRef">Acknowledgments</a>
       </h2>
-<p id="appendix-A-1">TODO acknowledge.<a href="#appendix-A-1" class="pilcrow">¶</a></p>
+<p id="appendix-A-1">The authors would like to thank Glenn Deen and Jason Livingood for their valuable
+review comments and discussion, which helped to significantly improve the clarity,
+applicability, and operational guidance of this document.<a href="#appendix-A-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="authors-addresses">
