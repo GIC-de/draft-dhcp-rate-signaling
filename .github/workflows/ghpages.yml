@@ -22,14 +22,6 @@ jobs:
       contents: write
       pull-requests: write
     steps:
-    - name: Install Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: 'node'
-
-    - name: Install aasvg
-      run: npm install -g aasvg@0.4.3
-
     - name: "Checkout"
       uses: actions/checkout@v6
 
