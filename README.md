@@ -1,19 +1,19 @@
 <!-- regenerate: on (set to off if you edit this file) -->
 
-# DHCP Explicit Rate Signalling
+# DHCP Explicit Rate Signaling
 
-This is the working area for the individual Internet-Draft, "DHCP Explicit Rate Signalling".
+This is the working area for the individual Internet-Draft, "DHCP Explicit Rate Signaling".
 
-* [Editor's Copy](https://GIC-de.github.io/draft-dhcp-rate-signalling/#go.draft-giese-intarea-dhcp-rate-signalling.html)
-* [Datatracker Page](https://datatracker.ietf.org/doc/draft-giese-intarea-dhcp-rate-signalling)
-* [Individual Draft](https://datatracker.ietf.org/doc/html/draft-giese-intarea-dhcp-rate-signalling)
-* [Compare Editor's Copy to Individual Draft](https://GIC-de.github.io/draft-dhcp-rate-signalling/#go.draft-giese-intarea-dhcp-rate-signalling.diff)
+* [Editor's Copy](https://GIC-de.github.io/draft-dhcp-rate-signaling/#go.draft-giese-intarea-dhcp-rate-signaling.html)
+* [Datatracker Page](https://datatracker.ietf.org/doc/draft-giese-intarea-dhcp-rate-signaling)
+* [Individual Draft](https://datatracker.ietf.org/doc/html/draft-giese-intarea-dhcp-rate-signaling)
+* [Compare Editor's Copy to Individual Draft](https://GIC-de.github.io/draft-dhcp-rate-signaling/#go.draft-giese-intarea-dhcp-rate-signaling.diff)
 
 
 ## Contributing
 
 See the
-[guidelines for contributions](https://github.com/GIC-de/draft-dhcp-rate-signalling/blob/main/CONTRIBUTING.md).
+[guidelines for contributions](https://github.com/GIC-de/draft-dhcp-rate-signaling/blob/main/CONTRIBUTING.md).
 
 The contributing file also has tips on how to make contributions, if you
 don't already know how to do that.
