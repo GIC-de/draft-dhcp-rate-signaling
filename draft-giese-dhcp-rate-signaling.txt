@@ -249,13 +249,13 @@ Table of Contents
    Value tuples for each sub-option, encoded in the following manner:
 
     SubOpt  Len     Sub-option Value
-   +------+------+------+------+------+------+--...-+------+
-   |  1   |   N  |  s1  |  s2  |  s3  |  s4  |      |  sN  |
-   +------+------+------+------+------+------+--...-+------+
+   +------+------+------+------+------+--...-+------+
+   |  1   |   N  |  s1  |  s2  |  s3  |      |  sN  |
+   +------+------+------+------+------+--...-+------+
     SubOpt  Len     Sub-option Value
-   +------+------+------+------+------+------+--...-+------+
-   |  2   |   N  |  i1  |  i2  |  i3  |  i4  |      |  iN  |
-   +------+------+------+------+------+------+--...-+------+
+   +------+------+------+------+------+--...-+------+
+   |  2   |   N  |  i1  |  i2  |  i3  |      |  iN  |
+   +------+------+------+------+------+--...-+------+
 
    No "pad" sub-option is defined, and the rate information field SHALL
    NOT be terminated with a 255 sub-option.  The length of OPTION_RATE
@@ -370,9 +370,9 @@ Table of Contents
    The DHCPv4 OPTION_RATE code is TBD1.
 
     Code   Len     Rate Information Field
-   +------+------+------+------+------+------+--...-+------+
-   | TBD1 | N    |  i1  |  i2  |  i3  |  i4  |      |  iN  |
-   +------+------+------+------+------+------+--...-+------+
+   +------+------+------+------+------+--...-+------+
+   | TBD1 | N    |  i1  |  i2  |  i3  |      |  iN  |
+   +------+------+------+------+------+--...-+------+
 
    The length (N) gives the total number of octets in the Rate
    Information Field, which is either zero or longer than 2 bytes, which
