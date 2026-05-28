@@ -1,7 +1,7 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-05-26T02:05:37.608430+00:00",
-  "repo": "GIC-de/draft-dhcp-rate-signalling",
+  "timestamp": "2026-05-28T01:57:42.188066+00:00",
+  "repo": "GIC-de/draft-dhcp-rate-signaling",
   "labels": [
     {
       "name": "bug",
@@ -49,6 +49,61 @@
       "color": "ffffff"
     }
   ],
-  "issues": [],
+  "issues": [
+    {
+      "number": 1,
+      "id": "I_kwDOSj3KQc8AAAABDgPt1g",
+      "title": "DHCPv6 Sub-Options Format",
+      "url": "https://github.com/GIC-de/draft-dhcp-rate-signaling/issues/1",
+      "state": "OPEN",
+      "author": "GIC-de",
+      "authorAssociation": "OWNER",
+      "assignees": [
+        "GIC-de"
+      ],
+      "labels": [],
+      "body": "Bernie Volz from DHC Working Group proposes that the OPTION_RATE  DHCPv6 sub-options utilize a two-byte format for both the sub-option code and the sub-option length. This aligns sub-option formatting with the standard DHCPv6 option structure defined in RFC 8415, necessitating updates to existing text regarding minimum DHCPv6 option lengths.\n\nWhile this approach introduces a structural difference between the corresponding OPTION_RATE DHCPv4 sub-options (which use single-byte fields) and OPTION_RATE  DHCPv6 sub-options, both protocols can continue to share the same registry of sub-option values. Standardizing on a uniform two-byte encoding/decoding structure for all DHCPv6 options simplifies implementation and eliminates the need for specialized parsing logic when introducing new options.",
+      "createdAt": "2026-05-27T06:35:04Z",
+      "updatedAt": "2026-05-27T06:35:04Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 2,
+      "id": "I_kwDOSj3KQc8AAAABDgQ6Lw",
+      "title": "DHCPv4/v6 Code Points (TBD1 and 2)",
+      "url": "https://github.com/GIC-de/draft-dhcp-rate-signaling/issues/2",
+      "state": "OPEN",
+      "author": "GIC-de",
+      "authorAssociation": "OWNER",
+      "assignees": [
+        "GIC-de"
+      ],
+      "labels": [],
+      "body": "Using a single placeholder (TBD1) for both the DHCPv4 and DHCPv6 option codes incorrectly implies that IANA will assign the identical numeric value to both. While this alignment is highly desired, it cannot be guaranteed during allocation. Therefore, this document should use distinct placeholders, TBD1 for DHCPv4 and TBD2 for DHCPv6, to avoid making assumptions. A note should been added to the IANA Considerations section requesting that IANA assign the same numeric value to both protocols if possible.",
+      "createdAt": "2026-05-27T06:38:23Z",
+      "updatedAt": "2026-05-27T06:41:50Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 3,
+      "id": "I_kwDOSj3KQc8AAAABDgSOhw",
+      "title": "Zero Length Options",
+      "url": "https://github.com/GIC-de/draft-dhcp-rate-signaling/issues/3",
+      "state": "OPEN",
+      "author": "GIC-de",
+      "authorAssociation": "OWNER",
+      "assignees": [
+        "GIC-de"
+      ],
+      "labels": [],
+      "body": "We should consider to not allow 0-length options. If we decide to allow them, we need to document exactly how a 0-length option differs from simply omitting the option altogether. If there is a deliberate semantic difference between an absent option and a 0-length option in a response, we must explicitly define that behavior in the draft.",
+      "createdAt": "2026-05-27T06:41:41Z",
+      "updatedAt": "2026-05-27T06:41:41Z",
+      "closedAt": null,
+      "comments": []
+    }
+  ],
   "pulls": []
 }
