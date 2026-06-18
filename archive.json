@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-06-16T02:41:29.029811+00:00",
+  "timestamp": "2026-06-18T02:36:05.143078+00:00",
   "repo": "GIC-de/draft-dhcp-rate-signaling",
   "labels": [
     {
@@ -103,7 +103,54 @@
       "updatedAt": "2026-05-27T06:41:41Z",
       "closedAt": null,
       "comments": []
+    },
+    {
+      "number": 5,
+      "id": "I_kwDOSj3KQc8AAAABFtEIww",
+      "title": "Rate Conflicts",
+      "url": "https://github.com/GIC-de/draft-dhcp-rate-signaling/issues/5",
+      "state": "OPEN",
+      "author": "GIC-de",
+      "authorAssociation": "OWNER",
+      "assignees": [
+        "GIC-de"
+      ],
+      "labels": [],
+      "body": "In the current draft-00, the guidance for handling conflicting rate information between DHCPv4 and DHCPv6 states that clients \"SHOULD apply the most recently received value\". However, in dual-stack environments where DHCP transactions often complete asynchronously, this approach can easily lead to a race condition. Depending on which protocol finishes its transaction last, the applied rate could flap unpredictably between the two values.\n\nTo guarantee a deterministic state and prevent this flapping, we should update the draft to dictate a strict hierarchy. The primary recommendation is to mandate that clients SHOULD explicitly prefer the DHCPv6 rate over the DHCPv4 rate. \n\nDictating a strict preference, however, introduces a new edge case regarding lease expirations that the draft needs to address. For instance, if a client prefers the DHCPv6 rate, we need to define what happens when that DHCPv6 lease expires while the DHCPv4 lease remains active. If the client simply retains the expired DHCPv6 rate indefinitely, the still-active DHCPv4 lease will never be able to step in and overwrite it.\n\nTo resolve this, clients should be required to store the learned rate alongside its source protocol. If the currently applied rate was sourced from DHCPv6 and that specific lease expires, the client needs to check if a valid DHCPv4 lease is still active. If it is, the active rate source effectively \"demotes\" to DHCPv4. While the applied rate itself temporarily remains the last value learned from DHCPv6, shifting the source ownership to DHCPv4 ensures that any subsequent DHCPv4 transactions can successfully update and overwrite that rate. On the other hand, if the preferred lease expires and there is no active secondary DHCPv4 lease to fall back on, the rate should simply reset to the device's default configuration.",
+      "createdAt": "2026-06-16T20:44:34Z",
+      "updatedAt": "2026-06-16T20:44:36Z",
+      "closedAt": null,
+      "comments": []
     }
   ],
-  "pulls": []
+  "pulls": [
+    {
+      "number": 4,
+      "id": "PR_kwDOSj3KQc7nLPcT",
+      "title": "updates for draft 01 (WIP)",
+      "url": "https://github.com/GIC-de/draft-dhcp-rate-signaling/pull/4",
+      "state": "OPEN",
+      "author": "GIC-de",
+      "authorAssociation": "OWNER",
+      "assignees": [
+        "GIC-de"
+      ],
+      "labels": [],
+      "body": "+ Zero Length Options (#1)\r\n+ DHCPv4/v6 Code Points (TBD1 and 2) (#2)\r\n+ DHCPv6 Sub-Options Format (#3)",
+      "createdAt": "2026-06-16T20:03:12Z",
+      "updatedAt": "2026-06-16T20:03:12Z",
+      "baseRepository": "GIC-de/draft-dhcp-rate-signaling",
+      "baseRefName": "main",
+      "baseRefOid": "548653231f04bceeeb1d2c6afb8d845509bc1785",
+      "headRepository": "GIC-de/draft-dhcp-rate-signaling",
+      "headRefName": "christian_01",
+      "headRefOid": "8a120adc024a69673fadbf9672f0b10d18fa14ef",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": []
+    }
+  ]
 }
