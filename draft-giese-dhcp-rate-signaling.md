@@ -210,7 +210,7 @@ The initial assignment of DHCP Rate Sub-options is as follows:
 
 | Code | Length | Description                                        |
 |-----:| ------:| -------------------------------------------------- |
-|    0 |      - | Unassigned                                         |
+|    0 |      - | Reserved                                         |
 |    1 |      8 | Available Rate Upstream in bits per second (bps)   |
 |    2 |      8 | Available Rate Downstream in bits per second (bps) |
 |    3 |      1 | Rate Type (L2 or L3)                               |
