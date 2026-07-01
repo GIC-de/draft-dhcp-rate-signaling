@@ -116,7 +116,7 @@ Table of Contents
 
    In typical broadband access networks, the Customer Premises Equipment
    (CPE) is often unaware of the actual available data rates.  This lack
-   of visibility may occurs when an external modem or Optical Network
+   of visibility may occur when an external modem or Optical Network
    Terminal (ONT) [G.984.1] connects to the CPE at a physical link speed
    that significantly exceeds the subscriber's provisioned service rate.
    Furthermore, operators commonly deploy unified access profiles where
