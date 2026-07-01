@@ -246,7 +246,7 @@ Table of Contents
 3.1.  Sub-Options Format
 
    The rate information field consists of a sequence of sub-option
-   (SubOpt) Code/Length/Value tuples.  Because the field sizing diverges
+   (SubOpt) Code/Length/Value tuples.  Because the field sizing differs
    between the two protocols to align with their respective base
    specifications, the sub-options are encoded as follows:
 
