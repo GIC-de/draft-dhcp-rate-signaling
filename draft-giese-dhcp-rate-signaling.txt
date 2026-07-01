@@ -5,8 +5,8 @@
 Network Working Group                                           C. Giese
 Internet-Draft                                                   RtBrick
 Intended status: Informational                              R. Patterson
-Expires: 27 November 2026                                         Sky UK
-                                                             26 May 2026
+Expires: 2 January 2027                                           Sky UK
+                                                             1 July 2026
 
 
                       DHCP Explicit Rate Signaling
@@ -53,7 +53,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 27 November 2026.
+   This Internet-Draft will expire on 2 January 2027.
 
 Copyright Notice
 
@@ -103,6 +103,7 @@ Table of Contents
      13.1.  DHCPv4 Option
      13.2.  DHCPv6 Option
      13.3.  DHCP Rate Sub-Options Registry
+     13.4.  DHCP Rate Types Registry
    14. References
      14.1.  Normative References
      14.2.  Informative References
@@ -115,7 +116,7 @@ Table of Contents
 
    In typical broadband access networks, the Customer Premises Equipment
    (CPE) is often unaware of the actual available data rates.  This lack
-   of visibility often occurs when an external modem or Optical Network
+   of visibility may occur when an external modem or Optical Network
    Terminal (ONT) [G.984.1] connects to the CPE at a physical link speed
    that significantly exceeds the subscriber's provisioned service rate.
    Furthermore, operators commonly deploy unified access profiles where
@@ -226,57 +227,69 @@ Table of Contents
 
 3.  DHCP Rate Option
 
-   The DHCP Rate Option specified in this document employs a unified
-   sub-option structure for both DHCPv4 and DHCPv6, utilizing the format
-   explicitly known from DHCPv4 Option 82 (the Relay Agent Information
-   Option) [RFC3046].  The top-level option encapsulation strictly
-   conforms to the requirements of each base protocol.  To simplify
-   cross-protocol implementation, this document proposes the uniform
-   assignment of OPTION_RATE with the option code TBD1 (value to be
-   assigned by IANA) for both IP versions.  Specifically, DHCPv4
-   utilizes an 8-bit option code set to TBD1 alongside an 8-bit length
-   field, whereas DHCPv6 utilizes a 16-bit option code set to TBD1
-   alongside a 16-bit length field.  Despite these differences in outer
-   header sizing, the internal payload remains completely identical.
-   The encapsulated sub-options maintain consistent 8-bit sub-option
-   code and 8-bit length fields across both protocol versions, ensuring
-   common parsing and processing logic regardless of the underlying IP
-   version.
+   The DHCP Rate Option specified in this document is a container option
+   with a sub-option structure for both DHCPv4 and DHCPv6.  The top-
+   level option encapsulation strictly conforms to the requirements of
+   each base protocol.  Specifically, DHCPv4 utilizes an 8-bit option
+   code set to TBD1 alongside an 8-bit length field, whereas DHCPv6
+   utilizes a 16-bit option code set to TBD2 alongside a 16-bit length
+   field.
+
+   While the underlying semantics of the rate information remain
+   identical across both IP versions, the internal payload sizing
+   differs to align with the conventions of each respective protocol.
+   For DHCPv4, the encapsulated sub-options utilize an 8-bit sub-option
+   code and an 8-bit sub-option length field, mirroring the format of
+   DHCPv4 Option 82 (Relay Agent Information Option) [RFC3046].
+   Conversely, for DHCPv6, the encapsulated sub-options utilize a 16-bit
+   sub-option code and a 16-bit sub-option length field.
 
 3.1.  Sub-Options Format
 
-   The rate information field consists of a sequence of SubOpt/Length/
-   Value tuples for each sub-option, encoded in the following manner:
+   The rate information field consists of a sequence of sub-option
+   (SubOpt) Code/Length/Value tuples.  Because the field sizing differs
+   between the two protocols to align with their respective base
+   specifications, the sub-options are encoded as follows:
 
-    SubOpt  Len     Sub-option Value
-   +------+------+------+------+------+--...-+------+
-   |  1   |   N  |  s1  |  s2  |  s3  |      |  sN  |
-   +------+------+------+------+------+--...-+------+
-    SubOpt  Len     Sub-option Value
-   +------+------+------+------+------+--...-+------+
-   |  2   |   N  |  i1  |  i2  |  i3  |      |  iN  |
-   +------+------+------+------+------+--...-+------+
+   DHCPv4 Sub-Option Format:
+
+    0                   1                   2                   3
+    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |  SubOpt Code  | SubOpt Length | SubOpt Value                  |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+   DHCPv6 Sub-Option Format:
+
+    0                   1                   2                   3
+    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |          SubOpt Code          |         SubOpt Length         |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |                         SubOpt Value                          |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
    No "pad" sub-option is defined, and the rate information field SHALL
    NOT be terminated with a 255 sub-option.  The length of OPTION_RATE
    MUST include all bytes of the sub-option code/length/value tuples.
-   The length N of the sub-options MUST be the number of octets in only
-   that sub-option's value field.  A sub-option length MAY be zero.  The
-   sub-options need not appear in sub-option code order.
+   The sub-option length MUST equal the number of octets in the sub-
+   option's value field.  A sub-option length MAY be zero.  The sub-
+   options need not appear in sub-option code order.
 
    The initial assignment of DHCP Rate Sub-options is as follows:
 
-         +=================+========+===========================+
-         | Sub-option Code | Length | Description               |
-         +=================+========+===========================+
-         |               1 |      8 | Available Rate Upstream   |
-         |                 |        | in bits per second (bps)  |
-         +-----------------+--------+---------------------------+
-         |               2 |      8 | Available Rate Downstream |
-         |                 |        | in bits per second (bps)  |
-         +-----------------+--------+---------------------------+
-         |               3 |      1 | Rate Type (L2 or L3)      |
-         +-----------------+--------+---------------------------+
+   +======+========+==================================================+
+   | Code | Length | Description                                      |
+   +======+========+==================================================+
+   |    0 |      - | Reserved                                         |
+   +------+--------+--------------------------------------------------+
+   |    1 |      8 | Available Rate Upstream in bits per second (bps) |
+   +------+--------+--------------------------------------------------+
+   |    2 |      8 | Available Rate Downstream in bits per second     |
+   |      |        | (bps)                                            |
+   +------+--------+--------------------------------------------------+
+   |    3 |      1 | Rate Type (L2 or L3)                             |
+   +------+--------+--------------------------------------------------+
 
                                  Table 1
 
@@ -289,10 +302,29 @@ Table of Contents
    direction.  The rate format is a 64-bit unsigned integer in network
    byte order.
 
-    SubOpt   Len     Available Rate Upstream
-   +------+------+------+------+------+------+------+------+--
-   |  1   |   8  |  64 Bit bps
-   +------+------+------+------+------+------+------+------+--
+   DHCPv4 Sub-Option Format:
+
+    0                   1                   2                   3
+    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   | SubOpt Code=1 | SubOpt Len=8  |                               |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                               +
+   | Available Rate Upstream                                       |
+   +                               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |                               |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+   DHCPv6 Sub-Option Format:
+
+    0                   1                   2                   3
+    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   | SubOpt Code=1                 | SubOpt Len=8                  |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   | Available Rate Upstream                                       |
+   +                                                               +
+   |                                                               |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
    A value of 0 in this context signifies an unrestricted rate.  It can
    be interpreted as a request to remove a previously set rate, thereby
@@ -305,10 +337,29 @@ Table of Contents
    direction.  The rate format is a 64-bit unsigned integer in network
    byte order.
 
-    SubOpt   Len     Available Rate Downstream
-   +------+------+------+------+------+------+------+------+--
-   |  2   |   8  |  64 Bit bps
-   +------+------+------+------+------+------+------+------+--
+   DHCPv4 Sub-Option Format:
+
+    0                   1                   2                   3
+    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   | SubOpt Code=2 | SubOpt Len=8  |                               |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                               +
+   | Available Rate Downstream                                     |
+   +                               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |                               |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+   DHCPv6 Sub-Option Format:
+
+    0                   1                   2                   3
+    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   | SubOpt Code=2                 | SubOpt Len=8                  |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   | Available Rate Downstream                                     |
+   +                                                               +
+   |                                                               |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
    A value of 0 in this context signifies an unrestricted rate.  It can
    be interpreted as a request to remove a previously set rate, thereby
@@ -323,10 +374,23 @@ Table of Contents
    and all payload, excluding the Ethernet Frame Check Sequence (FCS)
    and Inter-Packet Gap (IPG).
 
-    SubOpt   Len   Rate Type
-   +------+------+------+
-   |  3   |   1  | i    |
-   +------+------+------+
+   DHCPv4 Sub-Option Format:
+
+    0                   1                   2
+    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   | SubOpt Code=3 | SubOpt Len=1  | Rate Type     |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+   DHCPv6 Sub-Option Format:
+
+    0                   1                   2                   3
+    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   | SubOpt Code=3                 | SubOpt Len=1                  |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   | Rate Type     |
+   +-+-+-+-+-+-+-+-+
 
    If the rate type is set to 0, the explicitly signaled rates are
    informational only.  Devices receiving this rate type MUST NOT apply
@@ -357,6 +421,24 @@ Table of Contents
    safely, the receiving device MUST discard the option entirely and
    rely on its default rate configuration.
 
+   The initial assignment of rate types is as follows:
+
+                         +=======+===============+
+                         |  Type | Description   |
+                         +=======+===============+
+                         |     0 | Informational |
+                         +-------+---------------+
+                         |     1 | Reserved      |
+                         +-------+---------------+
+                         |     2 | Layer 2 rate  |
+                         +-------+---------------+
+                         |     3 | Layer 3 rate  |
+                         +-------+---------------+
+                         | 4-255 | Unassigned    |
+                         +-------+---------------+
+
+                                  Table 2
+
    A client MAY include the Rate Type sub-option within its initial
    requests to serve as a hint to the server regarding its preferred
    calculation method (e.g., requesting a Layer 3 rate instead of a
@@ -369,14 +451,26 @@ Table of Contents
 
    The DHCPv4 OPTION_RATE code is TBD1.
 
-    Code   Len     Rate Information Field
-   +------+------+------+------+------+--...-+------+
-   | TBD1 | N    |  i1  |  i2  |  i3  |      |  iN  |
-   +------+------+------+------+------+--...-+------+
+     0                   1                   2                   3
+     0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    | Code TBD1     | Length N      | SubOpt Code   | SubOpt Length |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    | SubOpt Value                                                  |
+    |                                                               |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    | SubOpt Code   | SubOpt Length | SubOpt Value                  |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                               |
+    |                                                               |
+    |                               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |                               | SubOpt Code   | SubOpt Length |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    | SubOpt Value
+    +-+-+-+-+-+-+-...
 
-   The length (N) gives the total number of octets in the Rate
-   Information Field, which is either zero or longer than 2 bytes, which
-   is the sub-options header length.
+   The option length (N) gives the total number of octets of all sub-
+   options, with a minimum value of 2 bytes, which is the sub-options
+   header length.
 
 4.2.  DHCPv4 Client Behavior
 
@@ -454,16 +548,26 @@ Table of Contents
 
 5.1.  DHCPv6 Rate Option
 
-   The DHCPv6 OPTION_RATE code is TBD1.
+   The DHCPv6 OPTION_RATE code is TBD2.
 
-    Code          Len            Rate Information Field
-   +------+------+------+------+------+------+------+--...-+------+
-   | TBD1        | N           |  i1  |  i2  |  i3  |      |  iN  |
-   +------+------+------+------+------+------+------+--...-+------+
+     0                   1                   2                   3
+     0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    | Code TBD2                     | Length N                      |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    | SubOpt Code                   | SubOpt Length                 |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    | SubOpt Value                                                  |
+    |                                                               |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    | SubOpt Code                   | SubOpt Length                 |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    | SubOpt Value
+    +-+-+-+-+-+-+-...
 
-   The length (N) gives the total number of octets in the Rate
-   Information Field, which is either zero or longer than 2 bytes, which
-   is the sub-options header length.
+   The option length (N) gives the total number of octets of all sub-
+   options, with a minimum value of 4 bytes, which is the sub-options
+   header length.
 
 5.2.  DHCPv6 Client Behavior
 
@@ -624,7 +728,16 @@ Table of Contents
 9.  Errors and Conflicts
 
    Clients receiving conflicting rate information across DHCPv4 and
-   DHCPv6 protocols SHOULD apply the most recently received value.
+   DHCPv6 SHOULD prefer a rate learned via DHCPv6 over a rate learned
+   via DHCPv4.  Implementations MUST retain the applied rate together
+   with its source protocol.  If the applied rate was learned via DHCPv6
+   and the corresponding DHCPv6 lease expires while a valid DHCPv4 lease
+   remains active, the client MUST treat the retained rate as
+   DHCPv4-derived for the purpose of subsequent updates and continue
+   using that rate until superseded by a later valid update.  If no
+   valid DHCPv4 lease remains active when the DHCPv6 lease expires, the
+   client MUST reset the applied rate to the device’s default
+   configuration.
 
    To ensure forward compatibility, clients, servers, and relay agents
    MUST ignore unrecognized sub-option codes and continue processing the
@@ -732,32 +845,58 @@ Table of Contents
 
 13.2.  DHCPv6 Option
 
-   IANA is requested to assign a new DHCPv6 Option Code (TBD1) in the
+   IANA is requested to assign a new DHCPv6 Option Code (TBD2) in the
    "Option Codes" registry for OPTION_RATE.
 
 13.3.  DHCP Rate Sub-Options Registry
 
    IANA is requested to create a new registry titled "DHCP Rate Sub-
-   Options".
+   Options" within the "Dynamic Host Configuration Protocol (DHCP) and
+   Bootstrap Protocol (BOOTP) Parameters" registry group.  This single
+   registry applies to the sub-options encapsulated within both the
+   DHCPv4 OPTION_RATE (TBD1) and the DHCPv6 OPTION_RATE (TBD2).
 
              +=======+===========================+===========+
              | Value | Description               | Reference |
              +=======+===========================+===========+
-             |     0 | Unassigned                |           |
+             |     0 | Reserved                  |           |
              +-------+---------------------------+-----------+
-             |     1 | Available Rate Upstream   | RFC TBD2  |
+             |     1 | Available Rate Upstream   | RFC-TBD   |
              |       | in bits per second (bps)  |           |
              +-------+---------------------------+-----------+
-             |     2 | Available Rate Downstream | RFC TBD2  |
+             |     2 | Available Rate Downstream | RFC-TBD   |
              |       | in bits per second (bps)  |           |
              +-------+---------------------------+-----------+
-             |     3 | Rate Type (L2, L3 or      | RFC TBD2  |
-             |       | informational)            |           |
+             |     3 | Rate Type                 | RFC-TBD   |
              +-------+---------------------------+-----------+
              | 4-255 | Unassigned                |           |
              +-------+---------------------------+-----------+
 
-                                  Table 2
+                                  Table 3
+
+13.4.  DHCP Rate Types Registry
+
+   IANA is requested to create a new registry titled "DHCP Rate Types"
+   within the "Dynamic Host Configuration Protocol (DHCP) and Bootstrap
+   Protocol (BOOTP) Parameters" registry group.  This registry defines
+   the values for the Rate Type sub-option (Code 3) used in both the
+   DHCPv4 and DHCPv6 OPTION_RATE.
+
+                         +=======+===============+
+                         | Value | Description   |
+                         +=======+===============+
+                         |     0 | Informational |
+                         +-------+---------------+
+                         |     1 | Reserved      |
+                         +-------+---------------+
+                         |     2 | Layer 2 rate  |
+                         +-------+---------------+
+                         |     3 | Layer 3 rate  |
+                         +-------+---------------+
+                         | 4-255 | Unassigned    |
+                         +-------+---------------+
+
+                                  Table 4
 
 14.  References
 

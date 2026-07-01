@@ -21,21 +21,22 @@ service edge. Additionally, it provides the necessary capacity awareness
 to enable effective Active Queue Management (AQM) and the Low Latency,
 Low Loss, and Scalable Throughput (L4S) architecture. 
     " name="description">
-<meta content="xml2rfc 3.33.0" name="generator">
+<meta content="xml2rfc 3.34.0" name="generator">
 <meta content="draft-giese-dhcp-rate-signaling-latest" name="ietf.draft">
 <!-- Generator version information:
-  xml2rfc 3.33.0
-    Python 3.12.13
-    ConfigArgParse 1.7
+  xml2rfc 3.34.0
+    Python 3.14.5
+    ConfigArgParse 1.7.5
     google-i18n-address 3.1.1
     intervaltree 3.2.1
     Jinja2 3.1.6
-    lxml 6.0.2
-    platformdirs 4.9.6
+    lxml 6.1.1
+    natsort 8.4.0
+    platformdirs 4.10.0
     pycountry 24.6.1
     PyYAML 6.0.3
     requests 2.33.1
-    wcwidth 0.7.0
+    wcwidth 0.8.1
 -->
 <link href="draft-giese-dhcp-rate-signaling.xml" rel="alternate" type="application/rfc+xml">
 <link href="#copyright" rel="license">
@@ -1054,11 +1055,11 @@ svg {
 <thead><tr>
 <td class="left">Internet-Draft</td>
 <td class="center">DHCP Explicit Rate Signaling</td>
-<td class="right">May 2026</td>
+<td class="right">July 2026</td>
 </tr></thead>
 <tfoot><tr>
 <td class="left">Giese &amp; Patterson</td>
-<td class="center">Expires 27 November 2026</td>
+<td class="center">Expires 2 January 2027</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1071,12 +1072,12 @@ svg {
 <dd class="internet-draft">draft-giese-dhcp-rate-signaling-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2026-05-26" class="published">26 May 2026</time>
+<time datetime="2026-07-01" class="published">1 July 2026</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Informational</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2026-11-27">27 November 2026</time></dd>
+<dd class="expires"><time datetime="2027-01-02">2 January 2027</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1135,7 +1136,7 @@ Low Loss, and Scalable Throughput (L4S) architecture.<a href="#section-abstract-
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 27 November 2026.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 2 January 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1270,6 +1271,9 @@ Low Loss, and Scalable Throughput (L4S) architecture.<a href="#section-abstract-
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13.2.3">
                 <p id="section-toc.1-1.13.2.3.1"><a href="#section-13.3" class="auto internal xref">13.3</a>.  <a href="#name-dhcp-rate-sub-options-regis" class="internal xref">DHCP Rate Sub-Options Registry</a></p>
 </li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13.2.4">
+                <p id="section-toc.1-1.13.2.4.1"><a href="#section-13.4" class="auto internal xref">13.4</a>.  <a href="#name-dhcp-rate-types-registry" class="internal xref">DHCP Rate Types Registry</a></p>
+</li>
             </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.14">
@@ -1305,7 +1309,7 @@ Low Loss, and Scalable Throughput (L4S) architecture.<a href="#section-abstract-
         </h3>
 <p id="section-1.1-1">In typical broadband access networks, the Customer Premises Equipment (CPE)
 is often unaware of the actual available data rates. This lack of visibility
-often occurs when an external modem or Optical Network Terminal (ONT) <span>[<a href="#G.984.1" class="cite xref">G.984.1</a>]</span>
+may occur when an external modem or Optical Network Terminal (ONT) <span>[<a href="#G.984.1" class="cite xref">G.984.1</a>]</span>
 connects to the CPE at a physical link speed that significantly exceeds the
 subscriber's provisioned service rate. Furthermore, operators commonly deploy
 unified access profiles where the available rate is artificially limited at
@@ -1426,95 +1430,160 @@ The following additional terms are used:<a href="#section-2-2" class="pilcrow">�
       <h2 id="name-dhcp-rate-option">
 <a href="#section-3" class="section-number selfRef">3. </a><a href="#name-dhcp-rate-option" class="section-name selfRef">DHCP Rate Option</a>
       </h2>
-<p id="section-3-1">The DHCP Rate Option specified in this document employs a unified sub-option structure for
-both DHCPv4 and DHCPv6, utilizing the format explicitly known from DHCPv4 Option 82
-(the Relay Agent Information Option) <span>[<a href="#RFC3046" class="cite xref">RFC3046</a>]</span>. The top-level option encapsulation strictly
-conforms to the requirements of each base protocol. To simplify cross-protocol implementation,
-this document proposes the uniform assignment of OPTION_RATE with the option code TBD1
-(value to be assigned by IANA) for both IP versions. Specifically, DHCPv4 utilizes an 8-bit option
-code set to TBD1 alongside an 8-bit length field, whereas DHCPv6 utilizes a 16-bit option code
-set to TBD1 alongside a 16-bit length field. Despite these differences in outer header sizing,
-the internal payload remains completely identical. The encapsulated sub-options maintain
-consistent 8-bit sub-option code and 8-bit length fields across both protocol versions,
-ensuring common parsing and processing logic regardless of the underlying IP version.<a href="#section-3-1" class="pilcrow">¶</a></p>
+<p id="section-3-1">The DHCP Rate Option specified in this document is a container option with a sub-option structure for
+both DHCPv4 and DHCPv6. The top-level option encapsulation strictly conforms to the
+requirements of each base protocol. Specifically, DHCPv4 utilizes an 8-bit option
+code set to TBD1 alongside an 8-bit length field, whereas DHCPv6 utilizes a 16-bit
+option code set to TBD2 alongside a 16-bit length field.<a href="#section-3-1" class="pilcrow">¶</a></p>
+<p id="section-3-2">While the underlying semantics of the rate information remain identical across both IP versions,
+the internal payload sizing differs to align with the conventions of each respective protocol.
+For DHCPv4, the encapsulated sub-options utilize an 8-bit sub-option code and an 8-bit sub-option
+length field, mirroring the format of DHCPv4 Option 82 (Relay Agent Information Option) <span>[<a href="#RFC3046" class="cite xref">RFC3046</a>]</span>.
+Conversely, for DHCPv6, the encapsulated sub-options utilize a 16-bit sub-option code and a
+16-bit sub-option length field.<a href="#section-3-2" class="pilcrow">¶</a></p>
 <div id="sub-options-format">
 <section id="section-3.1">
         <h3 id="name-sub-options-format">
 <a href="#section-3.1" class="section-number selfRef">3.1. </a><a href="#name-sub-options-format" class="section-name selfRef">Sub-Options Format</a>
         </h3>
-<p id="section-3.1-1">The rate information field consists of a sequence of SubOpt/Length/Value tuples for each
-sub-option, encoded in the following manner:<a href="#section-3.1-1" class="pilcrow">¶</a></p>
-<div id="section-3.1-2">
-          <div class="alignLeft art-svg artwork" id="section-3.1-2.1">
-<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="160" width="408" viewBox="0 0 408 160" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
-              <path d="M 8,48 L 8,80" fill="none" stroke="black"></path>
-              <path d="M 8,112 L 8,144" fill="none" stroke="black"></path>
-              <path d="M 64,48 L 64,80" fill="none" stroke="black"></path>
-              <path d="M 64,112 L 64,144" fill="none" stroke="black"></path>
-              <path d="M 120,48 L 120,80" fill="none" stroke="black"></path>
-              <path d="M 120,112 L 120,144" fill="none" stroke="black"></path>
-              <path d="M 176,48 L 176,80" fill="none" stroke="black"></path>
-              <path d="M 176,112 L 176,144" fill="none" stroke="black"></path>
-              <path d="M 232,48 L 232,80" fill="none" stroke="black"></path>
-              <path d="M 232,112 L 232,144" fill="none" stroke="black"></path>
-              <path d="M 288,48 L 288,80" fill="none" stroke="black"></path>
-              <path d="M 288,112 L 288,144" fill="none" stroke="black"></path>
-              <path d="M 344,48 L 344,80" fill="none" stroke="black"></path>
-              <path d="M 344,112 L 344,144" fill="none" stroke="black"></path>
-              <path d="M 400,48 L 400,80" fill="none" stroke="black"></path>
-              <path d="M 400,112 L 400,144" fill="none" stroke="black"></path>
-              <path d="M 8,48 L 312,48" fill="none" stroke="black"></path>
-              <path d="M 328,48 L 400,48" fill="none" stroke="black"></path>
-              <path d="M 8,80 L 312,80" fill="none" stroke="black"></path>
-              <path d="M 328,80 L 400,80" fill="none" stroke="black"></path>
-              <path d="M 8,112 L 312,112" fill="none" stroke="black"></path>
-              <path d="M 328,112 L 400,112" fill="none" stroke="black"></path>
-              <path d="M 8,144 L 312,144" fill="none" stroke="black"></path>
-              <path d="M 328,144 L 400,144" fill="none" stroke="black"></path>
+<p id="section-3.1-1">The rate information field consists of a sequence of sub-option (SubOpt) Code/Length/Value tuples.
+Because the field sizing differs between the two protocols to align with their
+respective base specifications, the sub-options are encoded as follows:<a href="#section-3.1-1" class="pilcrow">¶</a></p>
+<p id="section-3.1-2">DHCPv4 Sub-Option Format:<a href="#section-3.1-2" class="pilcrow">¶</a></p>
+<div id="section-3.1-3">
+          <div class="alignLeft art-svg artwork" id="section-3.1-3.1">
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="112" width="528" viewBox="0 0 528 112" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
+              <path d="M 8,64 L 8,96" fill="none" stroke="black"></path>
+              <path d="M 136,64 L 136,96" fill="none" stroke="black"></path>
+              <path d="M 264,64 L 264,96" fill="none" stroke="black"></path>
+              <path d="M 520,64 L 520,96" fill="none" stroke="black"></path>
+              <path d="M 8,64 L 520,64" fill="none" stroke="black"></path>
+              <path d="M 8,96 L 520,96" fill="none" stroke="black"></path>
               <g class="text">
-                <text x="36" y="36">SubOpt</text>
-                <text x="88" y="36">Len</text>
-                <text x="180" y="36">Sub-option</text>
-                <text x="248" y="36">Value</text>
-                <text x="320" y="52">.</text>
-                <text x="32" y="68">1</text>
-                <text x="96" y="68">N</text>
-                <text x="148" y="68">s1</text>
-                <text x="204" y="68">s2</text>
-                <text x="260" y="68">s3</text>
-                <text x="372" y="68">sN</text>
-                <text x="320" y="84">.</text>
-                <text x="36" y="100">SubOpt</text>
-                <text x="88" y="100">Len</text>
-                <text x="180" y="100">Sub-option</text>
-                <text x="248" y="100">Value</text>
-                <text x="320" y="116">.</text>
-                <text x="32" y="132">2</text>
-                <text x="96" y="132">N</text>
-                <text x="148" y="132">i1</text>
-                <text x="204" y="132">i2</text>
-                <text x="260" y="132">i3</text>
-                <text x="372" y="132">iN</text>
-                <text x="320" y="148">.</text>
+                <text x="16" y="36">0</text>
+                <text x="176" y="36">1</text>
+                <text x="336" y="36">2</text>
+                <text x="496" y="36">3</text>
+                <text x="16" y="52">0</text>
+                <text x="32" y="52">1</text>
+                <text x="48" y="52">2</text>
+                <text x="64" y="52">3</text>
+                <text x="80" y="52">4</text>
+                <text x="96" y="52">5</text>
+                <text x="112" y="52">6</text>
+                <text x="128" y="52">7</text>
+                <text x="144" y="52">8</text>
+                <text x="160" y="52">9</text>
+                <text x="176" y="52">0</text>
+                <text x="192" y="52">1</text>
+                <text x="208" y="52">2</text>
+                <text x="224" y="52">3</text>
+                <text x="240" y="52">4</text>
+                <text x="256" y="52">5</text>
+                <text x="272" y="52">6</text>
+                <text x="288" y="52">7</text>
+                <text x="304" y="52">8</text>
+                <text x="320" y="52">9</text>
+                <text x="336" y="52">0</text>
+                <text x="352" y="52">1</text>
+                <text x="368" y="52">2</text>
+                <text x="384" y="52">3</text>
+                <text x="400" y="52">4</text>
+                <text x="416" y="52">5</text>
+                <text x="432" y="52">6</text>
+                <text x="448" y="52">7</text>
+                <text x="464" y="52">8</text>
+                <text x="480" y="52">9</text>
+                <text x="496" y="52">0</text>
+                <text x="512" y="52">1</text>
+                <text x="52" y="84">SubOpt</text>
+                <text x="100" y="84">Code</text>
+                <text x="172" y="84">SubOpt</text>
+                <text x="228" y="84">Length</text>
+                <text x="300" y="84">SubOpt</text>
+                <text x="352" y="84">Value</text>
               </g>
-            </svg><a href="#section-3.1-2.1" class="pilcrow">¶</a>
+            </svg><a href="#section-3.1-3.1" class="pilcrow">¶</a>
 </div>
 </div>
-<p id="section-3.1-3">No "pad" sub-option is defined, and the rate information field <span class="bcp14">SHALL NOT</span> be terminated with a 255 sub-option.
-The length of OPTION_RATE <span class="bcp14">MUST</span> include all bytes of the sub-option code/length/value tuples.
-The length N of the sub-options <span class="bcp14">MUST</span> be the number of octets in only that sub-option's value field.
-A sub-option length <span class="bcp14">MAY</span> be zero. The sub-options need not appear in sub-option code order.<a href="#section-3.1-3" class="pilcrow">¶</a></p>
-<p id="section-3.1-4">The initial assignment of DHCP Rate Sub-options is as follows:<a href="#section-3.1-4" class="pilcrow">¶</a></p>
+<p id="section-3.1-4">DHCPv6 Sub-Option Format:<a href="#section-3.1-4" class="pilcrow">¶</a></p>
+<div id="section-3.1-5">
+          <div class="alignLeft art-svg artwork" id="section-3.1-5.1">
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="144" width="528" viewBox="0 0 528 144" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
+              <path d="M 8,64 L 8,128" fill="none" stroke="black"></path>
+              <path d="M 264,64 L 264,96" fill="none" stroke="black"></path>
+              <path d="M 520,64 L 520,128" fill="none" stroke="black"></path>
+              <path d="M 8,64 L 520,64" fill="none" stroke="black"></path>
+              <path d="M 8,96 L 520,96" fill="none" stroke="black"></path>
+              <path d="M 8,128 L 520,128" fill="none" stroke="black"></path>
+              <g class="text">
+                <text x="16" y="36">0</text>
+                <text x="176" y="36">1</text>
+                <text x="336" y="36">2</text>
+                <text x="496" y="36">3</text>
+                <text x="16" y="52">0</text>
+                <text x="32" y="52">1</text>
+                <text x="48" y="52">2</text>
+                <text x="64" y="52">3</text>
+                <text x="80" y="52">4</text>
+                <text x="96" y="52">5</text>
+                <text x="112" y="52">6</text>
+                <text x="128" y="52">7</text>
+                <text x="144" y="52">8</text>
+                <text x="160" y="52">9</text>
+                <text x="176" y="52">0</text>
+                <text x="192" y="52">1</text>
+                <text x="208" y="52">2</text>
+                <text x="224" y="52">3</text>
+                <text x="240" y="52">4</text>
+                <text x="256" y="52">5</text>
+                <text x="272" y="52">6</text>
+                <text x="288" y="52">7</text>
+                <text x="304" y="52">8</text>
+                <text x="320" y="52">9</text>
+                <text x="336" y="52">0</text>
+                <text x="352" y="52">1</text>
+                <text x="368" y="52">2</text>
+                <text x="384" y="52">3</text>
+                <text x="400" y="52">4</text>
+                <text x="416" y="52">5</text>
+                <text x="432" y="52">6</text>
+                <text x="448" y="52">7</text>
+                <text x="464" y="52">8</text>
+                <text x="480" y="52">9</text>
+                <text x="496" y="52">0</text>
+                <text x="512" y="52">1</text>
+                <text x="116" y="84">SubOpt</text>
+                <text x="164" y="84">Code</text>
+                <text x="364" y="84">SubOpt</text>
+                <text x="420" y="84">Length</text>
+                <text x="236" y="116">SubOpt</text>
+                <text x="288" y="116">Value</text>
+              </g>
+            </svg><a href="#section-3.1-5.1" class="pilcrow">¶</a>
+</div>
+</div>
+<p id="section-3.1-6">No "pad" sub-option is defined, and the rate information field <span class="bcp14">SHALL NOT</span>
+be terminated with a 255 sub-option. The length of OPTION_RATE <span class="bcp14">MUST</span> include
+all bytes of the sub-option code/length/value tuples. The sub-option length
+<span class="bcp14">MUST</span> equal the number of octets in the sub-option's value field. A sub-option
+length <span class="bcp14">MAY</span> be zero. The sub-options need not appear in sub-option code order.<a href="#section-3.1-6" class="pilcrow">¶</a></p>
+<p id="section-3.1-7">The initial assignment of DHCP Rate Sub-options is as follows:<a href="#section-3.1-7" class="pilcrow">¶</a></p>
 <table class="center" id="table-1">
           <caption><a href="#table-1" class="selfRef">Table 1</a></caption>
 <thead>
             <tr>
-              <th class="text-right" rowspan="1" colspan="1">Sub-option Code</th>
+              <th class="text-right" rowspan="1" colspan="1">Code</th>
               <th class="text-right" rowspan="1" colspan="1">Length</th>
               <th class="text-left" rowspan="1" colspan="1">Description</th>
             </tr>
           </thead>
           <tbody>
+            <tr>
+              <td class="text-right" rowspan="1" colspan="1">0</td>
+              <td class="text-right" rowspan="1" colspan="1">-</td>
+              <td class="text-left" rowspan="1" colspan="1">Reserved</td>
+            </tr>
             <tr>
               <td class="text-right" rowspan="1" colspan="1">1</td>
               <td class="text-right" rowspan="1" colspan="1">8</td>
@@ -1547,31 +1616,127 @@ A sub-option length <span class="bcp14">MAY</span> be zero. The sub-options need
 <p id="section-3.2.1-1">The sub-option Available Rate Upstream defines the rate in bits per second (bps) available from the
 DHCP client towards the DHCP server direction. The rate format is a 64-bit unsigned integer in
 network byte order.<a href="#section-3.2.1-1" class="pilcrow">¶</a></p>
-<div id="section-3.2.1-2">
-            <div class="alignLeft art-svg artwork" id="section-3.2.1-2.1">
-<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="96" width="480" viewBox="0 0 480 96" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
-                <path d="M 8,48 L 8,80" fill="none" stroke="black"></path>
-                <path d="M 64,48 L 64,80" fill="none" stroke="black"></path>
-                <path d="M 120,48 L 120,80" fill="none" stroke="black"></path>
-                <path d="M 8,48 L 472,48" fill="none" stroke="black"></path>
-                <path d="M 8,80 L 472,80" fill="none" stroke="black"></path>
+<p id="section-3.2.1-2">DHCPv4 Sub-Option Format:<a href="#section-3.2.1-2" class="pilcrow">¶</a></p>
+<div id="section-3.2.1-3">
+            <div class="alignLeft art-svg artwork" id="section-3.2.1-3.1">
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="176" width="528" viewBox="0 0 528 176" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
+                <path d="M 8,64 L 8,160" fill="none" stroke="black"></path>
+                <path d="M 136,64 L 136,96" fill="none" stroke="black"></path>
+                <path d="M 264,64 L 264,96" fill="none" stroke="black"></path>
+                <path d="M 264,128 L 264,160" fill="none" stroke="black"></path>
+                <path d="M 520,64 L 520,128" fill="none" stroke="black"></path>
+                <path d="M 8,64 L 520,64" fill="none" stroke="black"></path>
+                <path d="M 8,96 L 264,96" fill="none" stroke="black"></path>
+                <path d="M 264,128 L 520,128" fill="none" stroke="black"></path>
+                <path d="M 8,160 L 264,160" fill="none" stroke="black"></path>
                 <g class="text">
-                  <text x="36" y="36">SubOpt</text>
-                  <text x="96" y="36">Len</text>
-                  <text x="184" y="36">Available</text>
-                  <text x="244" y="36">Rate</text>
-                  <text x="300" y="36">Upstream</text>
-                  <text x="32" y="68">1</text>
-                  <text x="96" y="68">8</text>
-                  <text x="148" y="68">64</text>
-                  <text x="176" y="68">Bit</text>
-                  <text x="208" y="68">bps</text>
+                  <text x="16" y="36">0</text>
+                  <text x="176" y="36">1</text>
+                  <text x="336" y="36">2</text>
+                  <text x="496" y="36">3</text>
+                  <text x="16" y="52">0</text>
+                  <text x="32" y="52">1</text>
+                  <text x="48" y="52">2</text>
+                  <text x="64" y="52">3</text>
+                  <text x="80" y="52">4</text>
+                  <text x="96" y="52">5</text>
+                  <text x="112" y="52">6</text>
+                  <text x="128" y="52">7</text>
+                  <text x="144" y="52">8</text>
+                  <text x="160" y="52">9</text>
+                  <text x="176" y="52">0</text>
+                  <text x="192" y="52">1</text>
+                  <text x="208" y="52">2</text>
+                  <text x="224" y="52">3</text>
+                  <text x="240" y="52">4</text>
+                  <text x="256" y="52">5</text>
+                  <text x="272" y="52">6</text>
+                  <text x="288" y="52">7</text>
+                  <text x="304" y="52">8</text>
+                  <text x="320" y="52">9</text>
+                  <text x="336" y="52">0</text>
+                  <text x="352" y="52">1</text>
+                  <text x="368" y="52">2</text>
+                  <text x="384" y="52">3</text>
+                  <text x="400" y="52">4</text>
+                  <text x="416" y="52">5</text>
+                  <text x="432" y="52">6</text>
+                  <text x="448" y="52">7</text>
+                  <text x="464" y="52">8</text>
+                  <text x="480" y="52">9</text>
+                  <text x="496" y="52">0</text>
+                  <text x="512" y="52">1</text>
+                  <text x="44" y="84">SubOpt</text>
+                  <text x="100" y="84">Code=1</text>
+                  <text x="172" y="84">SubOpt</text>
+                  <text x="224" y="84">Len=8</text>
+                  <text x="56" y="116">Available</text>
+                  <text x="116" y="116">Rate</text>
+                  <text x="172" y="116">Upstream</text>
                 </g>
-              </svg><a href="#section-3.2.1-2.1" class="pilcrow">¶</a>
+              </svg><a href="#section-3.2.1-3.1" class="pilcrow">¶</a>
 </div>
 </div>
-<p id="section-3.2.1-3">A value of 0 in this context signifies an unrestricted rate. It can be interpreted as a request to
-remove a previously set rate, thereby resetting to the device default configuration.<a href="#section-3.2.1-3" class="pilcrow">¶</a></p>
+<p id="section-3.2.1-4">DHCPv6 Sub-Option Format:<a href="#section-3.2.1-4" class="pilcrow">¶</a></p>
+<div id="section-3.2.1-5">
+            <div class="alignLeft art-svg artwork" id="section-3.2.1-5.1">
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="176" width="528" viewBox="0 0 528 176" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
+                <path d="M 8,64 L 8,160" fill="none" stroke="black"></path>
+                <path d="M 264,64 L 264,96" fill="none" stroke="black"></path>
+                <path d="M 520,64 L 520,160" fill="none" stroke="black"></path>
+                <path d="M 8,64 L 520,64" fill="none" stroke="black"></path>
+                <path d="M 8,96 L 520,96" fill="none" stroke="black"></path>
+                <path d="M 8,160 L 520,160" fill="none" stroke="black"></path>
+                <g class="text">
+                  <text x="16" y="36">0</text>
+                  <text x="176" y="36">1</text>
+                  <text x="336" y="36">2</text>
+                  <text x="496" y="36">3</text>
+                  <text x="16" y="52">0</text>
+                  <text x="32" y="52">1</text>
+                  <text x="48" y="52">2</text>
+                  <text x="64" y="52">3</text>
+                  <text x="80" y="52">4</text>
+                  <text x="96" y="52">5</text>
+                  <text x="112" y="52">6</text>
+                  <text x="128" y="52">7</text>
+                  <text x="144" y="52">8</text>
+                  <text x="160" y="52">9</text>
+                  <text x="176" y="52">0</text>
+                  <text x="192" y="52">1</text>
+                  <text x="208" y="52">2</text>
+                  <text x="224" y="52">3</text>
+                  <text x="240" y="52">4</text>
+                  <text x="256" y="52">5</text>
+                  <text x="272" y="52">6</text>
+                  <text x="288" y="52">7</text>
+                  <text x="304" y="52">8</text>
+                  <text x="320" y="52">9</text>
+                  <text x="336" y="52">0</text>
+                  <text x="352" y="52">1</text>
+                  <text x="368" y="52">2</text>
+                  <text x="384" y="52">3</text>
+                  <text x="400" y="52">4</text>
+                  <text x="416" y="52">5</text>
+                  <text x="432" y="52">6</text>
+                  <text x="448" y="52">7</text>
+                  <text x="464" y="52">8</text>
+                  <text x="480" y="52">9</text>
+                  <text x="496" y="52">0</text>
+                  <text x="512" y="52">1</text>
+                  <text x="44" y="84">SubOpt</text>
+                  <text x="100" y="84">Code=1</text>
+                  <text x="300" y="84">SubOpt</text>
+                  <text x="352" y="84">Len=8</text>
+                  <text x="56" y="116">Available</text>
+                  <text x="116" y="116">Rate</text>
+                  <text x="172" y="116">Upstream</text>
+                </g>
+              </svg><a href="#section-3.2.1-5.1" class="pilcrow">¶</a>
+</div>
+</div>
+<p id="section-3.2.1-6">A value of 0 in this context signifies an unrestricted rate. It can be interpreted as a request to
+remove a previously set rate, thereby resetting to the device default configuration.<a href="#section-3.2.1-6" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="available-rate-downstream">
@@ -1581,31 +1746,127 @@ remove a previously set rate, thereby resetting to the device default configurat
           </h4>
 <p id="section-3.2.2-1">The available rate downstream defines the rate in bits per second (bps) available from the DHCP
 server towards the DHCP client direction. The rate format is a 64-bit unsigned integer in network byte order.<a href="#section-3.2.2-1" class="pilcrow">¶</a></p>
-<div id="section-3.2.2-2">
-            <div class="alignLeft art-svg artwork" id="section-3.2.2-2.1">
-<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="96" width="480" viewBox="0 0 480 96" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
-                <path d="M 8,48 L 8,80" fill="none" stroke="black"></path>
-                <path d="M 64,48 L 64,80" fill="none" stroke="black"></path>
-                <path d="M 120,48 L 120,80" fill="none" stroke="black"></path>
-                <path d="M 8,48 L 472,48" fill="none" stroke="black"></path>
-                <path d="M 8,80 L 472,80" fill="none" stroke="black"></path>
+<p id="section-3.2.2-2">DHCPv4 Sub-Option Format:<a href="#section-3.2.2-2" class="pilcrow">¶</a></p>
+<div id="section-3.2.2-3">
+            <div class="alignLeft art-svg artwork" id="section-3.2.2-3.1">
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="176" width="528" viewBox="0 0 528 176" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
+                <path d="M 8,64 L 8,160" fill="none" stroke="black"></path>
+                <path d="M 136,64 L 136,96" fill="none" stroke="black"></path>
+                <path d="M 264,64 L 264,96" fill="none" stroke="black"></path>
+                <path d="M 264,128 L 264,160" fill="none" stroke="black"></path>
+                <path d="M 520,64 L 520,128" fill="none" stroke="black"></path>
+                <path d="M 8,64 L 520,64" fill="none" stroke="black"></path>
+                <path d="M 8,96 L 264,96" fill="none" stroke="black"></path>
+                <path d="M 264,128 L 520,128" fill="none" stroke="black"></path>
+                <path d="M 8,160 L 264,160" fill="none" stroke="black"></path>
                 <g class="text">
-                  <text x="36" y="36">SubOpt</text>
-                  <text x="96" y="36">Len</text>
-                  <text x="184" y="36">Available</text>
-                  <text x="244" y="36">Rate</text>
-                  <text x="308" y="36">Downstream</text>
-                  <text x="32" y="68">2</text>
-                  <text x="96" y="68">8</text>
-                  <text x="148" y="68">64</text>
-                  <text x="176" y="68">Bit</text>
-                  <text x="208" y="68">bps</text>
+                  <text x="16" y="36">0</text>
+                  <text x="176" y="36">1</text>
+                  <text x="336" y="36">2</text>
+                  <text x="496" y="36">3</text>
+                  <text x="16" y="52">0</text>
+                  <text x="32" y="52">1</text>
+                  <text x="48" y="52">2</text>
+                  <text x="64" y="52">3</text>
+                  <text x="80" y="52">4</text>
+                  <text x="96" y="52">5</text>
+                  <text x="112" y="52">6</text>
+                  <text x="128" y="52">7</text>
+                  <text x="144" y="52">8</text>
+                  <text x="160" y="52">9</text>
+                  <text x="176" y="52">0</text>
+                  <text x="192" y="52">1</text>
+                  <text x="208" y="52">2</text>
+                  <text x="224" y="52">3</text>
+                  <text x="240" y="52">4</text>
+                  <text x="256" y="52">5</text>
+                  <text x="272" y="52">6</text>
+                  <text x="288" y="52">7</text>
+                  <text x="304" y="52">8</text>
+                  <text x="320" y="52">9</text>
+                  <text x="336" y="52">0</text>
+                  <text x="352" y="52">1</text>
+                  <text x="368" y="52">2</text>
+                  <text x="384" y="52">3</text>
+                  <text x="400" y="52">4</text>
+                  <text x="416" y="52">5</text>
+                  <text x="432" y="52">6</text>
+                  <text x="448" y="52">7</text>
+                  <text x="464" y="52">8</text>
+                  <text x="480" y="52">9</text>
+                  <text x="496" y="52">0</text>
+                  <text x="512" y="52">1</text>
+                  <text x="44" y="84">SubOpt</text>
+                  <text x="100" y="84">Code=2</text>
+                  <text x="172" y="84">SubOpt</text>
+                  <text x="224" y="84">Len=8</text>
+                  <text x="56" y="116">Available</text>
+                  <text x="116" y="116">Rate</text>
+                  <text x="180" y="116">Downstream</text>
                 </g>
-              </svg><a href="#section-3.2.2-2.1" class="pilcrow">¶</a>
+              </svg><a href="#section-3.2.2-3.1" class="pilcrow">¶</a>
 </div>
 </div>
-<p id="section-3.2.2-3">A value of 0 in this context signifies an unrestricted rate. It can be interpreted as a request to
-remove a previously set rate, thereby resetting to the device default configuration.<a href="#section-3.2.2-3" class="pilcrow">¶</a></p>
+<p id="section-3.2.2-4">DHCPv6 Sub-Option Format:<a href="#section-3.2.2-4" class="pilcrow">¶</a></p>
+<div id="section-3.2.2-5">
+            <div class="alignLeft art-svg artwork" id="section-3.2.2-5.1">
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="176" width="528" viewBox="0 0 528 176" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
+                <path d="M 8,64 L 8,160" fill="none" stroke="black"></path>
+                <path d="M 264,64 L 264,96" fill="none" stroke="black"></path>
+                <path d="M 520,64 L 520,160" fill="none" stroke="black"></path>
+                <path d="M 8,64 L 520,64" fill="none" stroke="black"></path>
+                <path d="M 8,96 L 520,96" fill="none" stroke="black"></path>
+                <path d="M 8,160 L 520,160" fill="none" stroke="black"></path>
+                <g class="text">
+                  <text x="16" y="36">0</text>
+                  <text x="176" y="36">1</text>
+                  <text x="336" y="36">2</text>
+                  <text x="496" y="36">3</text>
+                  <text x="16" y="52">0</text>
+                  <text x="32" y="52">1</text>
+                  <text x="48" y="52">2</text>
+                  <text x="64" y="52">3</text>
+                  <text x="80" y="52">4</text>
+                  <text x="96" y="52">5</text>
+                  <text x="112" y="52">6</text>
+                  <text x="128" y="52">7</text>
+                  <text x="144" y="52">8</text>
+                  <text x="160" y="52">9</text>
+                  <text x="176" y="52">0</text>
+                  <text x="192" y="52">1</text>
+                  <text x="208" y="52">2</text>
+                  <text x="224" y="52">3</text>
+                  <text x="240" y="52">4</text>
+                  <text x="256" y="52">5</text>
+                  <text x="272" y="52">6</text>
+                  <text x="288" y="52">7</text>
+                  <text x="304" y="52">8</text>
+                  <text x="320" y="52">9</text>
+                  <text x="336" y="52">0</text>
+                  <text x="352" y="52">1</text>
+                  <text x="368" y="52">2</text>
+                  <text x="384" y="52">3</text>
+                  <text x="400" y="52">4</text>
+                  <text x="416" y="52">5</text>
+                  <text x="432" y="52">6</text>
+                  <text x="448" y="52">7</text>
+                  <text x="464" y="52">8</text>
+                  <text x="480" y="52">9</text>
+                  <text x="496" y="52">0</text>
+                  <text x="512" y="52">1</text>
+                  <text x="44" y="84">SubOpt</text>
+                  <text x="100" y="84">Code=2</text>
+                  <text x="300" y="84">SubOpt</text>
+                  <text x="352" y="84">Len=8</text>
+                  <text x="56" y="116">Available</text>
+                  <text x="116" y="116">Rate</text>
+                  <text x="180" y="116">Downstream</text>
+                </g>
+              </svg><a href="#section-3.2.2-5.1" class="pilcrow">¶</a>
+</div>
+</div>
+<p id="section-3.2.2-6">A value of 0 in this context signifies an unrestricted rate. It can be interpreted as a request to
+remove a previously set rate, thereby resetting to the device default configuration.<a href="#section-3.2.2-6" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="rate-type">
@@ -1617,48 +1878,165 @@ remove a previously set rate, thereby resetting to the device default configurat
 is defined as the Layer 2 rate, which signifies that the rate encompasses the entire Ethernet frame.
 Implementations <span class="bcp14">SHOULD</span> calculate this rate using the Ethernet header and all payload, excluding the
 Ethernet Frame Check Sequence (FCS) and Inter-Packet Gap (IPG).<a href="#section-3.2.3-1" class="pilcrow">¶</a></p>
-<div id="section-3.2.3-2">
-            <div class="alignLeft art-svg artwork" id="section-3.2.3-2.1">
-<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="96" width="208" viewBox="0 0 208 96" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
-                <path d="M 8,48 L 8,80" fill="none" stroke="black"></path>
-                <path d="M 64,48 L 64,80" fill="none" stroke="black"></path>
-                <path d="M 120,48 L 120,80" fill="none" stroke="black"></path>
-                <path d="M 176,48 L 176,80" fill="none" stroke="black"></path>
-                <path d="M 8,48 L 176,48" fill="none" stroke="black"></path>
-                <path d="M 8,80 L 176,80" fill="none" stroke="black"></path>
+<p id="section-3.2.3-2">DHCPv4 Sub-Option Format:<a href="#section-3.2.3-2" class="pilcrow">¶</a></p>
+<div id="section-3.2.3-3">
+            <div class="alignLeft art-svg artwork" id="section-3.2.3-3.1">
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="112" width="400" viewBox="0 0 400 112" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
+                <path d="M 8,64 L 8,96" fill="none" stroke="black"></path>
+                <path d="M 136,64 L 136,96" fill="none" stroke="black"></path>
+                <path d="M 264,64 L 264,96" fill="none" stroke="black"></path>
+                <path d="M 392,64 L 392,96" fill="none" stroke="black"></path>
+                <path d="M 8,64 L 392,64" fill="none" stroke="black"></path>
+                <path d="M 8,96 L 392,96" fill="none" stroke="black"></path>
                 <g class="text">
-                  <text x="36" y="36">SubOpt</text>
-                  <text x="96" y="36">Len</text>
-                  <text x="148" y="36">Rate</text>
-                  <text x="188" y="36">Type</text>
-                  <text x="32" y="68">3</text>
-                  <text x="96" y="68">1</text>
-                  <text x="136" y="68">i</text>
+                  <text x="16" y="36">0</text>
+                  <text x="176" y="36">1</text>
+                  <text x="336" y="36">2</text>
+                  <text x="16" y="52">0</text>
+                  <text x="32" y="52">1</text>
+                  <text x="48" y="52">2</text>
+                  <text x="64" y="52">3</text>
+                  <text x="80" y="52">4</text>
+                  <text x="96" y="52">5</text>
+                  <text x="112" y="52">6</text>
+                  <text x="128" y="52">7</text>
+                  <text x="144" y="52">8</text>
+                  <text x="160" y="52">9</text>
+                  <text x="176" y="52">0</text>
+                  <text x="192" y="52">1</text>
+                  <text x="208" y="52">2</text>
+                  <text x="224" y="52">3</text>
+                  <text x="240" y="52">4</text>
+                  <text x="256" y="52">5</text>
+                  <text x="272" y="52">6</text>
+                  <text x="288" y="52">7</text>
+                  <text x="304" y="52">8</text>
+                  <text x="320" y="52">9</text>
+                  <text x="336" y="52">0</text>
+                  <text x="352" y="52">1</text>
+                  <text x="368" y="52">2</text>
+                  <text x="384" y="52">3</text>
+                  <text x="44" y="84">SubOpt</text>
+                  <text x="100" y="84">Code=3</text>
+                  <text x="172" y="84">SubOpt</text>
+                  <text x="224" y="84">Len=1</text>
+                  <text x="292" y="84">Rate</text>
+                  <text x="332" y="84">Type</text>
                 </g>
-              </svg><a href="#section-3.2.3-2.1" class="pilcrow">¶</a>
+              </svg><a href="#section-3.2.3-3.1" class="pilcrow">¶</a>
 </div>
 </div>
-<p id="section-3.2.3-3">If the rate type is set to 0, the explicitly signaled rates are informational only. Devices receiving this
+<p id="section-3.2.3-4">DHCPv6 Sub-Option Format:<a href="#section-3.2.3-4" class="pilcrow">¶</a></p>
+<div id="section-3.2.3-5">
+            <div class="alignLeft art-svg artwork" id="section-3.2.3-5.1">
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="144" width="528" viewBox="0 0 528 144" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
+                <path d="M 8,64 L 8,128" fill="none" stroke="black"></path>
+                <path d="M 136,96 L 136,128" fill="none" stroke="black"></path>
+                <path d="M 264,64 L 264,96" fill="none" stroke="black"></path>
+                <path d="M 520,64 L 520,96" fill="none" stroke="black"></path>
+                <path d="M 8,64 L 520,64" fill="none" stroke="black"></path>
+                <path d="M 8,96 L 520,96" fill="none" stroke="black"></path>
+                <path d="M 8,128 L 136,128" fill="none" stroke="black"></path>
+                <g class="text">
+                  <text x="16" y="36">0</text>
+                  <text x="176" y="36">1</text>
+                  <text x="336" y="36">2</text>
+                  <text x="496" y="36">3</text>
+                  <text x="16" y="52">0</text>
+                  <text x="32" y="52">1</text>
+                  <text x="48" y="52">2</text>
+                  <text x="64" y="52">3</text>
+                  <text x="80" y="52">4</text>
+                  <text x="96" y="52">5</text>
+                  <text x="112" y="52">6</text>
+                  <text x="128" y="52">7</text>
+                  <text x="144" y="52">8</text>
+                  <text x="160" y="52">9</text>
+                  <text x="176" y="52">0</text>
+                  <text x="192" y="52">1</text>
+                  <text x="208" y="52">2</text>
+                  <text x="224" y="52">3</text>
+                  <text x="240" y="52">4</text>
+                  <text x="256" y="52">5</text>
+                  <text x="272" y="52">6</text>
+                  <text x="288" y="52">7</text>
+                  <text x="304" y="52">8</text>
+                  <text x="320" y="52">9</text>
+                  <text x="336" y="52">0</text>
+                  <text x="352" y="52">1</text>
+                  <text x="368" y="52">2</text>
+                  <text x="384" y="52">3</text>
+                  <text x="400" y="52">4</text>
+                  <text x="416" y="52">5</text>
+                  <text x="432" y="52">6</text>
+                  <text x="448" y="52">7</text>
+                  <text x="464" y="52">8</text>
+                  <text x="480" y="52">9</text>
+                  <text x="496" y="52">0</text>
+                  <text x="512" y="52">1</text>
+                  <text x="44" y="84">SubOpt</text>
+                  <text x="100" y="84">Code=3</text>
+                  <text x="300" y="84">SubOpt</text>
+                  <text x="352" y="84">Len=1</text>
+                  <text x="36" y="116">Rate</text>
+                  <text x="76" y="116">Type</text>
+                </g>
+              </svg><a href="#section-3.2.3-5.1" class="pilcrow">¶</a>
+</div>
+</div>
+<p id="section-3.2.3-6">If the rate type is set to 0, the explicitly signaled rates are informational only. Devices receiving this
 rate type <span class="bcp14">MUST NOT</span> apply the specified rate limits to their physical interfaces, traffic shapers, policers,
 or Active Queue Management (AQM) parameters. This value accommodates deployments where the network exposes
 the provisioned service tier to the Customer Premises Equipment (CPE) solely to populate user interfaces
-or for telemetry purposes, without altering the device's localized forwarding behavior.<a href="#section-3.2.3-3" class="pilcrow">¶</a></p>
-<p id="section-3.2.3-4">If the rate type is set to 3, the rate applies to Layer 3, encompassing only the IP header and its
+or for telemetry purposes, without altering the device's localized forwarding behavior.<a href="#section-3.2.3-6" class="pilcrow">¶</a></p>
+<p id="section-3.2.3-7">If the rate type is set to 3, the rate applies to Layer 3, encompassing only the IP header and its
 payload. This rate calculation is frequently utilized by end-user speed test applications and is
 often regarded as the marketable "product bandwidth". Its primary advantage is its independence from
-the variable overhead introduced by differing numbers of VLAN tags or tunnel encapsulations.<a href="#section-3.2.3-4" class="pilcrow">¶</a></p>
-<p id="section-3.2.3-5">In the absence of the Rate Type sub-option, the client <span class="bcp14">MUST</span> assume that the signaled values are
-defined as the Layer 2 rate.<a href="#section-3.2.3-5" class="pilcrow">¶</a></p>
-<p id="section-3.2.3-6">The values 1 and 4-255 are currently unassigned and reserved for future use. If a client, server,
+the variable overhead introduced by differing numbers of VLAN tags or tunnel encapsulations.<a href="#section-3.2.3-7" class="pilcrow">¶</a></p>
+<p id="section-3.2.3-8">In the absence of the Rate Type sub-option, the client <span class="bcp14">MUST</span> assume that the signaled values are
+defined as the Layer 2 rate.<a href="#section-3.2.3-8" class="pilcrow">¶</a></p>
+<p id="section-3.2.3-9">The values 1 and 4-255 are currently unassigned and reserved for future use. If a client, server,
 or relay agent receives a Rate Type sub-option containing an unrecognized or reserved value,
 it <span class="bcp14">MUST</span> ignore the entire OPTION_RATE. Applying explicitly signaled rate limits without understanding
 the intended networking layer could result in incorrect localized traffic management. Therefore,
 to fail safely, the receiving device <span class="bcp14">MUST</span> discard the option entirely and rely on its default
-rate configuration.<a href="#section-3.2.3-6" class="pilcrow">¶</a></p>
-<p id="section-3.2.3-7">A client <span class="bcp14">MAY</span> include the Rate Type sub-option within its initial requests to serve as a hint to the
+rate configuration.<a href="#section-3.2.3-9" class="pilcrow">¶</a></p>
+<p id="section-3.2.3-10">The initial assignment of rate types is as follows:<a href="#section-3.2.3-10" class="pilcrow">¶</a></p>
+<table class="center" id="table-2">
+            <caption><a href="#table-2" class="selfRef">Table 2</a></caption>
+<thead>
+              <tr>
+                <th class="text-right" rowspan="1" colspan="1">Type</th>
+                <th class="text-left" rowspan="1" colspan="1">Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="text-right" rowspan="1" colspan="1">0</td>
+                <td class="text-left" rowspan="1" colspan="1">Informational</td>
+              </tr>
+              <tr>
+                <td class="text-right" rowspan="1" colspan="1">1</td>
+                <td class="text-left" rowspan="1" colspan="1">Reserved</td>
+              </tr>
+              <tr>
+                <td class="text-right" rowspan="1" colspan="1">2</td>
+                <td class="text-left" rowspan="1" colspan="1">Layer 2 rate</td>
+              </tr>
+              <tr>
+                <td class="text-right" rowspan="1" colspan="1">3</td>
+                <td class="text-left" rowspan="1" colspan="1">Layer 3 rate</td>
+              </tr>
+              <tr>
+                <td class="text-right" rowspan="1" colspan="1">4-255</td>
+                <td class="text-left" rowspan="1" colspan="1">Unassigned</td>
+              </tr>
+            </tbody>
+          </table>
+<p id="section-3.2.3-12">A client <span class="bcp14">MAY</span> include the Rate Type sub-option within its initial requests to serve as a hint to the
 server regarding its preferred calculation method (e.g., requesting a Layer 3 rate instead of a
 Layer 2 rate). Sending this hint is <span class="bcp14">OPTIONAL</span> for the client, and honoring the hint is <span class="bcp14">OPTIONAL</span>
-for the server.<a href="#section-3.2.3-7" class="pilcrow">¶</a></p>
+for the server.<a href="#section-3.2.3-12" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -1678,39 +2056,89 @@ for the server.<a href="#section-3.2.3-7" class="pilcrow">¶</a></p>
 <p id="section-4.1-1">The DHCPv4 OPTION_RATE code is TBD1.<a href="#section-4.1-1" class="pilcrow">¶</a></p>
 <div id="section-4.1-2">
           <div class="alignLeft art-svg artwork" id="section-4.1-2.1">
-<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="96" width="408" viewBox="0 0 408 96" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
-              <path d="M 8,48 L 8,80" fill="none" stroke="black"></path>
-              <path d="M 64,48 L 64,80" fill="none" stroke="black"></path>
-              <path d="M 120,48 L 120,80" fill="none" stroke="black"></path>
-              <path d="M 176,48 L 176,80" fill="none" stroke="black"></path>
-              <path d="M 232,48 L 232,80" fill="none" stroke="black"></path>
-              <path d="M 288,48 L 288,80" fill="none" stroke="black"></path>
-              <path d="M 344,48 L 344,80" fill="none" stroke="black"></path>
-              <path d="M 400,48 L 400,80" fill="none" stroke="black"></path>
-              <path d="M 8,48 L 312,48" fill="none" stroke="black"></path>
-              <path d="M 328,48 L 400,48" fill="none" stroke="black"></path>
-              <path d="M 8,80 L 312,80" fill="none" stroke="black"></path>
-              <path d="M 328,80 L 400,80" fill="none" stroke="black"></path>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="304" width="528" viewBox="0 0 528 304" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
+              <path d="M 8,64 L 8,272" fill="none" stroke="black"></path>
+              <path d="M 136,64 L 136,96" fill="none" stroke="black"></path>
+              <path d="M 136,144 L 136,176" fill="none" stroke="black"></path>
+              <path d="M 264,64 L 264,96" fill="none" stroke="black"></path>
+              <path d="M 264,144 L 264,176" fill="none" stroke="black"></path>
+              <path d="M 264,208 L 264,240" fill="none" stroke="black"></path>
+              <path d="M 392,64 L 392,96" fill="none" stroke="black"></path>
+              <path d="M 392,208 L 392,240" fill="none" stroke="black"></path>
+              <path d="M 520,64 L 520,240" fill="none" stroke="black"></path>
+              <path d="M 8,64 L 520,64" fill="none" stroke="black"></path>
+              <path d="M 8,96 L 520,96" fill="none" stroke="black"></path>
+              <path d="M 8,144 L 520,144" fill="none" stroke="black"></path>
+              <path d="M 8,176 L 264,176" fill="none" stroke="black"></path>
+              <path d="M 264,208 L 520,208" fill="none" stroke="black"></path>
+              <path d="M 8,240 L 520,240" fill="none" stroke="black"></path>
+              <path d="M 8,272 L 120,272" fill="none" stroke="black"></path>
               <g class="text">
-                <text x="28" y="36">Code</text>
-                <text x="80" y="36">Len</text>
-                <text x="148" y="36">Rate</text>
-                <text x="216" y="36">Information</text>
-                <text x="288" y="36">Field</text>
-                <text x="320" y="52">.</text>
-                <text x="36" y="68">TBD1</text>
-                <text x="80" y="68">N</text>
-                <text x="148" y="68">i1</text>
-                <text x="204" y="68">i2</text>
-                <text x="260" y="68">i3</text>
-                <text x="372" y="68">iN</text>
-                <text x="320" y="84">.</text>
+                <text x="16" y="36">0</text>
+                <text x="176" y="36">1</text>
+                <text x="336" y="36">2</text>
+                <text x="496" y="36">3</text>
+                <text x="16" y="52">0</text>
+                <text x="32" y="52">1</text>
+                <text x="48" y="52">2</text>
+                <text x="64" y="52">3</text>
+                <text x="80" y="52">4</text>
+                <text x="96" y="52">5</text>
+                <text x="112" y="52">6</text>
+                <text x="128" y="52">7</text>
+                <text x="144" y="52">8</text>
+                <text x="160" y="52">9</text>
+                <text x="176" y="52">0</text>
+                <text x="192" y="52">1</text>
+                <text x="208" y="52">2</text>
+                <text x="224" y="52">3</text>
+                <text x="240" y="52">4</text>
+                <text x="256" y="52">5</text>
+                <text x="272" y="52">6</text>
+                <text x="288" y="52">7</text>
+                <text x="304" y="52">8</text>
+                <text x="320" y="52">9</text>
+                <text x="336" y="52">0</text>
+                <text x="352" y="52">1</text>
+                <text x="368" y="52">2</text>
+                <text x="384" y="52">3</text>
+                <text x="400" y="52">4</text>
+                <text x="416" y="52">5</text>
+                <text x="432" y="52">6</text>
+                <text x="448" y="52">7</text>
+                <text x="464" y="52">8</text>
+                <text x="480" y="52">9</text>
+                <text x="496" y="52">0</text>
+                <text x="512" y="52">1</text>
+                <text x="36" y="84">Code</text>
+                <text x="76" y="84">TBD1</text>
+                <text x="172" y="84">Length</text>
+                <text x="208" y="84">N</text>
+                <text x="300" y="84">SubOpt</text>
+                <text x="348" y="84">Code</text>
+                <text x="428" y="84">SubOpt</text>
+                <text x="484" y="84">Length</text>
+                <text x="44" y="116">SubOpt</text>
+                <text x="96" y="116">Value</text>
+                <text x="44" y="164">SubOpt</text>
+                <text x="92" y="164">Code</text>
+                <text x="172" y="164">SubOpt</text>
+                <text x="228" y="164">Length</text>
+                <text x="300" y="164">SubOpt</text>
+                <text x="352" y="164">Value</text>
+                <text x="300" y="228">SubOpt</text>
+                <text x="348" y="228">Code</text>
+                <text x="428" y="228">SubOpt</text>
+                <text x="484" y="228">Length</text>
+                <text x="44" y="260">SubOpt</text>
+                <text x="96" y="260">Value</text>
+                <text x="132" y="276">..</text>
               </g>
             </svg><a href="#section-4.1-2.1" class="pilcrow">¶</a>
 </div>
 </div>
-<p id="section-4.1-3">The length (N) gives the total number of octets in the Rate Information Field, which is either zero
-or longer than 2 bytes, which is the sub-options header length.<a href="#section-4.1-3" class="pilcrow">¶</a></p>
+<p id="section-4.1-3">The option length (N) gives the total number of octets of all sub-options,
+with a minimum value of 2 bytes, which is the sub-options header length.<a href="#section-4.1-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="dhcpv4-client-behavior">
@@ -1786,42 +2214,80 @@ server, such as RADIUS.<a href="#section-4.4-2" class="pilcrow">¶</a></p>
         <h3 id="name-dhcpv6-rate-option">
 <a href="#section-5.1" class="section-number selfRef">5.1. </a><a href="#name-dhcpv6-rate-option" class="section-name selfRef">DHCPv6 Rate Option</a>
         </h3>
-<p id="section-5.1-1">The DHCPv6 OPTION_RATE code is TBD1.<a href="#section-5.1-1" class="pilcrow">¶</a></p>
+<p id="section-5.1-1">The DHCPv6 OPTION_RATE code is TBD2.<a href="#section-5.1-1" class="pilcrow">¶</a></p>
 <div id="section-5.1-2">
           <div class="alignLeft art-svg artwork" id="section-5.1-2.1">
-<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="96" width="520" viewBox="0 0 520 96" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
-              <path d="M 8,48 L 8,80" fill="none" stroke="black"></path>
-              <path d="M 120,48 L 120,80" fill="none" stroke="black"></path>
-              <path d="M 232,48 L 232,80" fill="none" stroke="black"></path>
-              <path d="M 288,48 L 288,80" fill="none" stroke="black"></path>
-              <path d="M 344,48 L 344,80" fill="none" stroke="black"></path>
-              <path d="M 400,48 L 400,80" fill="none" stroke="black"></path>
-              <path d="M 456,48 L 456,80" fill="none" stroke="black"></path>
-              <path d="M 512,48 L 512,80" fill="none" stroke="black"></path>
-              <path d="M 8,48 L 424,48" fill="none" stroke="black"></path>
-              <path d="M 440,48 L 512,48" fill="none" stroke="black"></path>
-              <path d="M 8,80 L 424,80" fill="none" stroke="black"></path>
-              <path d="M 440,80 L 512,80" fill="none" stroke="black"></path>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="272" width="528" viewBox="0 0 528 272" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
+              <path d="M 8,64 L 8,240" fill="none" stroke="black"></path>
+              <path d="M 264,64 L 264,128" fill="none" stroke="black"></path>
+              <path d="M 264,176 L 264,208" fill="none" stroke="black"></path>
+              <path d="M 520,64 L 520,208" fill="none" stroke="black"></path>
+              <path d="M 8,64 L 520,64" fill="none" stroke="black"></path>
+              <path d="M 8,96 L 520,96" fill="none" stroke="black"></path>
+              <path d="M 8,128 L 520,128" fill="none" stroke="black"></path>
+              <path d="M 8,176 L 520,176" fill="none" stroke="black"></path>
+              <path d="M 8,208 L 520,208" fill="none" stroke="black"></path>
+              <path d="M 8,240 L 120,240" fill="none" stroke="black"></path>
               <g class="text">
-                <text x="28" y="36">Code</text>
-                <text x="136" y="36">Len</text>
-                <text x="260" y="36">Rate</text>
-                <text x="328" y="36">Information</text>
-                <text x="400" y="36">Field</text>
-                <text x="432" y="52">.</text>
-                <text x="36" y="68">TBD1</text>
-                <text x="136" y="68">N</text>
-                <text x="260" y="68">i1</text>
-                <text x="316" y="68">i2</text>
-                <text x="372" y="68">i3</text>
-                <text x="484" y="68">iN</text>
-                <text x="432" y="84">.</text>
+                <text x="16" y="36">0</text>
+                <text x="176" y="36">1</text>
+                <text x="336" y="36">2</text>
+                <text x="496" y="36">3</text>
+                <text x="16" y="52">0</text>
+                <text x="32" y="52">1</text>
+                <text x="48" y="52">2</text>
+                <text x="64" y="52">3</text>
+                <text x="80" y="52">4</text>
+                <text x="96" y="52">5</text>
+                <text x="112" y="52">6</text>
+                <text x="128" y="52">7</text>
+                <text x="144" y="52">8</text>
+                <text x="160" y="52">9</text>
+                <text x="176" y="52">0</text>
+                <text x="192" y="52">1</text>
+                <text x="208" y="52">2</text>
+                <text x="224" y="52">3</text>
+                <text x="240" y="52">4</text>
+                <text x="256" y="52">5</text>
+                <text x="272" y="52">6</text>
+                <text x="288" y="52">7</text>
+                <text x="304" y="52">8</text>
+                <text x="320" y="52">9</text>
+                <text x="336" y="52">0</text>
+                <text x="352" y="52">1</text>
+                <text x="368" y="52">2</text>
+                <text x="384" y="52">3</text>
+                <text x="400" y="52">4</text>
+                <text x="416" y="52">5</text>
+                <text x="432" y="52">6</text>
+                <text x="448" y="52">7</text>
+                <text x="464" y="52">8</text>
+                <text x="480" y="52">9</text>
+                <text x="496" y="52">0</text>
+                <text x="512" y="52">1</text>
+                <text x="36" y="84">Code</text>
+                <text x="76" y="84">TBD2</text>
+                <text x="300" y="84">Length</text>
+                <text x="336" y="84">N</text>
+                <text x="44" y="116">SubOpt</text>
+                <text x="92" y="116">Code</text>
+                <text x="300" y="116">SubOpt</text>
+                <text x="356" y="116">Length</text>
+                <text x="44" y="148">SubOpt</text>
+                <text x="96" y="148">Value</text>
+                <text x="44" y="196">SubOpt</text>
+                <text x="92" y="196">Code</text>
+                <text x="300" y="196">SubOpt</text>
+                <text x="356" y="196">Length</text>
+                <text x="44" y="228">SubOpt</text>
+                <text x="96" y="228">Value</text>
+                <text x="132" y="244">..</text>
               </g>
             </svg><a href="#section-5.1-2.1" class="pilcrow">¶</a>
 </div>
 </div>
-<p id="section-5.1-3">The length (N) gives the total number of octets in the Rate Information Field, which is either zero
-or longer than 2 bytes, which is the sub-options header length.<a href="#section-5.1-3" class="pilcrow">¶</a></p>
+<p id="section-5.1-3">The option length (N) gives the total number of octets of all sub-options,
+with a minimum value of 4 bytes, which is the sub-options header length.<a href="#section-5.1-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="dhcpv6-client-behavior">
@@ -1962,8 +2428,13 @@ design of AQM and congestion control algorithms remains outside the scope of thi
       <h2 id="name-errors-and-conflicts">
 <a href="#section-9" class="section-number selfRef">9. </a><a href="#name-errors-and-conflicts" class="section-name selfRef">Errors and Conflicts</a>
       </h2>
-<p id="section-9-1">Clients receiving conflicting rate information across DHCPv4 and DHCPv6 protocols <span class="bcp14">SHOULD</span> apply the
-most recently received value.<a href="#section-9-1" class="pilcrow">¶</a></p>
+<p id="section-9-1">Clients receiving conflicting rate information across DHCPv4 and DHCPv6 <span class="bcp14">SHOULD</span> prefer a rate learned
+via DHCPv6 over a rate learned via DHCPv4. Implementations <span class="bcp14">MUST</span> retain the applied rate together with
+its source protocol. If the applied rate was learned via DHCPv6 and the corresponding DHCPv6 lease
+expires while a valid DHCPv4 lease remains active, the client <span class="bcp14">MUST</span> treat the retained rate as
+DHCPv4-derived for the purpose of subsequent updates and continue using that rate until superseded
+by a later valid update. If no valid DHCPv4 lease remains active when the DHCPv6 lease expires,
+the client <span class="bcp14">MUST</span> reset the applied rate to the device’s default configuration.<a href="#section-9-1" class="pilcrow">¶</a></p>
 <p id="section-9-2">To ensure forward compatibility, clients, servers, and relay agents <span class="bcp14">MUST</span> ignore unrecognized sub-option
 codes and continue processing the remainder of the Rate Option.<a href="#section-9-2" class="pilcrow">¶</a></p>
 <p id="section-9-3">Conversely, if a device receives a recognized sub-option containing an unrecognized or reserved value
@@ -2061,7 +2532,8 @@ DHCP Options" registry for OPTION_RATE.<a href="#section-13.1-1" class="pilcrow"
         <h3 id="name-dhcpv6-option">
 <a href="#section-13.2" class="section-number selfRef">13.2. </a><a href="#name-dhcpv6-option" class="section-name selfRef">DHCPv6 Option</a>
         </h3>
-<p id="section-13.2-1">IANA is requested to assign a new DHCPv6 Option Code (TBD1) in the "Option Codes" registry for OPTION_RATE.<a href="#section-13.2-1" class="pilcrow">¶</a></p>
+<p id="section-13.2-1">IANA is requested to assign a new DHCPv6 Option Code (TBD2) in the "Option Codes"
+registry for OPTION_RATE.<a href="#section-13.2-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="dhcp-rate-sub-options-registry">
@@ -2069,9 +2541,12 @@ DHCP Options" registry for OPTION_RATE.<a href="#section-13.1-1" class="pilcrow"
         <h3 id="name-dhcp-rate-sub-options-regis">
 <a href="#section-13.3" class="section-number selfRef">13.3. </a><a href="#name-dhcp-rate-sub-options-regis" class="section-name selfRef">DHCP Rate Sub-Options Registry</a>
         </h3>
-<p id="section-13.3-1">IANA is requested to create a new registry titled "DHCP Rate Sub-Options".<a href="#section-13.3-1" class="pilcrow">¶</a></p>
-<table class="center" id="table-2">
-          <caption><a href="#table-2" class="selfRef">Table 2</a></caption>
+<p id="section-13.3-1">IANA is requested to create a new registry titled "DHCP Rate Sub-Options" within the
+"Dynamic Host Configuration Protocol (DHCP) and Bootstrap Protocol (BOOTP) Parameters"
+registry group. This single registry applies to the sub-options encapsulated within both
+the DHCPv4 OPTION_RATE (TBD1) and the DHCPv6 OPTION_RATE (TBD2).<a href="#section-13.3-1" class="pilcrow">¶</a></p>
+<table class="center" id="table-3">
+          <caption><a href="#table-3" class="selfRef">Table 3</a></caption>
 <thead>
             <tr>
               <th class="text-right" rowspan="1" colspan="1">Value</th>
@@ -2082,28 +2557,70 @@ DHCP Options" registry for OPTION_RATE.<a href="#section-13.1-1" class="pilcrow"
           <tbody>
             <tr>
               <td class="text-right" rowspan="1" colspan="1">0</td>
-              <td class="text-left" rowspan="1" colspan="1">Unassigned</td>
+              <td class="text-left" rowspan="1" colspan="1">Reserved</td>
               <td class="text-left" rowspan="1" colspan="1"> </td>
             </tr>
             <tr>
               <td class="text-right" rowspan="1" colspan="1">1</td>
               <td class="text-left" rowspan="1" colspan="1">Available Rate Upstream in bits per second (bps)</td>
-              <td class="text-left" rowspan="1" colspan="1">RFC TBD2</td>
+              <td class="text-left" rowspan="1" colspan="1">RFC-TBD</td>
             </tr>
             <tr>
               <td class="text-right" rowspan="1" colspan="1">2</td>
               <td class="text-left" rowspan="1" colspan="1">Available Rate Downstream in bits per second (bps)</td>
-              <td class="text-left" rowspan="1" colspan="1">RFC TBD2</td>
+              <td class="text-left" rowspan="1" colspan="1">RFC-TBD</td>
             </tr>
             <tr>
               <td class="text-right" rowspan="1" colspan="1">3</td>
-              <td class="text-left" rowspan="1" colspan="1">Rate Type (L2, L3 or informational)</td>
-              <td class="text-left" rowspan="1" colspan="1">RFC TBD2</td>
+              <td class="text-left" rowspan="1" colspan="1">Rate Type</td>
+              <td class="text-left" rowspan="1" colspan="1">RFC-TBD</td>
             </tr>
             <tr>
               <td class="text-right" rowspan="1" colspan="1">4-255</td>
               <td class="text-left" rowspan="1" colspan="1">Unassigned</td>
               <td class="text-left" rowspan="1" colspan="1"> </td>
+            </tr>
+          </tbody>
+        </table>
+</section>
+</div>
+<div id="dhcp-rate-types-registry">
+<section id="section-13.4">
+        <h3 id="name-dhcp-rate-types-registry">
+<a href="#section-13.4" class="section-number selfRef">13.4. </a><a href="#name-dhcp-rate-types-registry" class="section-name selfRef">DHCP Rate Types Registry</a>
+        </h3>
+<p id="section-13.4-1">IANA is requested to create a new registry titled "DHCP Rate Types" within the
+"Dynamic Host Configuration Protocol (DHCP) and Bootstrap Protocol (BOOTP) Parameters"
+registry group. This registry defines the values for the Rate Type sub-option (Code 3)
+used in both the DHCPv4 and DHCPv6 OPTION_RATE.<a href="#section-13.4-1" class="pilcrow">¶</a></p>
+<table class="center" id="table-4">
+          <caption><a href="#table-4" class="selfRef">Table 4</a></caption>
+<thead>
+            <tr>
+              <th class="text-right" rowspan="1" colspan="1">Value</th>
+              <th class="text-left" rowspan="1" colspan="1">Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="text-right" rowspan="1" colspan="1">0</td>
+              <td class="text-left" rowspan="1" colspan="1">Informational</td>
+            </tr>
+            <tr>
+              <td class="text-right" rowspan="1" colspan="1">1</td>
+              <td class="text-left" rowspan="1" colspan="1">Reserved</td>
+            </tr>
+            <tr>
+              <td class="text-right" rowspan="1" colspan="1">2</td>
+              <td class="text-left" rowspan="1" colspan="1">Layer 2 rate</td>
+            </tr>
+            <tr>
+              <td class="text-right" rowspan="1" colspan="1">3</td>
+              <td class="text-left" rowspan="1" colspan="1">Layer 3 rate</td>
+            </tr>
+            <tr>
+              <td class="text-right" rowspan="1" colspan="1">4-255</td>
+              <td class="text-left" rowspan="1" colspan="1">Unassigned</td>
             </tr>
           </tbody>
         </table>
