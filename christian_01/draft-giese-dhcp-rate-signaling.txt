@@ -237,7 +237,7 @@ Table of Contents
 
    While the underlying semantics of the rate information remain
    identical across both IP versions, the internal payload sizing
-   diverges to align with the conventions of each respective protocol.
+   differs to align with the conventions of each respective protocol.
    For DHCPv4, the encapsulated sub-options utilize an 8-bit sub-option
    code and an 8-bit sub-option length field, mirroring the format of
    DHCPv4 Option 82 (Relay Agent Information Option) [RFC3046].
@@ -281,7 +281,7 @@ Table of Contents
    +======+========+==================================================+
    | Code | Length | Description                                      |
    +======+========+==================================================+
-   |    0 |      - | Unassigned                                       |
+   |    0 |      - | Reserved                                         |
    +------+--------+--------------------------------------------------+
    |    1 |      8 | Available Rate Upstream in bits per second (bps) |
    +------+--------+--------------------------------------------------+
