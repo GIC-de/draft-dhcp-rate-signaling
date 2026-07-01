@@ -64,7 +64,7 @@ Low Loss, and Scalable Throughput (L4S) architecture.
 
 In typical broadband access networks, the Customer Premises Equipment (CPE)
 is often unaware of the actual available data rates. This lack of visibility
-may occurs when an external modem or Optical Network Terminal (ONT) {{G.984.1}}
+may occur when an external modem or Optical Network Terminal (ONT) {{G.984.1}}
 connects to the CPE at a physical link speed that significantly exceeds the
 subscriber's provisioned service rate. Furthermore, operators commonly deploy
 unified access profiles where the available rate is artificially limited at
