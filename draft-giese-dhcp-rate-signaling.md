@@ -166,7 +166,7 @@ code set to TBD1 alongside an 8-bit length field, whereas DHCPv6 utilizes a 16-b
 option code set to TBD2 alongside a 16-bit length field.
 
 While the underlying semantics of the rate information remain identical across both IP versions,
-the internal payload sizing diverges to align with the conventions of each respective protocol.
+the internal payload sizing differs to align with the conventions of each respective protocol.
 For DHCPv4, the encapsulated sub-options utilize an 8-bit sub-option code and an 8-bit sub-option
 length field, mirroring the format of DHCPv4 Option 82 (Relay Agent Information Option) {{!RFC3046}}.
 Conversely, for DHCPv6, the encapsulated sub-options utilize a 16-bit sub-option code and a
