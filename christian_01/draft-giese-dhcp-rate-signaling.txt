@@ -5,8 +5,8 @@
 Network Working Group                                           C. Giese
 Internet-Draft                                                   RtBrick
 Intended status: Informational                              R. Patterson
-Expires: 18 December 2026                                         Sky UK
-                                                            16 June 2026
+Expires: 2 January 2027                                           Sky UK
+                                                             1 July 2026
 
 
                       DHCP Explicit Rate Signaling
@@ -53,7 +53,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 18 December 2026.
+   This Internet-Draft will expire on 2 January 2027.
 
 Copyright Notice
 
@@ -727,7 +727,16 @@ Table of Contents
 9.  Errors and Conflicts
 
    Clients receiving conflicting rate information across DHCPv4 and
-   DHCPv6 protocols SHOULD apply the most recently received value.
+   DHCPv6 SHOULD prefer a rate learned via DHCPv6 over a rate learned
+   via DHCPv4.  Implementations MUST retain the applied rate together
+   with its source protocol.  If the applied rate was learned via DHCPv6
+   and the corresponding DHCPv6 lease expires while a valid DHCPv4 lease
+   remains active, the client MUST treat the retained rate as
+   DHCPv4-derived for the purpose of subsequent updates and continue
+   using that rate until superseded by a later valid update.  If no
+   valid DHCPv4 lease remains active when the DHCPv6 lease expires, the
+   client MUST reset the applied rate to the device’s default
+   configuration.
 
    To ensure forward compatibility, clients, servers, and relay agents
    MUST ignore unrecognized sub-option codes and continue processing the
