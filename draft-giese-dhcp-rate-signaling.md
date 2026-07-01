@@ -2,7 +2,7 @@
 title: "DHCP Explicit Rate Signaling"
 docname: draft-giese-dhcp-rate-signaling-latest
 submissiontype: IETF
-date: 2026-06-16
+date: 2026-07-01
 ipr: trust200902
 category: info
 v: 3
@@ -583,8 +583,13 @@ design of AQM and congestion control algorithms remains outside the scope of thi
 
 # Errors and Conflicts {#errors}
 
-Clients receiving conflicting rate information across DHCPv4 and DHCPv6 protocols SHOULD apply the
-most recently received value.
+Clients receiving conflicting rate information across DHCPv4 and DHCPv6 SHOULD prefer a rate learned
+via DHCPv6 over a rate learned via DHCPv4. Implementations MUST retain the applied rate together with
+its source protocol. If the applied rate was learned via DHCPv6 and the corresponding DHCPv6 lease
+expires while a valid DHCPv4 lease remains active, the client MUST treat the retained rate as
+DHCPv4-derived for the purpose of subsequent updates and continue using that rate until superseded
+by a later valid update. If no valid DHCPv4 lease remains active when the DHCPv6 lease expires,
+the client MUST reset the applied rate to the device’s default configuration.
 
 To ensure forward compatibility, clients, servers, and relay agents MUST ignore unrecognized sub-option
 codes and continue processing the remainder of the Rate Option.
