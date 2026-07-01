@@ -175,7 +175,7 @@ Conversely, for DHCPv6, the encapsulated sub-options utilize a 16-bit sub-option
 ## Sub-Options Format
 
 The rate information field consists of a sequence of sub-option (SubOpt) Code/Length/Value tuples.
-Because the field sizing diverges between the two protocols to align with their
+Because the field sizing differs between the two protocols to align with their
 respective base specifications, the sub-options are encoded as follows:
 
 DHCPv4 Sub-Option Format:
