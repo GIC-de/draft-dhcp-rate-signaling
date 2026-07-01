@@ -159,7 +159,7 @@ Subscriber
 
 # DHCP Rate Option
 
-The DHCP Rate Option specified in this document employs a sub-option structure for
+The DHCP Rate Option specified in this document is a container option with a sub-option structure for
 both DHCPv4 and DHCPv6. The top-level option encapsulation strictly conforms to the
 requirements of each base protocol. Specifically, DHCPv4 utilizes an 8-bit option
 code set to TBD1 alongside an 8-bit length field, whereas DHCPv6 utilizes a 16-bit
