@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-06-28T02:27:32.982158+00:00",
+  "timestamp": "2026-07-02T02:08:03.774003+00:00",
   "repo": "GIC-de/draft-dhcp-rate-signaling",
   "labels": [
     {
@@ -64,9 +64,17 @@
       "labels": [],
       "body": "Bernie Volz from DHC Working Group proposes that the OPTION_RATE  DHCPv6 sub-options utilize a two-byte format for both the sub-option code and the sub-option length. This aligns sub-option formatting with the standard DHCPv6 option structure defined in RFC 8415, necessitating updates to existing text regarding minimum DHCPv6 option lengths.\n\nWhile this approach introduces a structural difference between the corresponding OPTION_RATE DHCPv4 sub-options (which use single-byte fields) and OPTION_RATE  DHCPv6 sub-options, both protocols can continue to share the same registry of sub-option values. Standardizing on a uniform two-byte encoding/decoding structure for all DHCPv6 options simplifies implementation and eliminates the need for specialized parsing logic when introducing new options.",
       "createdAt": "2026-05-27T06:35:04Z",
-      "updatedAt": "2026-05-27T06:35:04Z",
+      "updatedAt": "2026-07-01T13:48:07Z",
       "closedAt": null,
-      "comments": []
+      "comments": [
+        {
+          "author": "GIC-de",
+          "authorAssociation": "OWNER",
+          "body": "The draft version 01 now incorporates this topic.",
+          "createdAt": "2026-07-01T13:48:07Z",
+          "updatedAt": "2026-07-01T13:48:07Z"
+        }
+      ]
     },
     {
       "number": 2,
@@ -149,9 +157,9 @@
     {
       "number": 4,
       "id": "PR_kwDOSj3KQc7nLPcT",
-      "title": "updates for draft 01 (WIP)",
+      "title": "updates for draft 01",
       "url": "https://github.com/GIC-de/draft-dhcp-rate-signaling/pull/4",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "GIC-de",
       "authorAssociation": "OWNER",
       "assignees": [
@@ -160,19 +168,66 @@
       "labels": [],
       "body": "+ Zero Length Options (#1)\r\n+ DHCPv4/v6 Code Points (TBD1 and 2) (#2)\r\n+ DHCPv6 Sub-Options Format (#3)",
       "createdAt": "2026-06-16T20:03:12Z",
-      "updatedAt": "2026-06-16T20:03:12Z",
+      "updatedAt": "2026-07-01T13:38:56Z",
       "baseRepository": "GIC-de/draft-dhcp-rate-signaling",
       "baseRefName": "main",
       "baseRefOid": "548653231f04bceeeb1d2c6afb8d845509bc1785",
       "headRepository": "GIC-de/draft-dhcp-rate-signaling",
       "headRefName": "christian_01",
-      "headRefOid": "8a120adc024a69673fadbf9672f0b10d18fa14ef",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "headRefOid": "74551dcb3ff1edfcacf17d091aa8177f61286b53",
+      "closedAt": "2026-07-01T13:38:56Z",
+      "mergedAt": "2026-07-01T13:38:56Z",
+      "mergedBy": "GIC-de",
+      "mergeCommit": {
+        "oid": "7ee5802a10df73390f43de0ae90f14746c2dc693"
+      },
       "comments": [],
-      "reviews": []
+      "reviews": [
+        {
+          "id": "PRR_kwDOSj3KQc8AAAABErtigQ",
+          "commit": {
+            "abbreviatedOid": "8a120ad"
+          },
+          "author": "rpnz01",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "APPROVED",
+          "body": "minor tweaks",
+          "createdAt": "2026-07-01T13:05:04Z",
+          "updatedAt": "2026-07-01T13:27:39Z",
+          "comments": [
+            {
+              "originalPosition": 14,
+              "body": "```suggestion\nmay occur when an external modem or Optical Network Terminal (ONT) {{G.984.1}}\n```",
+              "createdAt": "2026-07-01T13:05:04Z",
+              "updatedAt": "2026-07-01T13:27:39Z"
+            },
+            {
+              "originalPosition": 40,
+              "body": "```suggestion\nthe internal payload sizing differs to align with the conventions of each respective protocol.\n```",
+              "createdAt": "2026-07-01T13:09:25Z",
+              "updatedAt": "2026-07-01T13:27:39Z"
+            },
+            {
+              "originalPosition": 51,
+              "body": "```suggestion\nBecause the field sizing differs between the two protocols to align with their\n```",
+              "createdAt": "2026-07-01T13:09:46Z",
+              "updatedAt": "2026-07-01T13:27:39Z"
+            },
+            {
+              "originalPosition": 33,
+              "body": "```suggestion\nThe DHCP Rate Option specified in this document is a container option with a sub-option structure for\n```",
+              "createdAt": "2026-07-01T13:19:03Z",
+              "updatedAt": "2026-07-01T13:27:39Z"
+            },
+            {
+              "originalPosition": 103,
+              "body": "```suggestion\n|    0 |      - | Reserved                                         |\n```",
+              "createdAt": "2026-07-01T13:26:37Z",
+              "updatedAt": "2026-07-01T13:27:39Z"
+            }
+          ]
+        }
+      ]
     }
   ]
 }
