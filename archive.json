@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-07-02T02:08:03.774003+00:00",
+  "timestamp": "2026-07-05T01:58:24.454782+00:00",
   "repo": "GIC-de/draft-dhcp-rate-signaling",
   "labels": [
     {
@@ -47,6 +47,11 @@
       "name": "wontfix",
       "description": "This will not be worked on",
       "color": "ffffff"
+    },
+    {
+      "name": "resolved",
+      "description": "Resolved in recent revisions",
+      "color": "0e8a16"
     }
   ],
   "issues": [
@@ -61,10 +66,12 @@
       "assignees": [
         "GIC-de"
       ],
-      "labels": [],
+      "labels": [
+        "resolved"
+      ],
       "body": "Bernie Volz from DHC Working Group proposes that the OPTION_RATE  DHCPv6 sub-options utilize a two-byte format for both the sub-option code and the sub-option length. This aligns sub-option formatting with the standard DHCPv6 option structure defined in RFC 8415, necessitating updates to existing text regarding minimum DHCPv6 option lengths.\n\nWhile this approach introduces a structural difference between the corresponding OPTION_RATE DHCPv4 sub-options (which use single-byte fields) and OPTION_RATE  DHCPv6 sub-options, both protocols can continue to share the same registry of sub-option values. Standardizing on a uniform two-byte encoding/decoding structure for all DHCPv6 options simplifies implementation and eliminates the need for specialized parsing logic when introducing new options.",
       "createdAt": "2026-05-27T06:35:04Z",
-      "updatedAt": "2026-07-01T13:48:07Z",
+      "updatedAt": "2026-07-03T08:49:04Z",
       "closedAt": null,
       "comments": [
         {
@@ -87,10 +94,12 @@
       "assignees": [
         "GIC-de"
       ],
-      "labels": [],
+      "labels": [
+        "resolved"
+      ],
       "body": "Using a single placeholder (TBD1) for both the DHCPv4 and DHCPv6 option codes incorrectly implies that IANA will assign the identical numeric value to both. While this alignment is highly desired, it cannot be guaranteed during allocation. Therefore, this document should use distinct placeholders, TBD1 for DHCPv4 and TBD2 for DHCPv6, to avoid making assumptions. A note should been added to the IANA Considerations section requesting that IANA assign the same numeric value to both protocols if possible.",
       "createdAt": "2026-05-27T06:38:23Z",
-      "updatedAt": "2026-05-27T06:41:50Z",
+      "updatedAt": "2026-07-03T08:49:05Z",
       "closedAt": null,
       "comments": []
     },
@@ -105,10 +114,12 @@
       "assignees": [
         "GIC-de"
       ],
-      "labels": [],
+      "labels": [
+        "resolved"
+      ],
       "body": "We should consider to not allow 0-length options. If we decide to allow them, we need to document exactly how a 0-length option differs from simply omitting the option altogether. If there is a deliberate semantic difference between an absent option and a 0-length option in a response, we must explicitly define that behavior in the draft.",
       "createdAt": "2026-05-27T06:41:41Z",
-      "updatedAt": "2026-05-27T06:41:41Z",
+      "updatedAt": "2026-07-03T08:49:05Z",
       "closedAt": null,
       "comments": []
     },
@@ -123,15 +134,17 @@
       "assignees": [
         "GIC-de"
       ],
-      "labels": [],
+      "labels": [
+        "resolved"
+      ],
       "body": "In the current draft-00, the guidance for handling conflicting rate information between DHCPv4 and DHCPv6 states that clients \"SHOULD apply the most recently received value\". However, in dual-stack environments where DHCP transactions often complete asynchronously, this approach can easily lead to a race condition. Depending on which protocol finishes its transaction last, the applied rate could flap unpredictably between the two values.\n\nTo guarantee a deterministic state and prevent this flapping, we should update the draft to dictate a strict hierarchy. The primary recommendation is to mandate that clients SHOULD explicitly prefer the DHCPv6 rate over the DHCPv4 rate. \n\nDictating a strict preference, however, introduces a new edge case regarding lease expirations that the draft needs to address. For instance, if a client prefers the DHCPv6 rate, we need to define what happens when that DHCPv6 lease expires while the DHCPv4 lease remains active. If the client simply retains the expired DHCPv6 rate indefinitely, the still-active DHCPv4 lease will never be able to step in and overwrite it.\n\nTo resolve this, clients should be required to store the learned rate alongside its source protocol. If the currently applied rate was sourced from DHCPv6 and that specific lease expires, the client needs to check if a valid DHCPv4 lease is still active. If it is, the active rate source effectively \"demotes\" to DHCPv4. While the applied rate itself temporarily remains the last value learned from DHCPv6, shifting the source ownership to DHCPv4 ensures that any subsequent DHCPv4 transactions can successfully update and overwrite that rate. On the other hand, if the preferred lease expires and there is no active secondary DHCPv4 lease to fall back on, the rate should simply reset to the device's default configuration.",
       "createdAt": "2026-06-16T20:44:34Z",
-      "updatedAt": "2026-06-26T12:37:51Z",
+      "updatedAt": "2026-07-03T08:49:06Z",
       "closedAt": null,
       "comments": [
         {
           "author": "rpnz01",
-          "authorAssociation": "NONE",
+          "authorAssociation": "CONTRIBUTOR",
           "body": "an alternative, lighter weight approach so that clients don't have to keep state yet still get stable and deterministic behaviour, is we set a rule based on the values rather than the address family.  i.e., clients SHOULD prefer the lower of the values.\nThis can be implemented with simple logic, rather than a lookup.\n\nNow if we should prefer lower or higher, I don't know.  I think lower is safer?",
           "createdAt": "2026-06-25T12:36:43Z",
           "updatedAt": "2026-06-25T12:36:43Z"
@@ -145,7 +158,7 @@
         },
         {
           "author": "rpnz01",
-          "authorAssociation": "NONE",
+          "authorAssociation": "CONTRIBUTOR",
           "body": "In my head I was thinking those changes are intentional and should occur simultaneously across both address families in parallel under BAU operations, so we're only having to catch the fringe cases where they may not for some unplanned reason.\n\nBut yeah, whilst changes may get pushed to the server in parallel by the OSS, DHCP clients will only receive the updated information upon renew, and the lifetimes may be different between address families, plus the entropy with DHCPv6 means renews will always be skewed.   \n\nLet's suggest the table to track idea and see what the WG thinks.",
           "createdAt": "2026-06-26T12:37:51Z",
           "updatedAt": "2026-06-26T12:37:51Z"
