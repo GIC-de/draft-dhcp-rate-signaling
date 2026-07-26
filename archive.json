@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-07-05T01:58:24.454782+00:00",
+  "timestamp": "2026-07-26T01:45:06.177092+00:00",
   "repo": "GIC-de/draft-dhcp-rate-signaling",
   "labels": [
     {
@@ -139,7 +139,7 @@
       ],
       "body": "In the current draft-00, the guidance for handling conflicting rate information between DHCPv4 and DHCPv6 states that clients \"SHOULD apply the most recently received value\". However, in dual-stack environments where DHCP transactions often complete asynchronously, this approach can easily lead to a race condition. Depending on which protocol finishes its transaction last, the applied rate could flap unpredictably between the two values.\n\nTo guarantee a deterministic state and prevent this flapping, we should update the draft to dictate a strict hierarchy. The primary recommendation is to mandate that clients SHOULD explicitly prefer the DHCPv6 rate over the DHCPv4 rate. \n\nDictating a strict preference, however, introduces a new edge case regarding lease expirations that the draft needs to address. For instance, if a client prefers the DHCPv6 rate, we need to define what happens when that DHCPv6 lease expires while the DHCPv4 lease remains active. If the client simply retains the expired DHCPv6 rate indefinitely, the still-active DHCPv4 lease will never be able to step in and overwrite it.\n\nTo resolve this, clients should be required to store the learned rate alongside its source protocol. If the currently applied rate was sourced from DHCPv6 and that specific lease expires, the client needs to check if a valid DHCPv4 lease is still active. If it is, the active rate source effectively \"demotes\" to DHCPv4. While the applied rate itself temporarily remains the last value learned from DHCPv6, shifting the source ownership to DHCPv4 ensures that any subsequent DHCPv4 transactions can successfully update and overwrite that rate. On the other hand, if the preferred lease expires and there is no active secondary DHCPv4 lease to fall back on, the rate should simply reset to the device's default configuration.",
       "createdAt": "2026-06-16T20:44:34Z",
-      "updatedAt": "2026-07-03T08:49:06Z",
+      "updatedAt": "2026-07-25T09:26:26Z",
       "closedAt": null,
       "comments": [
         {
@@ -162,8 +162,121 @@
           "body": "In my head I was thinking those changes are intentional and should occur simultaneously across both address families in parallel under BAU operations, so we're only having to catch the fringe cases where they may not for some unplanned reason.\n\nBut yeah, whilst changes may get pushed to the server in parallel by the OSS, DHCP clients will only receive the updated information upon renew, and the lifetimes may be different between address families, plus the entropy with DHCPv6 means renews will always be skewed.   \n\nLet's suggest the table to track idea and see what the WG thinks.",
           "createdAt": "2026-06-26T12:37:51Z",
           "updatedAt": "2026-06-26T12:37:51Z"
+        },
+        {
+          "author": "moeller0",
+          "authorAssociation": "NONE",
+          "body": "I am all for act on all reports so \"most recent report wins\". It seems not too much to expect an ISP to feed both its DHCPv4 and DHCPv6 pathways with \"ground truth\" rate information, especially in the context of injecting that via a relay agent at e.g. the BNG. The protocol we invent here will not be fool-proof, so let's not make it more complicated by trying to solve competence issues at the ISP side (respectfully, I assume ISPs to get this right anyway). We could make it a MUST that both DHCP variants use the same ground truth information, on the basis of them not doing it will violate our protocol's assumptions.",
+          "createdAt": "2026-07-25T09:26:26Z",
+          "updatedAt": "2026-07-25T09:26:26Z"
         }
       ]
+    },
+    {
+      "number": 6,
+      "id": "I_kwDOSj3KQc8AAAABKBY2dA",
+      "title": "Informational Rates",
+      "url": "https://github.com/GIC-de/draft-dhcp-rate-signaling/issues/6",
+      "state": "OPEN",
+      "author": "GIC-de",
+      "authorAssociation": "OWNER",
+      "assignees": [
+        "GIC-de"
+      ],
+      "labels": [],
+      "body": "Here, `MUST NOT` is incorrect; `SHOULD NOT` is a more appropriate choice, as CPE application remains possible.\n\n```\nIf the rate type is set to 0, the explicitly signaled rates are\ninformational only.  Devices receiving this rate type MUST NOT apply\nthe specified rate limits to their physical interfaces, traffic\nshapers, policers, or Active Queue Management (AQM) parameters. \n```",
+      "createdAt": "2026-07-24T10:20:42Z",
+      "updatedAt": "2026-07-24T10:20:42Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 7,
+      "id": "I_kwDOSj3KQc8AAAABKFJ7Vw",
+      "title": "PPP Authentication Reply",
+      "url": "https://github.com/GIC-de/draft-dhcp-rate-signaling/issues/7",
+      "state": "OPEN",
+      "author": "GIC-de",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "Here, `MUST` is incorrect; `SHOULD` is a more appropriate choice, as CPE application remains possible.\n```\nIf a client receives rate limits embedded within the PPP\nauthentication reply message and concurrently receives the DHCP\nOPTION_RATE, the explicitly signaled DHCP OPTION_RATE MUST take\npriority.  This precedence ensures that the standardized, dynamic\nDHCP signaling supersedes fragmented or proprietary rate limits\npreviously negotiated during the PPP authentication phase.\n```\n\n",
+      "createdAt": "2026-07-24T19:41:43Z",
+      "updatedAt": "2026-07-25T09:19:51Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "moeller0",
+          "authorAssociation": "NONE",
+          "body": "As written on-list, if we opt to go for \"latest report takes precedence\" this resolves organically...",
+          "createdAt": "2026-07-25T09:19:51Z",
+          "updatedAt": "2026-07-25T09:19:51Z"
+        }
+      ]
+    },
+    {
+      "number": 8,
+      "id": "I_kwDOSj3KQc8AAAABKIvIQg",
+      "title": "Mandate L2-rate information, make L3-information an optional addition",
+      "url": "https://github.com/GIC-de/draft-dhcp-rate-signaling/issues/8",
+      "state": "OPEN",
+      "author": "moeller0",
+      "authorAssociation": "NONE",
+      "assignees": [],
+      "labels": [],
+      "body": "For the purpose of actually configuring CPE-side traffic shapers (required for allowing AQMs to actually be useful, when the interface egress rate exceeds the contracted bottleneck rate) the applicable gross L2-rate is necessary, so make that mandatory. L3-payload rates can be nice to report in that these could match closely to what end users see in capacity tests but make these second-class citizens here and mandate L2-rates. This might require a change in the options to always report L2 and L3 rates.",
+      "createdAt": "2026-07-25T09:36:03Z",
+      "updatedAt": "2026-07-25T09:36:03Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 9,
+      "id": "I_kwDOSj3KQc8AAAABKIwwgg",
+      "title": "Add L2-overhead information",
+      "url": "https://github.com/GIC-de/draft-dhcp-rate-signaling/issues/9",
+      "state": "OPEN",
+      "author": "moeller0",
+      "authorAssociation": "NONE",
+      "assignees": [],
+      "labels": [],
+      "body": "To properly configure a traffic shaper one needs at least both the true L2-bottleneck rate (or a somewhat lower estimate thereof, e.g. if reporting sync rates of DSL links using PTM the reported rate should be derated for PTM's 64/65 encoding) and the applicable effective per-packet overhead (applicable in that all effective parts are accounted, e.g. ethernet's inter frame gap is not a data, but \"radio-silence\" worth 12 octets worth of transmission time). As the overhead is hard to deduce even when the true effective bottleneck rate is known, let's add two more mandatory fields to report here downstream and upstream per-packet overhead.\nGiven the goal of this method is to allow competent CPE-side traffic shaping/scheduling/queue management, let's make sure we mandate the necessary pieces of information to actually make that happen.",
+      "createdAt": "2026-07-25T09:44:59Z",
+      "updatedAt": "2026-07-25T09:44:59Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 10,
+      "id": "I_kwDOSj3KQc8AAAABKIxX6g",
+      "title": "Consider adding information about \"funky\" encapsulations",
+      "url": "https://github.com/GIC-de/draft-dhcp-rate-signaling/issues/10",
+      "state": "OPEN",
+      "author": "moeller0",
+      "authorAssociation": "NONE",
+      "assignees": [],
+      "labels": [],
+      "body": "The canonical example for a quirky encapsulation is ATM/AAL5 that mandates that all data frames are packed into an integer number of ATM cells with the last cell(s) carrying up to 47 bytes of padding. While I hope that no modern encapsulation will ever become that baroque, let's not base the option's utility on my hopes. To solve this we should add a way to signal quirky encapsulations, or maybe relevant encasulations?",
+      "createdAt": "2026-07-25T09:48:44Z",
+      "updatedAt": "2026-07-25T09:48:44Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 11,
+      "id": "I_kwDOSj3KQc8AAAABKJ8UWA",
+      "title": "Broaden scope to LAN distribution",
+      "url": "https://github.com/GIC-de/draft-dhcp-rate-signaling/issues/11",
+      "state": "OPEN",
+      "author": "blocktrron",
+      "authorAssociation": "NONE",
+      "assignees": [],
+      "labels": [],
+      "body": "The concepts focus on the WAN side of a CPE device, but the concept is also useful to apply in a LAN environment to communicate the available WAN bandwidth to a client device.\n\nAs a specific use-case, we employ server-side shaping in VPN tunneling applications which primarily cap at CPU capacity of the terminating devices, however this might still be above the WAN bandwidth. Having such a DHCP option available also for LAN is very useful to employ bandwidth limits.\n\nI don't think the concept needs functional changes, however this can be taken into the Problem Statements.\nPotentially this case needs clarification in how e.g. a case of a Multi-Gbit WAN and Single-Gbit LAN shall be handled.",
+      "createdAt": "2026-07-25T15:55:18Z",
+      "updatedAt": "2026-07-25T15:55:18Z",
+      "closedAt": null,
+      "comments": []
     }
   ],
   "pulls": [
