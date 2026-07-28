@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-07-26T01:45:06.177092+00:00",
+  "timestamp": "2026-07-28T01:27:01.078215+00:00",
   "repo": "GIC-de/draft-dhcp-rate-signaling",
   "labels": [
     {
@@ -139,7 +139,7 @@
       ],
       "body": "In the current draft-00, the guidance for handling conflicting rate information between DHCPv4 and DHCPv6 states that clients \"SHOULD apply the most recently received value\". However, in dual-stack environments where DHCP transactions often complete asynchronously, this approach can easily lead to a race condition. Depending on which protocol finishes its transaction last, the applied rate could flap unpredictably between the two values.\n\nTo guarantee a deterministic state and prevent this flapping, we should update the draft to dictate a strict hierarchy. The primary recommendation is to mandate that clients SHOULD explicitly prefer the DHCPv6 rate over the DHCPv4 rate. \n\nDictating a strict preference, however, introduces a new edge case regarding lease expirations that the draft needs to address. For instance, if a client prefers the DHCPv6 rate, we need to define what happens when that DHCPv6 lease expires while the DHCPv4 lease remains active. If the client simply retains the expired DHCPv6 rate indefinitely, the still-active DHCPv4 lease will never be able to step in and overwrite it.\n\nTo resolve this, clients should be required to store the learned rate alongside its source protocol. If the currently applied rate was sourced from DHCPv6 and that specific lease expires, the client needs to check if a valid DHCPv4 lease is still active. If it is, the active rate source effectively \"demotes\" to DHCPv4. While the applied rate itself temporarily remains the last value learned from DHCPv6, shifting the source ownership to DHCPv4 ensures that any subsequent DHCPv4 transactions can successfully update and overwrite that rate. On the other hand, if the preferred lease expires and there is no active secondary DHCPv4 lease to fall back on, the rate should simply reset to the device's default configuration.",
       "createdAt": "2026-06-16T20:44:34Z",
-      "updatedAt": "2026-07-25T09:26:26Z",
+      "updatedAt": "2026-07-27T17:08:15Z",
       "closedAt": null,
       "comments": [
         {
@@ -169,6 +169,20 @@
           "body": "I am all for act on all reports so \"most recent report wins\". It seems not too much to expect an ISP to feed both its DHCPv4 and DHCPv6 pathways with \"ground truth\" rate information, especially in the context of injecting that via a relay agent at e.g. the BNG. The protocol we invent here will not be fool-proof, so let's not make it more complicated by trying to solve competence issues at the ISP side (respectfully, I assume ISPs to get this right anyway). We could make it a MUST that both DHCP variants use the same ground truth information, on the basis of them not doing it will violate our protocol's assumptions.",
           "createdAt": "2026-07-25T09:26:26Z",
           "updatedAt": "2026-07-25T09:26:26Z"
+        },
+        {
+          "author": "rpnz01",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "Thanks @moeller0.\n\nI like the idea of specifying that they MUST be the same, with the justification that rates are not [usually] traffic managed individually per L3 address family.  There was also a comment from Ondrej at the mic, which I completely misunderstood, asking about should the two option values across the address families be summed together, we could fix that uncertainty at the same time.\n\nThe \"most recent report wins\", I'm still on the fence about.  I like the simplicity of it, but unsure about how non-deterministic it is, and  have historically seen issues when implementing traffic management based on TR-101's Option 82, depending on if DHCPv4 or DHCPv6 was used for authentication last.  But that was a combination of implementation issues / vendor support, that we should be designing this around.\n\nI like the deterministic-ness of saying \"in case of a discrepancy between address families, DHCPv6 option takes precedent\", but could be swayed into the \"most recent\" camp.",
+          "createdAt": "2026-07-27T15:08:00Z",
+          "updatedAt": "2026-07-27T15:08:00Z"
+        },
+        {
+          "author": "GIC-de",
+          "authorAssociation": "OWNER",
+          "body": "I tend to agree with the \"most recent wins\" approach. Temporary discrepancies between DHCPv4 and DHCPv6 are usually just expected transitional states during a rate change. Whichever protocol renews first will carry the new rate, so applying the most recently received value ensures the fastest application of updated rates.\n\nIf the network continuously sends different rates across the two address families, that is fundamentally a provisioning error. I am not convinced we need to enforce a strict mitigation strategy for handling misconfigured networks. Instead, we could propose a few valid strategies in the draft, but ultimately leave it to the implementation to choose the one that best fits their architecture.\n\nFrom a practical implementation standpoint, \"most recent wins\" is often much easier to deploy. This is especially true for typical Linux-based stacks, where independent DHCPv4 and DHCPv6 daemons act asynchronously and simply trigger external scripts to apply rate information.",
+          "createdAt": "2026-07-27T17:08:15Z",
+          "updatedAt": "2026-07-27T17:08:15Z"
         }
       ]
     },
@@ -186,9 +200,17 @@
       "labels": [],
       "body": "Here, `MUST NOT` is incorrect; `SHOULD NOT` is a more appropriate choice, as CPE application remains possible.\n\n```\nIf the rate type is set to 0, the explicitly signaled rates are\ninformational only.  Devices receiving this rate type MUST NOT apply\nthe specified rate limits to their physical interfaces, traffic\nshapers, policers, or Active Queue Management (AQM) parameters. \n```",
       "createdAt": "2026-07-24T10:20:42Z",
-      "updatedAt": "2026-07-24T10:20:42Z",
+      "updatedAt": "2026-07-26T17:39:10Z",
       "closedAt": null,
-      "comments": []
+      "comments": [
+        {
+          "author": "GIC-de",
+          "authorAssociation": "OWNER",
+          "body": "If the rate type is informational (0), it is considered to be L2 (default). ",
+          "createdAt": "2026-07-26T17:39:09Z",
+          "updatedAt": "2026-07-26T17:39:09Z"
+        }
+      ]
     },
     {
       "number": 7,
@@ -198,11 +220,13 @@
       "state": "OPEN",
       "author": "GIC-de",
       "authorAssociation": "OWNER",
-      "assignees": [],
+      "assignees": [
+        "GIC-de"
+      ],
       "labels": [],
       "body": "Here, `MUST` is incorrect; `SHOULD` is a more appropriate choice, as CPE application remains possible.\n```\nIf a client receives rate limits embedded within the PPP\nauthentication reply message and concurrently receives the DHCP\nOPTION_RATE, the explicitly signaled DHCP OPTION_RATE MUST take\npriority.  This precedence ensures that the standardized, dynamic\nDHCP signaling supersedes fragmented or proprietary rate limits\npreviously negotiated during the PPP authentication phase.\n```\n\n",
       "createdAt": "2026-07-24T19:41:43Z",
-      "updatedAt": "2026-07-25T09:19:51Z",
+      "updatedAt": "2026-07-26T11:11:35Z",
       "closedAt": null,
       "comments": [
         {
@@ -211,6 +235,20 @@
           "body": "As written on-list, if we opt to go for \"latest report takes precedence\" this resolves organically...",
           "createdAt": "2026-07-25T09:19:51Z",
           "updatedAt": "2026-07-25T09:19:51Z"
+        },
+        {
+          "author": "GIC-de",
+          "authorAssociation": "OWNER",
+          "body": "Based on the discussion, I think it\u2019s best to propose a recommended conflict resolution strategy rather than making it normative. This leaves room for CPE vendors to make it configurable or adapt their approach as field deployments evolve. ",
+          "createdAt": "2026-07-26T11:03:53Z",
+          "updatedAt": "2026-07-26T11:03:53Z"
+        },
+        {
+          "author": "moeller0",
+          "authorAssociation": "NONE",
+          "body": "Sure, a SHOULD with a short rationale to allow timely updates seems fine, or even just a MAY....",
+          "createdAt": "2026-07-26T11:11:35Z",
+          "updatedAt": "2026-07-26T11:11:35Z"
         }
       ]
     },
@@ -226,9 +264,24 @@
       "labels": [],
       "body": "For the purpose of actually configuring CPE-side traffic shapers (required for allowing AQMs to actually be useful, when the interface egress rate exceeds the contracted bottleneck rate) the applicable gross L2-rate is necessary, so make that mandatory. L3-payload rates can be nice to report in that these could match closely to what end users see in capacity tests but make these second-class citizens here and mandate L2-rates. This might require a change in the options to always report L2 and L3 rates.",
       "createdAt": "2026-07-25T09:36:03Z",
-      "updatedAt": "2026-07-25T09:36:03Z",
+      "updatedAt": "2026-07-26T13:16:51Z",
       "closedAt": null,
-      "comments": []
+      "comments": [
+        {
+          "author": "GIC-de",
+          "authorAssociation": "OWNER",
+          "body": "Let me provide some operational background behind the demand for L3 rates. The core issue goes both ways: you cannot perfectly convert L2 to L3 and vice versa because both require assuming an average packet size. While you could assume maximum frame size, the average packet size will likely be lower. So while most providers would likely prefer to apply an L2 rate, regulatory authorities in some countries strictly enforce L3 rates. In a large ISP I worked with, this went so far that the provider could not sell a 1000 Mbps product if the CPE lacked 2.5G ports, because a 1G physical port simply cannot deliver 1000 Mbps at L3 due to framing overhead. If a CPE cannot install L3 shapers directly, it needs to internally convert the rate based on its own local stack, accounting for its specific VLAN headers, PPPoE encapsulation, and other overhead. The default rate type remains L2 if not explicitly signaled, and the draft also allows clients to send a hint in their request if they prefer an L2 or L3 rate. That said, I see that this whole topic needs more detail in the draft, and we plan to clarify these mechanics in the next revision.",
+          "createdAt": "2026-07-26T12:36:41Z",
+          "updatedAt": "2026-07-26T12:36:41Z"
+        },
+        {
+          "author": "moeller0",
+          "authorAssociation": "NONE",
+          "body": "> you cannot perfectly convert L2 to L3 and vice versa because both require assuming an average packet size.\n\nI respectfully beg to differ, knowing all applicable overhead (general and per-packet) I can very much deduce for a given L- packet how much transmission time it will consume on L2. My goal here is to make sure the proposed mechanism will include the required information tp make that happen.\n\n\n> So while most providers would likely prefer to apply an L2 rate, regulatory authorities in some countries strictly enforce L3 rates.\n\nI would argue providers opt for L2 rate shaping, as that is the only thing that makes sense given the reasons to traffic shape in the first place... And regulatory agencies might simply just want that advertised/contracted rates are communicated as easy to confirm in on-line speedtests TCP/HTTPS payload rates. I have yet to see a regulation requiring true L3-traffic shaping (see my example calculations how that would require an ISP to increase the L2-rate for smaller packets). The German regulatory agency (agreeing with BEREC guidelines) expects that the advertised maximum datarate is specified as L4-payload rate, but at the same time (also in agreement with BEREC) notes that this rate does not need to be the actual limit rate... So providers simply set their L2-shapers such that for the typical speedtest configuration (maximum MSS/MTU sized packets) the L4-payload rate exceeds the contracted rate....\n\n\n> In a large ISP I worked with, this went so far that the provider could not sell a 1000 Mbps product if the CPE lacked 2.5G ports, because a 1G physical port simply cannot deliver 1000 Mbps at L3 due to framing overhead.\n\nI could be wrong, but that very much sounds like the situation in Germany. However quite a number of ISPs opted to do exactly that offer nominal 1000 Mbps plans that are limited by Gigabit ethernet ports to actually only deliver around 940 Mbps. The national regulatory agency seems to tolerate this and even baked this into its official method to confirm whether ISPs actually fulfill their contracted rates, as a 10% discount, that is ISPs simply need to deliver >= 90% of the advertised rates as payload rates.\n\n\n\n> If a CPE cannot install L3 shapers directly, it needs to internally convert the rate based on its own local stack, accounting for its specific VLAN headers, PPPoE encapsulation, and other overhead.\n\nI disagree, unless the bottleneck operates on L3 (and L2 has ample reserve capacity to absorb the cost on L2-overhead) this will not work out well. A competent shaper needs to faithfully model the true bottleneck, its bottleneck rate, its per-packet overhead and quirky encapsulations like ATM/AAL5, otherwise it will fail to properly shape the traffic in some (probably mot too likely) scenarios. This ID, should in my opinion clearly document and strongly encourage providers to do the right thing here.",
+          "createdAt": "2026-07-26T13:16:51Z",
+          "updatedAt": "2026-07-26T13:16:51Z"
+        }
+      ]
     },
     {
       "number": 9,
@@ -254,11 +307,13 @@
       "state": "OPEN",
       "author": "moeller0",
       "authorAssociation": "NONE",
-      "assignees": [],
+      "assignees": [
+        "GIC-de"
+      ],
       "labels": [],
       "body": "The canonical example for a quirky encapsulation is ATM/AAL5 that mandates that all data frames are packed into an integer number of ATM cells with the last cell(s) carrying up to 47 bytes of padding. While I hope that no modern encapsulation will ever become that baroque, let's not base the option's utility on my hopes. To solve this we should add a way to signal quirky encapsulations, or maybe relevant encasulations?",
       "createdAt": "2026-07-25T09:48:44Z",
-      "updatedAt": "2026-07-25T09:48:44Z",
+      "updatedAt": "2026-07-26T11:04:02Z",
       "closedAt": null,
       "comments": []
     },
@@ -270,13 +325,30 @@
       "state": "OPEN",
       "author": "blocktrron",
       "authorAssociation": "NONE",
-      "assignees": [],
+      "assignees": [
+        "GIC-de"
+      ],
       "labels": [],
       "body": "The concepts focus on the WAN side of a CPE device, but the concept is also useful to apply in a LAN environment to communicate the available WAN bandwidth to a client device.\n\nAs a specific use-case, we employ server-side shaping in VPN tunneling applications which primarily cap at CPU capacity of the terminating devices, however this might still be above the WAN bandwidth. Having such a DHCP option available also for LAN is very useful to employ bandwidth limits.\n\nI don't think the concept needs functional changes, however this can be taken into the Problem Statements.\nPotentially this case needs clarification in how e.g. a case of a Multi-Gbit WAN and Single-Gbit LAN shall be handled.",
       "createdAt": "2026-07-25T15:55:18Z",
-      "updatedAt": "2026-07-25T15:55:18Z",
+      "updatedAt": "2026-07-27T07:55:51Z",
       "closedAt": null,
-      "comments": []
+      "comments": [
+        {
+          "author": "GIC-de",
+          "authorAssociation": "OWNER",
+          "body": "Great point. That\u2019s a very interesting scenario and worth considering in this context.",
+          "createdAt": "2026-07-26T11:00:02Z",
+          "updatedAt": "2026-07-26T11:00:02Z"
+        },
+        {
+          "author": "blocktrron",
+          "authorAssociation": "NONE",
+          "body": "In the LAN case, the meaning needs to be specified more closely to refer to the maximum expected bandwidth for the receiving device.\nThe current scope does not cover WiFi Hotspot applications where hard shaper limits might be defined per-user. \n\nThinking about specific use-cases, communicating this information to client devices can benefit from:\n\n - Transfer Time Estimations for Downloads\n - Selection of suitable Live Video Quality defaults (Streaming / P2P calls)",
+          "createdAt": "2026-07-27T07:55:51Z",
+          "updatedAt": "2026-07-27T07:55:51Z"
+        }
+      ]
     }
   ],
   "pulls": [
