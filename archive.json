@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-07-28T01:27:01.078215+00:00",
+  "timestamp": "2026-07-30T01:19:56.346742+00:00",
   "repo": "GIC-de/draft-dhcp-rate-signaling",
   "labels": [
     {
@@ -139,7 +139,7 @@
       ],
       "body": "In the current draft-00, the guidance for handling conflicting rate information between DHCPv4 and DHCPv6 states that clients \"SHOULD apply the most recently received value\". However, in dual-stack environments where DHCP transactions often complete asynchronously, this approach can easily lead to a race condition. Depending on which protocol finishes its transaction last, the applied rate could flap unpredictably between the two values.\n\nTo guarantee a deterministic state and prevent this flapping, we should update the draft to dictate a strict hierarchy. The primary recommendation is to mandate that clients SHOULD explicitly prefer the DHCPv6 rate over the DHCPv4 rate. \n\nDictating a strict preference, however, introduces a new edge case regarding lease expirations that the draft needs to address. For instance, if a client prefers the DHCPv6 rate, we need to define what happens when that DHCPv6 lease expires while the DHCPv4 lease remains active. If the client simply retains the expired DHCPv6 rate indefinitely, the still-active DHCPv4 lease will never be able to step in and overwrite it.\n\nTo resolve this, clients should be required to store the learned rate alongside its source protocol. If the currently applied rate was sourced from DHCPv6 and that specific lease expires, the client needs to check if a valid DHCPv4 lease is still active. If it is, the active rate source effectively \"demotes\" to DHCPv4. While the applied rate itself temporarily remains the last value learned from DHCPv6, shifting the source ownership to DHCPv4 ensures that any subsequent DHCPv4 transactions can successfully update and overwrite that rate. On the other hand, if the preferred lease expires and there is no active secondary DHCPv4 lease to fall back on, the rate should simply reset to the device's default configuration.",
       "createdAt": "2026-06-16T20:44:34Z",
-      "updatedAt": "2026-07-27T17:08:15Z",
+      "updatedAt": "2026-07-28T08:38:25Z",
       "closedAt": null,
       "comments": [
         {
@@ -183,6 +183,20 @@
           "body": "I tend to agree with the \"most recent wins\" approach. Temporary discrepancies between DHCPv4 and DHCPv6 are usually just expected transitional states during a rate change. Whichever protocol renews first will carry the new rate, so applying the most recently received value ensures the fastest application of updated rates.\n\nIf the network continuously sends different rates across the two address families, that is fundamentally a provisioning error. I am not convinced we need to enforce a strict mitigation strategy for handling misconfigured networks. Instead, we could propose a few valid strategies in the draft, but ultimately leave it to the implementation to choose the one that best fits their architecture.\n\nFrom a practical implementation standpoint, \"most recent wins\" is often much easier to deploy. This is especially true for typical Linux-based stacks, where independent DHCPv4 and DHCPv6 daemons act asynchronously and simply trigger external scripts to apply rate information.",
           "createdAt": "2026-07-27T17:08:15Z",
           "updatedAt": "2026-07-27T17:08:15Z"
+        },
+        {
+          "author": "moeller0",
+          "authorAssociation": "NONE",
+          "body": "Considering the options I believe \"most recent wins\" is an acceptable compromise, as it naturally allows the timely rate changes some links might make desirable and keeps complexity at the CPE small, as there is little state to keep... if we want some help against misconfigurations we could recommend CPE to log the received rate information options for post-game analysis?\nWe could also explicitly note that the modell here is a unified L3-agnostic traffic shaper... and use SHOULDs so experimentally minded providers can still feel allowed to implement L3-aware shaper hierarchies if they feel like it.  ",
+          "createdAt": "2026-07-28T07:18:48Z",
+          "updatedAt": "2026-07-28T07:18:48Z"
+        },
+        {
+          "author": "rpnz01",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "Consider me won over to the \"most recent wins\" camp. :) ",
+          "createdAt": "2026-07-28T08:38:25Z",
+          "updatedAt": "2026-07-28T08:38:25Z"
         }
       ]
     },
@@ -331,7 +345,7 @@
       "labels": [],
       "body": "The concepts focus on the WAN side of a CPE device, but the concept is also useful to apply in a LAN environment to communicate the available WAN bandwidth to a client device.\n\nAs a specific use-case, we employ server-side shaping in VPN tunneling applications which primarily cap at CPU capacity of the terminating devices, however this might still be above the WAN bandwidth. Having such a DHCP option available also for LAN is very useful to employ bandwidth limits.\n\nI don't think the concept needs functional changes, however this can be taken into the Problem Statements.\nPotentially this case needs clarification in how e.g. a case of a Multi-Gbit WAN and Single-Gbit LAN shall be handled.",
       "createdAt": "2026-07-25T15:55:18Z",
-      "updatedAt": "2026-07-27T07:55:51Z",
+      "updatedAt": "2026-07-29T10:53:49Z",
       "closedAt": null,
       "comments": [
         {
@@ -347,6 +361,27 @@
           "body": "In the LAN case, the meaning needs to be specified more closely to refer to the maximum expected bandwidth for the receiving device.\nThe current scope does not cover WiFi Hotspot applications where hard shaper limits might be defined per-user. \n\nThinking about specific use-cases, communicating this information to client devices can benefit from:\n\n - Transfer Time Estimations for Downloads\n - Selection of suitable Live Video Quality defaults (Streaming / P2P calls)",
           "createdAt": "2026-07-27T07:55:51Z",
           "updatedAt": "2026-07-27T07:55:51Z"
+        },
+        {
+          "author": "moeller0",
+          "authorAssociation": "NONE",
+          "body": "Well, any such use would need to be back-stopped by a traffic shaper/policer, especially in the WiFi hotspot case leaving enforcement of limits to the endpoints is inherently abusable/gameable, no?",
+          "createdAt": "2026-07-28T07:33:11Z",
+          "updatedAt": "2026-07-28T07:33:11Z"
+        },
+        {
+          "author": "blocktrron",
+          "authorAssociation": "NONE",
+          "body": "This is not about limit enforcement on the end user device but being able to select the most appropriate configuration for a given experience on the device.\n\nIf a smartphone is communicated a connection is able to deliver single digit megabit transfer speeds, it can either auto-select a appropriate resolution / bitrate for live video or can change to mobile data for carrying applications exceeding the LAN capacity.\n\nHow this is done is not part of this document, but just ideas which use cases can benefit from this information being available.",
+          "createdAt": "2026-07-28T09:48:36Z",
+          "updatedAt": "2026-07-28T09:48:36Z"
+        },
+        {
+          "author": "moeller0",
+          "authorAssociation": "NONE",
+          "body": "Given that these are at best hints (hard to guarantee the full internet path to arbitrary servers) said smartphone will still need all the methods for automatic rate adjustments, sure, it might start from a higher starting point or it might forego starting at all (but now we opened a DOS channel, or a way to force the use of likely more costly mobile data). For the VPN application it makes some sense to create back-pressure rather earlier than later.\nThat said, I am all for distributing rate information to the LAN side, so in principle we agree I just want to \"kick the tires\" on potential examples we could use to motivate this in the draft.",
+          "createdAt": "2026-07-28T09:55:14Z",
+          "updatedAt": "2026-07-29T10:53:49Z"
         }
       ]
     }
