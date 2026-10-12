@@ -101,15 +101,15 @@ inform end devices about the capacity of the upstream connection.
 
 ## Problem Statement
 
-In broadband access networks, the rate available to a subscriber is typically lower than the
-speed of the physical link that connects the Customer Premises Equipment (CPE) to the network.
-The provisioned rate is commonly enforced at the Broadband Network Gateway (BNG) {{TR101}}, which
-limits the traffic of each subscriber to the purchased service tier. In addition, the upstream
-rate can be limited by an access device connected to the CPE, such as an Optical Network Terminal
-(ONT) {{G.984.1}}, a DSL modem, or a cable modem, or within the access network, for example by the
-upstream bandwidth allocation of a passive optical network or by the synchronization rate of a
-DSL line. The CPE is typically unaware of these rates and sends at the speed of its physical
-link.
+In broadband access networks, the rate available to a subscriber is typically lower than the speed
+of the physical link that connects the Customer Premises Equipment (CPE) to the network. The
+provisioned rate is commonly enforced at the Broadband Network Gateway (BNG) {{TR101}}, which limits
+the traffic of each subscriber to the purchased service tier. In addition, the upstream rate can be
+limited by an access device connected to the CPE, such as an Optical Network Terminal (ONT)
+{{G.984.1}}, a DSL modem, or a cable modem, or within the access network, for example by the
+upstream bandwidth allocation of a passive optical network, by the synchronization rate of a DSL
+line, or by the upstream rate limit enforced by a cable modem. The CPE is typically unaware of these
+rates and sends at the speed of its physical link.
 
 In the upstream direction, the provisioned rate is typically enforced at the BNG on traffic
 received from the subscriber. Per-subscriber queuing in the upstream direction is not supported
@@ -240,6 +240,10 @@ Downstream
   to traffic received on the interface on which the DHCP Rate Option was received. For a relay
   agent or snooping device, this corresponds to traffic sent on the client-facing interface or
   port.
+
+Enforcement Point
+: The node or link at which the signaled rates are enforced or which constitutes the bottleneck
+  of the path, for example a policer at the BNG or an access link.
 
 Receiver
 : Any node that processes a received DHCP Rate Option, including DHCP clients, relay agents
@@ -425,56 +429,6 @@ are intended to be applied by the receiver or are provided for informational pur
 rates intended to be applied, the rate type indicates the layer at which the enforcement point
 accounts traffic, so that receivers can model this accounting.
 
-A Layer 2 rate encompasses the Ethernet frame as sent or received on the interface of the
-receiver, including the Ethernet header, any VLAN tags {{IEEE802.1Q}} present on that interface,
-and the complete Ethernet payload, including any encapsulation headers carried within it (e.g.,
-PPPoE and PPP headers). It excludes the Ethernet Frame Check Sequence (FCS), preamble, Start
-Frame Delimiter (SFD), and Inter-Packet Gap (IPG). For link layers other than Ethernet, the
-Layer 2 rate is calculated analogously over the link-layer header and payload, excluding
-link-layer trailers and physical-layer framing overhead.
-
-Because each receiver calculates the Layer 2 rate over the frames as seen on its own interface,
-the per-packet overhead can differ between the receiver and the enforcement point, for example
-when an access node adds or removes a VLAN tag. Servers can signal such differences using the
-Per-Packet Overhead sub-options (see {{overhead}}) or, in DHCPv6, by signaling node-specific rates
-(see {{dhcpv6-server}}).
-
-A Layer 3 rate encompasses only the IP header and its payload. This rate calculation is frequently
-utilized by end-user speed test applications and is often regarded as the marketable "product
-bandwidth". Its primary advantage is its independence from the variable overhead introduced by
-differing numbers of VLAN tags or tunnel encapsulations, which makes it suitable for comparison
-with end-user measurements.
-
-A receiver whose traffic management functions account traffic at Layer 3 can apply a Layer 3
-rate directly. The applied rate then closely corresponds to the rate measured by end-user speed
-tests and is identical on every node, independent of the encapsulation used on the interface of
-the receiver or on any other segment of the path. A receiver whose traffic management functions
-account traffic at a lower layer compensates implicitly for the headers between Layer 3 and its
-accounting layer, such as Ethernet, VLAN, and PPPoE headers, so that the applied rate still
-corresponds to the signaled Layer 3 rate.
-
-Traffic management functions that account traffic at Layer 2 or at Layer 3 are already supported
-by CPE implementations available on the market. However, the rates and the accounting layer are
-currently configured manually or through proprietary mechanisms. This document provides a
-standardized way to convey this information.
-
-For rates intended to be applied, servers SHOULD signal the rate at the layer at which the
-enforcement point accounts traffic and SHOULD include the Per-Packet Overhead sub-options where the
-accounting of the enforcement point differs from the size of the packets as seen by the receiver.
-A Layer 2 rate together with the per-packet overhead allows the most precise modeling of a
-bottleneck that accounts traffic at Layer 2. A Layer 3 rate is useful where the enforcement point
-itself accounts traffic at Layer 3, where the applied rate is intended to match the rates
-measured by end-user speed tests, or for informational purposes.
-
-The traffic management functions of a receiver do not necessarily account traffic at the layer
-indicated by the Rate Type. For example, shapers commonly account for the Layer 2 frame length,
-while the signaled rate may be a Layer 3 rate. In this case, a receiver whose traffic management
-functions support per-packet overhead accounting compensates for the difference between its own
-accounting and the accounting of the enforcement point, as indicated by the Rate Type and the
-Per-Packet Overhead sub-options (see {{overhead}}), for example using the overhead compensation
-provided by its shaper. A receiver without such support applies the signaled rate directly or
-approximates the difference, for example by reducing the applied rate by a margin.
-
 DHCPv4 Sub-Option Format:
 
 ~~~ aasvg
@@ -508,17 +462,29 @@ The initial assignment of rate types is as follows:
 | 4-255 | Unassigned                 |
 {: #rate-type-table title="Rate Types"}
 
+A Layer 2 rate encompasses the Ethernet frame as sent or received on the interface of the
+receiver, including the Ethernet header, any VLAN tags {{IEEE802.1Q}} present on that interface,
+and the complete Ethernet payload, including any encapsulation headers carried within it (e.g.,
+PPPoE and PPP headers). It excludes the Ethernet Frame Check Sequence (FCS), preamble, start
+frame delimiter (SFD), and inter-packet gap (IPG) {{IEEE802.3}}. For link layers other than Ethernet, the
+Layer 2 rate is calculated analogously over the link-layer header and payload, excluding
+link-layer trailers and physical-layer framing overhead.
+
+A Layer 3 rate encompasses only the IP header and its payload. This rate calculation is frequently
+utilized by end-user speed test applications and is often regarded as the marketable "product
+bandwidth". Its primary advantage is its independence from the variable overhead introduced by
+differing numbers of VLAN tags or tunnel encapsulations, which makes it suitable for comparison
+with end-user measurements.
+
+Because each receiver calculates the Layer 2 rate over the frames as seen on its own interface,
+the per-packet overhead can differ between the receiver and the enforcement point, for example
+when an access node adds or removes a VLAN tag. Servers can signal such differences using the
+Per-Packet Overhead sub-options (see {{overhead}}) or, in DHCPv6, by signaling node-specific rates
+(see {{dhcpv6-server}}).
+
 If the rate type is set to 2 (Layer 2 rate) or 3 (Layer 3 rate), the receiver is expected
 to apply the signaled rates to its local traffic management functions, such as traffic shapers,
 policers, or Active Queue Management (AQM) parameters, as described in this document.
-
-From the perspective of a client, the upstream rate is the relevant one: downstream traffic is
-typically already shaped by the network before it reaches the client, whereas upstream traffic
-is enforced by the network only after it has left the client. A client therefore typically
-applies only the upstream rate to its traffic management functions and uses the downstream rate
-for informational purposes, even if the Rate Type indicates a rate to be applied. A client MAY
-additionally apply the downstream rate, for example by shaping received traffic. Intermediate
-nodes, such as relay agents and snooping devices, typically apply the rates in both directions.
 
 If the rate type is set to 0 (Informational Layer 2 rate) or 1 (Informational Layer 3 rate),
 the signaled rates are informational only and MUST be interpreted at the respective networking
@@ -528,18 +494,51 @@ the network exposes the provisioned service tier to the Customer Premises Equipm
 to populate user interfaces, facilitate telemetry, or serve as a metric to select a path with
 higher throughput, all without otherwise altering the device's localized forwarding behavior.
 
-The initial assignments are structured such that the least significant bit indicates the networking
-layer (0 for Layer 2, 1 for Layer 3). This structure is a property of the initial assignments only
-and does not define a bit field. Receivers MUST interpret the Rate Type as an enumerated value and
-MUST NOT infer the semantics of an unrecognized value from its individual bits.
-
 In the absence of the Rate Type sub-option, a receiver MUST interpret the signaled values as an
 Informational Layer 2 rate (rate type 0). Consequently, a server that intends the signaled rates
 to be applied to local traffic management functions MUST include the Rate Type sub-option with
 a value of 2 (Layer 2 rate) or 3 (Layer 3 rate).
 
+The initial assignments are structured such that the least significant bit indicates the networking
+layer (0 for Layer 2, 1 for Layer 3). This structure is a property of the initial assignments only
+and does not define a bit field. Receivers MUST interpret the Rate Type as an enumerated value and
+MUST NOT infer the semantics of an unrecognized value from its individual bits.
+
 The values 4-255 are currently unassigned. A receiver that does not recognize the Rate Type
 value discards the entire OPTION_RATE (see {{errors}}).
+
+For rates intended to be applied, servers SHOULD signal the rate at the layer at which the
+enforcement point accounts traffic and SHOULD include the Per-Packet Overhead sub-options where the
+accounting of the enforcement point differs from the size of the packets as seen by the receiver.
+A Layer 2 rate together with the per-packet overhead allows the most precise modeling of a
+bottleneck that accounts traffic at Layer 2. A Layer 3 rate is useful where the enforcement point
+itself accounts traffic at Layer 3, where the applied rate is intended to match the rates
+measured by end-user speed tests, or for informational purposes.
+
+A receiver whose traffic management functions account traffic at Layer 3 can apply a Layer 3
+rate directly. The applied rate then closely corresponds to the rate measured by end-user speed
+tests and is identical on every node, independent of the encapsulation used on the interface of
+the receiver or on any other segment of the path. A receiver whose traffic management functions
+account traffic at a lower layer compensates implicitly for the headers between Layer 3 and its
+accounting layer, such as Ethernet, VLAN, and PPPoE headers, so that the applied rate still
+corresponds to the signaled Layer 3 rate.
+
+The traffic management functions of a receiver do not necessarily account traffic at the layer
+indicated by the Rate Type. For example, shapers commonly account for the Layer 2 frame length,
+while the signaled rate may be a Layer 3 rate. In this case, a receiver whose traffic management
+functions support per-packet overhead accounting compensates for the difference between its own
+accounting and the accounting of the enforcement point, as indicated by the Rate Type and the
+Per-Packet Overhead sub-options (see {{overhead}}), for example using the overhead compensation
+provided by its shaper. A receiver without such support applies the signaled rate directly or
+approximates the difference, for example by reducing the applied rate by a margin.
+
+From the perspective of a client, the upstream rate is the relevant one: downstream traffic is
+typically already shaped by the network before it reaches the client, whereas upstream traffic
+is enforced by the network only after it has left the client. A client therefore typically
+applies only the upstream rate to its traffic management functions and uses the downstream rate
+for informational purposes, even if the Rate Type indicates a rate to be applied. A client MAY
+additionally apply the downstream rate, for example by shaping received traffic. Intermediate
+nodes, such as relay agents and snooping devices, typically apply the rates in both directions.
 
 A client MAY indicate its preferred rate type as a hint (see {{hints}}).
 
@@ -595,7 +594,7 @@ Overhead:
   example if the enforcement point does not account for headers that are present on the
   interface of the receiver. Where the bottleneck is a physical link rather than a policer, the
   Overhead includes physical-layer overhead that consumes transmission time, such as the
-  Ethernet preamble, start frame delimiter, and inter-frame gap.
+  Ethernet preamble, start frame delimiter (SFD), and inter-packet gap (IPG).
 
 Minimum Packet Unit (MPU):
 : A 16-bit unsigned integer in network byte order, indicating the minimum size in octets that
@@ -618,29 +617,29 @@ accounted by the enforcement point is calculated as follows:
 1. L = max(S + Overhead, MPU)
 2. If the Cell Payload is not 0: L = ceil(L / Cell Payload) * Cell Size
 
-Cell-based accounting describes link layers that pad each packet to an integer number of cells.
-The most common example is Asynchronous Transfer Mode (ATM) Adaptation Layer 5 (AAL5), as used
-for example on ADSL, ADSL2, and ADSL2+ lines, which is described by a Cell Payload of 48 and a
-Cell Size of 53. In this case, the Overhead includes all encapsulation overhead carried within
-the AAL5 frame, including the 8-octet AAL5 trailer. A Cell Size smaller than the Cell Payload
-is invalid; a receiver that receives such values ignores the cell-based accounting. Accounting
-models that cannot be described by these parameters can be defined as additional sub-options
-(see {{iana-sub-option-table}}). Examples of parameter values for common deployments are given in
+Cell-based accounting describes link layers that pad each packet to an integer number of cells. The
+most common example is Asynchronous Transfer Mode (ATM) Adaptation Layer 5 (AAL5), as used for
+example on ADSL, ADSL2, and ADSL2+ lines, which is described by a Cell Payload of 48 and a Cell Size
+of 53. In this case, the Overhead includes all encapsulation overhead carried within the AAL5 frame,
+including the 8-octet AAL5 trailer, and the signaled rate corresponds to the rate of ATM cells, for
+example the synchronization rate of the ADSL line. A Cell Size smaller than the Cell Payload is
+invalid; a receiver that receives such values ignores the cell-based accounting. Accounting models
+that cannot be described by these parameters can be defined as additional sub-options (see
+{{iana-sub-option-table}}). Examples of parameter values for common deployments are given in
 {{examples}}.
 
-The Per-Packet Overhead sub-options are optional and supplement the signaled rates to improve
-the accuracy of traffic management. A receiver that applies the signaled rates and whose traffic
-management functions support per-packet overhead accounting SHOULD configure them such that the
-rate of transmitted traffic, calculated over the accounted sizes L, does not exceed the signaled
-rate for the respective direction.
+The Per-Packet Overhead sub-options are optional and supplement the signaled rates to improve the
+accuracy of traffic management. A receiver that applies the signaled rates and whose traffic
+management functions support per-packet overhead accounting SHOULD configure them such that the rate
+of the traffic in the respective direction, calculated over the accounted sizes L, does not exceed
+the signaled rate for that direction.
 
 A receiver whose traffic management functions do not support per-packet overhead accounting, or
 support it only partially (e.g., without cell-based accounting or only for a limited range of
-values), MAY ignore the sub-options or those
-parts of them that it cannot apply, and applies the signaled rates as specified in
-{{rate-type}}. Such a receiver MAY reduce the applied rate by a margin to approximate the
-accounting of the enforcement point. The inability of a receiver to apply the Per-Packet
-Overhead sub-options, fully or partially, does not render the OPTION_RATE invalid.
+values), MAY ignore the sub-options or those parts of them that it cannot apply, and applies the
+signaled rates as specified in {{rate-type}}. Such a receiver MAY reduce the applied rate by a
+margin to approximate the accounting of the enforcement point. The inability of a receiver to apply
+the Per-Packet Overhead sub-options, fully or partially, does not render the OPTION_RATE invalid.
 
 For a direction for which no Per-Packet Overhead sub-option applies, the receiver assumes an
 Overhead of 0, an MPU of 0, and no cell-based accounting. Clients do not include the Per-Packet
@@ -1081,7 +1080,7 @@ operators typically configure the enforcement point such that the payload rate a
 maximum-sized packets meets the contracted rate; the signaled rate and overhead then describe
 the configuration of the enforcement point, not the contracted payload rate.
 
-VDSL2 and G.fast use Packet Transfer Mode (PTM) with 64/65-octet encoding instead of ATM cells.
+VDSL2 commonly uses Packet Transfer Mode (PTM) with 64/65-octet encapsulation instead of ATM cells.
 Its effect corresponds to a constant reduction of the available rate and can be included in the
 signaled rate, without requiring cell-based accounting. Per-packet overhead of PTM, such as the
 Ethernet FCS, can be signaled using the Overhead field (see {{overhead}}).
@@ -1423,11 +1422,11 @@ Check Sequence (FCS) (see {{rate-type}}).
 {: #tab-examples title="Example Per-Packet Overhead Parameters"}
 
 Ethernet link as bottleneck:
-: Where the bottleneck is an Ethernet link, for example an Ethernet handoff at the provisioned
-  rate, each frame additionally consumes the transmission time of the FCS (4 octets), the
-  preamble (7 octets), the start frame delimiter (1 octet), and the inter-frame gap (12 octets)
-  {{IEEE802.3}}, resulting in an Overhead of 24 octets. As the minimum Ethernet frame size is 64
-  octets including the FCS, the MPU is 84 octets.
+: Where the bottleneck is an Ethernet link, for example an Ethernet handoff at the provisioned rate,
+  each frame additionally consumes the transmission time of the FCS (4 octets), the preamble (7
+  octets), the SFD (1 octet), and the inter-packet gap (12 octets) {{IEEE802.3}}, resulting in an
+  Overhead of 24 octets. As the minimum Ethernet frame size is 64 octets including the FCS, the
+  MPU is 84 octets.
 
 Policer, VLAN tag added by access node:
 : The enforcement point accounts Ethernet frames without FCS, but the access node adds a VLAN tag
@@ -1440,15 +1439,51 @@ Policer accounting IP packets:
 
 ADSL, PPPoE, bridged Ethernet with LLC/SNAP:
 : The receiver sends PPPoE frames over Ethernet, which are transported over ATM using bridged
-  Ethernet encapsulation with LLC/SNAP {{?RFC2684}}. Within the AAL5 frame, the Ethernet frame
-  without FCS is preceded by the LLC/SNAP header including padding (10 octets) and followed by
-  the AAL5 trailer (8 octets), resulting in an Overhead of 18 octets and cell-based accounting
-  with a Cell Payload of 48 and a Cell Size of 53.
+  Ethernet encapsulation with LLC/SNAP without preserved FCS {{?RFC2684}}. Within the AAL5 frame,
+  the Ethernet frame without FCS is preceded by the LLC/SNAP header including padding (10 octets)
+  and followed by the AAL5 trailer (8 octets), resulting in an Overhead of 18 octets and
+  cell-based accounting with a Cell Payload of 48 and a Cell Size of 53. If the FCS is preserved,
+  the Overhead increases by 4 octets.
 
 ADSL, PPPoA with VC multiplexing:
 : The receiver sends PPP frames over ATM using PPP over AAL5 with VC multiplexing {{?RFC2364}}.
   S includes the 2-octet PPP protocol field. The AAL5 trailer (8 octets) results in an Overhead
   of 8 octets, with cell-based accounting using a Cell Payload of 48 and a Cell Size of 53.
+
+# Example Receiver Processing {#example-processing}
+
+This appendix summarizes the processing of the DHCP Rate Option by a receiver as specified in
+{{rate-type}}, {{overhead}}, {{processing}}, and {{errors}}. It is informative; in case of
+discrepancies, the referenced sections take precedence.
+
+~~~
+For each DHCPACK or Reply message received on an interface:
+  if no OPTION_RATE is present:
+    keep the applied rates unchanged; done
+  if the OPTION_RATE is malformed or the Rate Type is unknown:
+    keep the applied rates unchanged; done
+  type := Rate Type sub-option, or 0 (Informational L2) if absent
+  ovh_up := Per-Packet Overhead (4), or defaults if absent
+  ovh_down := Per-Packet Overhead Downstream (5), or ovh_up
+  for each direction (upstream, downstream):
+    rate := rate sub-option of the direction, or 0 if absent
+    if type is informational or rate is 0:
+      revert the direction to the default configuration
+    else:
+      rate := min(rate, capacity of the physical link)
+      apply rate with the overhead of the direction,
+        if supported; otherwise apply rate, optionally
+        reduced by a margin
+  if the result equals the applied configuration:
+    do not reconfigure
+
+On termination of the link or session:
+  revert to the default configuration
+~~~
+{: #fig-example-processing title="Example Receiver Processing"}
+
+A client typically applies only the upstream direction and uses the downstream rate for
+informational purposes (see {{rate-type}}).
 
 # Acknowledgments
 {:numbered="false"}
