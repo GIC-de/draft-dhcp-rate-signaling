@@ -64,6 +64,13 @@ informative:
       date: 2022
       seriesinfo:
          IEEE Std: 802.1Q-2022
+   IEEE802.3:
+      title: "IEEE Standard for Ethernet"
+      author:
+      - org: IEEE
+      date: 2022
+      seriesinfo:
+         IEEE Std: 802.3-2022
    G.984.1:
       title: "Gigabit-capable passive optical networks (GPON): General characteristics"
       author:
@@ -325,8 +332,9 @@ The initial assignment of DHCP Rate Sub-options is as follows:
 |    1  |      8 | Available Rate Upstream in bits per second (bps)   |
 |    2  |      8 | Available Rate Downstream in bits per second (bps) |
 |    3  |      1 | Rate Type                                          |
-|    4  |      5 | Per-Packet Overhead                                |
-| 5-254 |      - | Unassigned                                         |
+|    4  |      6 | Per-Packet Overhead                                |
+|    5  |      6 | Per-Packet Overhead Downstream                     |
+| 6-254 |      - | Unassigned                                         |
 |   255 |      - | Reserved                                           |
 {: #sub-option-table title="Sub-Options"}
 
@@ -428,7 +436,7 @@ link-layer trailers and physical-layer framing overhead.
 Because each receiver calculates the Layer 2 rate over the frames as seen on its own interface,
 the per-packet overhead can differ between the receiver and the enforcement point, for example
 when an access node adds or removes a VLAN tag. Servers can signal such differences using the
-Per-Packet Overhead sub-option (see {{overhead}}) or, in DHCPv6, by signaling node-specific rates
+Per-Packet Overhead sub-options (see {{overhead}}) or, in DHCPv6, by signaling node-specific rates
 (see {{dhcpv6-server}}).
 
 A Layer 3 rate encompasses only the IP header and its payload. This rate calculation is frequently
@@ -451,7 +459,7 @@ currently configured manually or through proprietary mechanisms. This document p
 standardized way to convey this information.
 
 For rates intended to be applied, servers SHOULD signal the rate at the layer at which the
-enforcement point accounts traffic and SHOULD include the Per-Packet Overhead sub-option where the
+enforcement point accounts traffic and SHOULD include the Per-Packet Overhead sub-options where the
 accounting of the enforcement point differs from the size of the packets as seen by the receiver.
 A Layer 2 rate together with the per-packet overhead allows the most precise modeling of a
 bottleneck that accounts traffic at Layer 2. A Layer 3 rate is useful where the enforcement point
@@ -463,7 +471,7 @@ indicated by the Rate Type. For example, shapers commonly account for the Layer 
 while the signaled rate may be a Layer 3 rate. In this case, a receiver whose traffic management
 functions support per-packet overhead accounting compensates for the difference between its own
 accounting and the accounting of the enforcement point, as indicated by the Rate Type and the
-Per-Packet Overhead sub-option (see {{overhead}}), for example using the overhead compensation
+Per-Packet Overhead sub-options (see {{overhead}}), for example using the overhead compensation
 provided by its shaper. A receiver without such support applies the signaled rate directly or
 approximates the difference, for example by reducing the applied rate by a margin.
 
@@ -537,12 +545,22 @@ A client MAY indicate its preferred rate type as a hint (see {{hints}}).
 
 ### Per-Packet Overhead {#overhead}
 
-The Per-Packet Overhead sub-option describes the size that the enforcement point of the signaled
+The Per-Packet Overhead sub-options describe the size that the enforcement point of the signaled
 rates accounts for each packet, relative to the size of the packet at the layer indicated by the
-Rate Type as seen by the receiver. It allows a receiver to configure its traffic management
+Rate Type as seen by the receiver. They allow a receiver to configure its traffic management
 functions such that they accurately model the enforcement point, independent of differences in
 encapsulation between the receiver and the enforcement point, such as additional VLAN tags or
 cell-based link layers.
+
+Two sub-options with identical format and semantics are defined. The Per-Packet Overhead
+sub-option (code 4) applies to both directions. If the Per-Packet Overhead Downstream sub-option
+(code 5) is present, it overrides the Per-Packet Overhead sub-option for the downstream
+direction. As the per-packet overhead is typically identical in both directions, and clients
+typically apply only the upstream rate (see {{rate-type}}), servers usually include only the
+Per-Packet Overhead sub-option.
+
+The format is shown for the Per-Packet Overhead sub-option. The Per-Packet Overhead Downstream
+sub-option uses the same format with a sub-option code of 5.
 
 DHCPv4 Sub-Option Format:
 
@@ -550,10 +568,10 @@ DHCPv4 Sub-Option Format:
  0                   1                   2                   3
  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-| SubOpt Code=4 | SubOpt Len=5  |           Overhead            |
+| SubOpt Code=4 | SubOpt Len=6  |           Overhead            |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|    Minimum Packet Unit (MPU)  |     Flags     |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|    Minimum Packet Unit (MPU)  | Cell Payload  |   Cell Size   |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 ~~~
 
 DHCPv6 Sub-Option Format:
@@ -562,12 +580,12 @@ DHCPv6 Sub-Option Format:
  0                   1                   2                   3
  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-| SubOpt Code=4                 | SubOpt Len=5                  |
+| SubOpt Code=4                 | SubOpt Len=6                  |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 |           Overhead            |    Minimum Packet Unit (MPU)  |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|     Flags     |
-+-+-+-+-+-+-+-+-+
+| Cell Payload  |   Cell Size   |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 ~~~
 
 Overhead:
@@ -575,46 +593,59 @@ Overhead:
   octets the enforcement point accounts per packet in addition to the size of the packet at the
   layer indicated by the Rate Type, as seen by the receiver. The value can be negative, for
   example if the enforcement point does not account for headers that are present on the
-  interface of the receiver.
+  interface of the receiver. Where the bottleneck is a physical link rather than a policer, the
+  Overhead includes physical-layer overhead that consumes transmission time, such as the
+  Ethernet preamble, start frame delimiter, and inter-frame gap.
 
 Minimum Packet Unit (MPU):
 : A 16-bit unsigned integer in network byte order, indicating the minimum size in octets that
   the enforcement point accounts per packet, after the Overhead has been added. A value of 0
   indicates that no minimum applies.
 
-Flags:
-: An 8-bit field. The most significant bit (A) indicates cell-based accounting as used by
-  Asynchronous Transfer Mode (ATM) Adaptation Layer 5 (AAL5), for example on ADSL, ADSL2, and
-  ADSL2+ lines, which transport data in ATM cells. With cell-based accounting, the accounted size
-  is rounded up to a multiple of 48 octets, each of which is accounted as a 53-octet cell. When
-  the A flag is set, the Overhead includes all encapsulation overhead carried within the AAL5
-  frame, including the 8-octet AAL5 trailer. The remaining bits are reserved; they MUST be set to
-  zero by the sender and MUST be ignored by the receiver.
+Cell Payload:
+: An 8-bit unsigned integer indicating the number of octets of packet data carried per cell for
+  link layers that transport packets in fixed-size cells. A value of 0 indicates that no
+  cell-based accounting applies.
+
+Cell Size:
+: An 8-bit unsigned integer indicating the number of octets accounted per cell, including the
+  cell header. If the Cell Payload is 0, the Cell Size MUST be set to 0 by the sender and is
+  ignored by the receiver.
 
 For a packet with a size of S octets at the layer indicated by the Rate Type, the size L
 accounted by the enforcement point is calculated as follows:
 
 1. L = max(S + Overhead, MPU)
-2. If the A flag is set: L = ceil(L / 48) * 53
+2. If the Cell Payload is not 0: L = ceil(L / Cell Payload) * Cell Size
 
-The Per-Packet Overhead sub-option is optional and supplements the signaled rates to improve the
-accuracy of traffic management. A receiver that applies the signaled rates and whose traffic
+Cell-based accounting describes link layers that pad each packet to an integer number of cells.
+The most common example is Asynchronous Transfer Mode (ATM) Adaptation Layer 5 (AAL5), as used
+for example on ADSL, ADSL2, and ADSL2+ lines, which is described by a Cell Payload of 48 and a
+Cell Size of 53. In this case, the Overhead includes all encapsulation overhead carried within
+the AAL5 frame, including the 8-octet AAL5 trailer. A Cell Size smaller than the Cell Payload
+is invalid; a receiver that receives such values ignores the cell-based accounting. Accounting
+models that cannot be described by these parameters can be defined as additional sub-options
+(see {{iana-sub-option-table}}). Examples of parameter values for common deployments are given in
+{{examples}}.
+
+The Per-Packet Overhead sub-options are optional and supplement the signaled rates to improve
+the accuracy of traffic management. A receiver that applies the signaled rates and whose traffic
 management functions support per-packet overhead accounting SHOULD configure them such that the
 rate of transmitted traffic, calculated over the accounted sizes L, does not exceed the signaled
-rate.
+rate for the respective direction.
 
 A receiver whose traffic management functions do not support per-packet overhead accounting, or
 support it only partially (e.g., without cell-based accounting or only for a limited range of
-values), MAY ignore the sub-option or those parts of it that it cannot apply, and applies the
-signaled rates as specified in {{rate-type}}. Such a receiver MAY reduce the applied rate by a
-margin to approximate the accounting of the enforcement point. The inability of a receiver to
-apply the Per-Packet Overhead sub-option, fully or partially, does not render the OPTION_RATE
-invalid.
+values), MAY ignore the sub-options or those
+parts of them that it cannot apply, and applies the signaled rates as specified in
+{{rate-type}}. Such a receiver MAY reduce the applied rate by a margin to approximate the
+accounting of the enforcement point. The inability of a receiver to apply the Per-Packet
+Overhead sub-options, fully or partially, does not render the OPTION_RATE invalid.
 
-In the absence of the Per-Packet Overhead sub-option, the receiver assumes an Overhead of 0, an
-MPU of 0, and no cell-based accounting. Clients do not include the Per-Packet Overhead sub-option
-in hints (see {{hints}}); servers ignore it if present. The sub-option can be ignored for
-informational rate types.
+For a direction for which no Per-Packet Overhead sub-option applies, the receiver assumes an
+Overhead of 0, an MPU of 0, and no cell-based accounting. Clients do not include the Per-Packet
+Overhead sub-options in hints (see {{hints}}); servers ignore them if present. The sub-options
+can be ignored for informational rate types.
 
 ## Rate Processing {#processing}
 
@@ -716,8 +747,8 @@ Conversely, if a receiver processes a recognized sub-option containing an unreco
 reserved value that determines the interpretation of the rate parameters (such as an unassigned
 Rate Type), it MUST discard the entire OPTION_RATE. Applying signaled rates without understanding
 their intended interpretation could result in incorrect traffic management. This does not apply
-to the Per-Packet Overhead sub-option: values of this sub-option that a receiver cannot apply do
-not cause the OPTION_RATE to be discarded (see {{overhead}}).
+to the Per-Packet Overhead sub-options: values of these sub-options that a receiver cannot apply
+do not cause the OPTION_RATE to be discarded (see {{overhead}}).
 
 A receiver MUST also discard the entire OPTION_RATE if any of the following conditions is met:
 
@@ -1103,7 +1134,7 @@ used by OpenWrt can request OPTION_RATE, send hints, and expose received options
 hexadecimal environment variables to user-defined hook scripts. All client behavior specified in
 this document can therefore be implemented in such scripts, which parse the option, apply the
 processing rules of {{processing}}, and configure local traffic management (e.g., via SQM or
-tc/CAKE). The fields of the Per-Packet Overhead sub-option (see {{overhead}}) map directly to the
+tc/CAKE). The fields of the Per-Packet Overhead sub-options (see {{overhead}}) map directly to the
 overhead, minimum packet unit, and ATM cell accounting parameters of CAKE. The rates learned on the
 WAN interface can be propagated to LAN clients using the existing custom-option support of the
 OpenWrt DHCPv4 server (dnsmasq) and DHCPv6 server (odhcpd).
@@ -1135,7 +1166,7 @@ The appropriate minimum depends on the deployment and the use case of the device
 therefore left to the client implementation. For example, a broadband CPE might reject rates
 below 1 Mbps.
 
-Excessive values of the Overhead or MPU fields of the Per-Packet Overhead sub-option effectively
+Excessive values of the Overhead or MPU fields of the Per-Packet Overhead sub-options effectively
 reduce the applied rate. Receivers MAY limit these values to a plausible range or ignore the
 sub-option, which does not invalidate the OPTION_RATE (see {{overhead}}).
 
@@ -1234,7 +1265,8 @@ The Reference column identifies the specification that defines the registered va
 |     2 | Available Rate Downstream in bits per second (bps) | RFC-TBD   |
 |     3 | Rate Type                                          | RFC-TBD   |
 |     4 | Per-Packet Overhead                                | RFC-TBD   |
-| 5-254 | Unassigned                                         |           |
+|     5 | Per-Packet Overhead Downstream                     | RFC-TBD   |
+| 6-254 | Unassigned                                         |           |
 |   255 | Reserved                                           |           |
 {: #iana-sub-option-table title="Sub-Options"}
 
@@ -1369,9 +1401,59 @@ effect only after the session is re-established; and the information is not avai
 intermediate nodes. This document defines a standardized and interoperable alternative that
 addresses these limitations.
 
+# Examples of Per-Packet Overhead Parameters {#examples}
+
+This appendix provides examples of the parameters of the Per-Packet Overhead sub-options (see
+{{overhead}}) for common deployments. The values are illustrative; the actual values depend on
+the configuration of the access network and of the enforcement point and need to be determined
+by the operator.
+
+In all examples, S denotes the size of the packet at the layer indicated by the Rate Type, as
+seen by the receiver. For a Layer 2 rate, S includes the Ethernet header and any VLAN tags and
+encapsulation headers present on the interface of the receiver, but excludes the Ethernet Frame
+Check Sequence (FCS) (see {{rate-type}}).
+
+| Scenario                                    | Rate Type | Overhead | MPU | Cell Payload / Size |
+| :------------------------------------------ | :-------- | -------: | --: | ------------------: |
+| Ethernet link as bottleneck                 | Layer 2   |       24 |  84 |               0 / 0 |
+| Policer, VLAN tag added by access node      | Layer 2   |        4 |   0 |               0 / 0 |
+| Policer accounting IP packets               | Layer 3   |        0 |   0 |               0 / 0 |
+| ADSL, PPPoE, bridged Ethernet with LLC/SNAP | Layer 2   |       18 |   0 |             48 / 53 |
+| ADSL, PPPoA with VC multiplexing            | Layer 2   |        8 |   0 |             48 / 53 |
+{: #tab-examples title="Example Per-Packet Overhead Parameters"}
+
+Ethernet link as bottleneck:
+: Where the bottleneck is an Ethernet link, for example an Ethernet handoff at the provisioned
+  rate, each frame additionally consumes the transmission time of the FCS (4 octets), the
+  preamble (7 octets), the start frame delimiter (1 octet), and the inter-frame gap (12 octets)
+  {{IEEE802.3}}, resulting in an Overhead of 24 octets. As the minimum Ethernet frame size is 64
+  octets including the FCS, the MPU is 84 octets.
+
+Policer, VLAN tag added by access node:
+: The enforcement point accounts Ethernet frames without FCS, but the access node adds a VLAN tag
+  that is not present on the interface of the receiver, resulting in an Overhead of 4 octets.
+
+Policer accounting IP packets:
+: The enforcement point accounts IP packets. No Per-Packet Overhead sub-option is required. A
+  receiver that accounts traffic at Layer 2 compensates for its own headers implicitly (see
+  {{rate-type}}).
+
+ADSL, PPPoE, bridged Ethernet with LLC/SNAP:
+: The receiver sends PPPoE frames over Ethernet, which are transported over ATM using bridged
+  Ethernet encapsulation with LLC/SNAP {{?RFC2684}}. Within the AAL5 frame, the Ethernet frame
+  without FCS is preceded by the LLC/SNAP header including padding (10 octets) and followed by
+  the AAL5 trailer (8 octets), resulting in an Overhead of 18 octets and cell-based accounting
+  with a Cell Payload of 48 and a Cell Size of 53.
+
+ADSL, PPPoA with VC multiplexing:
+: The receiver sends PPP frames over ATM using PPP over AAL5 with VC multiplexing {{?RFC2364}}.
+  S includes the 2-octet PPP protocol field. The AAL5 trailer (8 octets) results in an Overhead
+  of 8 octets, with cell-based accounting using a Cell Payload of 48 and a Cell Size of 53.
+
 # Acknowledgments
 {:numbered="false"}
 
-The authors would like to thank Glenn Deen and Jason Livingood for their valuable
-review comments and discussion, which helped to significantly improve the clarity,
+The authors would like to thank Glenn Deen, Jason Livingood and 
+Sebastian Moeller for their valuable review comments and discussion, 
+which helped to significantly improve the clarity,
 applicability, and operational guidance of this document.
