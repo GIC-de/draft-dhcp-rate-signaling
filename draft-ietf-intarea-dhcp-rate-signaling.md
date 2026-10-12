@@ -325,7 +325,8 @@ The initial assignment of DHCP Rate Sub-options is as follows:
 |    1  |      8 | Available Rate Upstream in bits per second (bps)   |
 |    2  |      8 | Available Rate Downstream in bits per second (bps) |
 |    3  |      1 | Rate Type                                          |
-| 4-254 |      - | Unassigned                                         |
+|    4  |      5 | Per-Packet Overhead                                |
+| 5-254 |      - | Unassigned                                         |
 |   255 |      - | Reserved                                           |
 {: #sub-option-table title="Sub-Options"}
 
@@ -412,7 +413,9 @@ informational rate, a value of 0 indicates that no downstream rate information i
 ### Rate Type {#rate-type}
 
 The rate type defines the networking layer to which the stated rates apply and whether those rates
-are intended to be applied by the receiver or are provided for informational purposes only.
+are intended to be applied by the receiver or are provided for informational purposes only. For
+rates intended to be applied, the rate type indicates the layer at which the enforcement point
+accounts traffic, so that receivers can model this accounting.
 
 A Layer 2 rate encompasses the Ethernet frame as sent or received on the interface of the
 receiver, including the Ethernet header, any VLAN tags {{IEEE802.1Q}} present on that interface,
@@ -423,21 +426,46 @@ Layer 2 rate is calculated analogously over the link-layer header and payload, e
 link-layer trailers and physical-layer framing overhead.
 
 Because each receiver calculates the Layer 2 rate over the frames as seen on its own interface,
-the per-packet overhead can differ between nodes along the path, for example when an access node
-adds or removes a VLAN tag. Operators can compensate for such differences by signaling
-node-specific rates (see {{dhcpv6-server}}) or by using a Layer 3 rate type.
+the per-packet overhead can differ between the receiver and the enforcement point, for example
+when an access node adds or removes a VLAN tag. Servers can signal such differences using the
+Per-Packet Overhead sub-option (see {{overhead}}) or, in DHCPv6, by signaling node-specific rates
+(see {{dhcpv6-server}}).
 
 A Layer 3 rate encompasses only the IP header and its payload. This rate calculation is frequently
 utilized by end-user speed test applications and is often regarded as the marketable "product
 bandwidth". Its primary advantage is its independence from the variable overhead introduced by
-differing numbers of VLAN tags or tunnel encapsulations.
+differing numbers of VLAN tags or tunnel encapsulations, which makes it suitable for comparison
+with end-user measurements.
 
-The traffic management functions of a receiver do not necessarily operate at the layer indicated
-by the Rate Type. For example, shapers commonly account for the Layer 2 frame length, while the
-signaled rate may be a Layer 3 rate. In this case, the receiver accounts for the difference by
-compensating for the per-packet overhead between the two layers, for example using the overhead
-compensation provided by its shaper, so that the applied rate corresponds to the signaled rate at
-the indicated layer.
+A receiver whose traffic management functions account traffic at Layer 3 can apply a Layer 3
+rate directly. The applied rate then closely corresponds to the rate measured by end-user speed
+tests and is identical on every node, independent of the encapsulation used on the interface of
+the receiver or on any other segment of the path. A receiver whose traffic management functions
+account traffic at a lower layer compensates implicitly for the headers between Layer 3 and its
+accounting layer, such as Ethernet, VLAN, and PPPoE headers, so that the applied rate still
+corresponds to the signaled Layer 3 rate.
+
+Traffic management functions that account traffic at Layer 2 or at Layer 3 are already supported
+by CPE implementations available on the market. However, the rates and the accounting layer are
+currently configured manually or through proprietary mechanisms. This document provides a
+standardized way to convey this information.
+
+For rates intended to be applied, servers SHOULD signal the rate at the layer at which the
+enforcement point accounts traffic and SHOULD include the Per-Packet Overhead sub-option where the
+accounting of the enforcement point differs from the size of the packets as seen by the receiver.
+A Layer 2 rate together with the per-packet overhead allows the most precise modeling of a
+bottleneck that accounts traffic at Layer 2. A Layer 3 rate is useful where the enforcement point
+itself accounts traffic at Layer 3, where the applied rate is intended to match the rates
+measured by end-user speed tests, or for informational purposes.
+
+The traffic management functions of a receiver do not necessarily account traffic at the layer
+indicated by the Rate Type. For example, shapers commonly account for the Layer 2 frame length,
+while the signaled rate may be a Layer 3 rate. In this case, a receiver whose traffic management
+functions support per-packet overhead accounting compensates for the difference between its own
+accounting and the accounting of the enforcement point, as indicated by the Rate Type and the
+Per-Packet Overhead sub-option (see {{overhead}}), for example using the overhead compensation
+provided by its shaper. A receiver without such support applies the signaled rate directly or
+approximates the difference, for example by reducing the applied rate by a margin.
 
 DHCPv4 Sub-Option Format:
 
@@ -507,6 +535,87 @@ value discards the entire OPTION_RATE (see {{errors}}).
 
 A client MAY indicate its preferred rate type as a hint (see {{hints}}).
 
+### Per-Packet Overhead {#overhead}
+
+The Per-Packet Overhead sub-option describes the size that the enforcement point of the signaled
+rates accounts for each packet, relative to the size of the packet at the layer indicated by the
+Rate Type as seen by the receiver. It allows a receiver to configure its traffic management
+functions such that they accurately model the enforcement point, independent of differences in
+encapsulation between the receiver and the enforcement point, such as additional VLAN tags or
+cell-based link layers.
+
+DHCPv4 Sub-Option Format:
+
+~~~ aasvg
+ 0                   1                   2                   3
+ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+| SubOpt Code=4 | SubOpt Len=5  |           Overhead            |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|    Minimum Packet Unit (MPU)  |     Flags     |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+~~~
+
+DHCPv6 Sub-Option Format:
+
+~~~ aasvg
+ 0                   1                   2                   3
+ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+| SubOpt Code=4                 | SubOpt Len=5                  |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|           Overhead            |    Minimum Packet Unit (MPU)  |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|     Flags     |
++-+-+-+-+-+-+-+-+
+~~~
+
+Overhead:
+: A 16-bit signed integer in two's complement and network byte order, indicating the number of
+  octets the enforcement point accounts per packet in addition to the size of the packet at the
+  layer indicated by the Rate Type, as seen by the receiver. The value can be negative, for
+  example if the enforcement point does not account for headers that are present on the
+  interface of the receiver.
+
+Minimum Packet Unit (MPU):
+: A 16-bit unsigned integer in network byte order, indicating the minimum size in octets that
+  the enforcement point accounts per packet, after the Overhead has been added. A value of 0
+  indicates that no minimum applies.
+
+Flags:
+: An 8-bit field. The most significant bit (A) indicates cell-based accounting as used by
+  Asynchronous Transfer Mode (ATM) Adaptation Layer 5 (AAL5), for example on ADSL, ADSL2, and
+  ADSL2+ lines, which transport data in ATM cells. With cell-based accounting, the accounted size
+  is rounded up to a multiple of 48 octets, each of which is accounted as a 53-octet cell. When
+  the A flag is set, the Overhead includes all encapsulation overhead carried within the AAL5
+  frame, including the 8-octet AAL5 trailer. The remaining bits are reserved; they MUST be set to
+  zero by the sender and MUST be ignored by the receiver.
+
+For a packet with a size of S octets at the layer indicated by the Rate Type, the size L
+accounted by the enforcement point is calculated as follows:
+
+1. L = max(S + Overhead, MPU)
+2. If the A flag is set: L = ceil(L / 48) * 53
+
+The Per-Packet Overhead sub-option is optional and supplements the signaled rates to improve the
+accuracy of traffic management. A receiver that applies the signaled rates and whose traffic
+management functions support per-packet overhead accounting SHOULD configure them such that the
+rate of transmitted traffic, calculated over the accounted sizes L, does not exceed the signaled
+rate.
+
+A receiver whose traffic management functions do not support per-packet overhead accounting, or
+support it only partially (e.g., without cell-based accounting or only for a limited range of
+values), MAY ignore the sub-option or those parts of it that it cannot apply, and applies the
+signaled rates as specified in {{rate-type}}. Such a receiver MAY reduce the applied rate by a
+margin to approximate the accounting of the enforcement point. The inability of a receiver to
+apply the Per-Packet Overhead sub-option, fully or partially, does not render the OPTION_RATE
+invalid.
+
+In the absence of the Per-Packet Overhead sub-option, the receiver assumes an Overhead of 0, an
+MPU of 0, and no cell-based accounting. Clients do not include the Per-Packet Overhead sub-option
+in hints (see {{hints}}); servers ignore it if present. The sub-option can be ignored for
+informational rate types.
+
 ## Rate Processing {#processing}
 
 The processing of the DHCP Rate Option is intentionally stateless with respect to the DHCP protocol
@@ -534,8 +643,9 @@ options with a length of zero, servers SHOULD NOT send an OPTION_RATE without su
 DHCPv4. To remove previously signaled rates for both directions, a server instead includes an
 OPTION_RATE containing rate sub-options with a value of 0.
 
-If the rates and rate type contained in a valid OPTION_RATE are identical to the currently
-applied ones, the receiver SHOULD NOT reconfigure its traffic management functions.
+If the rates, rate type, and per-packet overhead contained in a valid OPTION_RATE are identical
+to the currently applied ones, the receiver SHOULD NOT reconfigure its traffic management
+functions.
 
 If a DHCPACK or Reply message does not contain an OPTION_RATE, the receiver MUST retain the
 currently applied rates unchanged.
@@ -605,7 +715,9 @@ and continue processing the remainder of the OPTION_RATE.
 Conversely, if a receiver processes a recognized sub-option containing an unrecognized or
 reserved value that determines the interpretation of the rate parameters (such as an unassigned
 Rate Type), it MUST discard the entire OPTION_RATE. Applying signaled rates without understanding
-their intended interpretation could result in incorrect traffic management.
+their intended interpretation could result in incorrect traffic management. This does not apply
+to the Per-Packet Overhead sub-option: values of this sub-option that a receiver cannot apply do
+not cause the OPTION_RATE to be discarded (see {{overhead}}).
 
 A receiver MUST also discard the entire OPTION_RATE if any of the following conditions is met:
 
@@ -929,11 +1041,19 @@ considerations for network management. When combined with appropriately configur
 deployed, L4S-compatible queue management, these per-subscriber rate parameters help to concentrate
 congestion control at a well-defined bottleneck and minimize queuing delay in the access segment.
 
-Operators should choose the rate type according to their network. A Layer 2 rate allows precise
-alignment with enforcement mechanisms that operate on Layer 2 frames, but depends on the
-encapsulation used on each segment of the path (see {{rate-type}}). A Layer 3 rate is independent
-of the encapsulation and is therefore preferable where the encapsulation differs between nodes or
-is not known to the server.
+Operators should signal the rate at the layer at which the enforcement point accounts traffic,
+together with the per-packet overhead of the enforcement point where it differs from the
+packets as seen by the receiver (see {{overhead}}). This allows clients to model the actual
+bottleneck precisely, including additional encapsulations and cell-based link layers. Where
+contracted rates are specified as payload rates, for example due to regulatory requirements,
+operators typically configure the enforcement point such that the payload rate achieved with
+maximum-sized packets meets the contracted rate; the signaled rate and overhead then describe
+the configuration of the enforcement point, not the contracted payload rate.
+
+VDSL2 and G.fast use Packet Transfer Mode (PTM) with 64/65-octet encoding instead of ATM cells.
+Its effect corresponds to a constant reduction of the available rate and can be included in the
+signaled rate, without requiring cell-based accounting. Per-packet overhead of PTM, such as the
+Ethernet FCS, can be signaled using the Overhead field (see {{overhead}}).
 
 Where intermediate nodes enforce the signaled rates, operators should ensure that the enforcement
 at the intermediate node is not triggered by a client that shapes its traffic to the signaled
@@ -978,14 +1098,15 @@ At the time of writing, no implementations of this document are known to the aut
 ## Implementation Feasibility on Open-Source CPE
 
 The authors analyzed the feasibility of implementing the client behavior on OpenWrt without
-modifying the DHCP client software. The DHCPv4 client (BusyBox udhcpc) and DHCPv6 client
-(odhcp6c) used by OpenWrt can request OPTION_RATE, send hints, and expose received options of
-unknown type as hexadecimal environment variables to user-defined hook scripts. All client
-behavior specified in this document can therefore be implemented in such scripts, which parse
-the option, apply the processing rules of {{processing}}, and configure local traffic management
-(e.g., via SQM or tc/CAKE). The rates learned on the WAN interface can be propagated to LAN
-clients using the existing custom-option support of the OpenWrt DHCPv4 server (dnsmasq) and
-DHCPv6 server (odhcpd).
+modifying the DHCP client software. The DHCPv4 client (BusyBox udhcpc) and DHCPv6 client (odhcp6c)
+used by OpenWrt can request OPTION_RATE, send hints, and expose received options of unknown type as
+hexadecimal environment variables to user-defined hook scripts. All client behavior specified in
+this document can therefore be implemented in such scripts, which parse the option, apply the
+processing rules of {{processing}}, and configure local traffic management (e.g., via SQM or
+tc/CAKE). The fields of the Per-Packet Overhead sub-option (see {{overhead}}) map directly to the
+overhead, minimum packet unit, and ATM cell accounting parameters of CAKE. The rates learned on the
+WAN interface can be propagated to LAN clients using the existing custom-option support of the
+OpenWrt DHCPv4 server (dnsmasq) and DHCPv6 server (odhcpd).
 
 # Security Considerations {#security}
 
@@ -1013,6 +1134,10 @@ signaling a non-zero rate below this minimum as if it were not present (see {{pr
 The appropriate minimum depends on the deployment and the use case of the device and is
 therefore left to the client implementation. For example, a broadband CPE might reject rates
 below 1 Mbps.
+
+Excessive values of the Overhead or MPU fields of the Per-Packet Overhead sub-option effectively
+reduce the applied rate. Receivers MAY limit these values to a plausible range or ignore the
+sub-option, which does not invalidate the OPTION_RATE (see {{overhead}}).
 
 Conversely, an attacker could inject an excessively high rate, a rate value of 0, or an
 OPTION_RATE without rate sub-options, thereby removing any effective rate limit (see
@@ -1108,7 +1233,8 @@ The Reference column identifies the specification that defines the registered va
 |     1 | Available Rate Upstream in bits per second (bps)   | RFC-TBD   |
 |     2 | Available Rate Downstream in bits per second (bps) | RFC-TBD   |
 |     3 | Rate Type                                          | RFC-TBD   |
-| 4-254 | Unassigned                                         |           |
+|     4 | Per-Packet Overhead                                | RFC-TBD   |
+| 5-254 | Unassigned                                         |           |
 |   255 | Reserved                                           |           |
 {: #iana-sub-option-table title="Sub-Options"}
 
@@ -1234,12 +1360,14 @@ client software (see {{processing}}).
 
 Several operators have successfully deployed proprietary mechanisms to provide the CPE with its
 provisioned rate, for example by embedding rate information in PPP authentication messages or by
-vendor-specific management interfaces. The deployment of such mechanisms demonstrates the need
-for this information at the CPE. However, these mechanisms have significant limitations: they
-are typically supported only by operator-provided CPE, so that customer-owned CPE fall back to
-the policing behavior described above; rate changes often take effect only after the session is
-re-established; and the information is not available to intermediate nodes. This document
-defines a standardized and interoperable alternative that addresses these limitations.
+vendor-specific management interfaces. The deployment of such mechanisms demonstrates the need for
+this information at the CPE, and CPE implementations already provide the corresponding traffic
+management functions, including shaping at Layer 2 or at Layer 3. However, these mechanisms have
+significant limitations: they are typically supported only by operator-provided CPE, so that
+customer-owned CPE fall back to the policing behavior described above; rate changes often take
+effect only after the session is re-established; and the information is not available to
+intermediate nodes. This document defines a standardized and interoperable alternative that
+addresses these limitations.
 
 # Acknowledgments
 {:numbered="false"}
