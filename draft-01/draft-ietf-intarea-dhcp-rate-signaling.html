@@ -1346,10 +1346,13 @@ inform end devices about the capacity of the upstream connection.<a href="#secti
             </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.15">
-            <p id="section-toc.1-1.15.1"><a href="#appendix-B" class="auto internal xref"></a><a href="#name-acknowledgments" class="internal xref">Acknowledgments</a></p>
+            <p id="section-toc.1-1.15.1"><a href="#appendix-B" class="auto internal xref">Appendix B</a>.  <a href="#name-examples-of-per-packet-over" class="internal xref">Examples of Per-Packet Overhead Parameters</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.16">
-            <p id="section-toc.1-1.16.1"><a href="#appendix-C" class="auto internal xref"></a><a href="#name-authors-addresses" class="internal xref">Authors' Addresses</a></p>
+            <p id="section-toc.1-1.16.1"><a href="#appendix-C" class="auto internal xref"></a><a href="#name-acknowledgments" class="internal xref">Acknowledgments</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.17">
+            <p id="section-toc.1-1.17.1"><a href="#appendix-D" class="auto internal xref"></a><a href="#name-authors-addresses" class="internal xref">Authors' Addresses</a></p>
 </li>
         </ul>
 </nav>
@@ -1799,11 +1802,16 @@ sub-option codes above 255 as unrecognized sub-option codes (see <a href="#error
             </tr>
             <tr>
               <td class="text-right" rowspan="1" colspan="1">4</td>
-              <td class="text-right" rowspan="1" colspan="1">5</td>
+              <td class="text-right" rowspan="1" colspan="1">6</td>
               <td class="text-left" rowspan="1" colspan="1">Per-Packet Overhead</td>
             </tr>
             <tr>
-              <td class="text-right" rowspan="1" colspan="1">5-254</td>
+              <td class="text-right" rowspan="1" colspan="1">5</td>
+              <td class="text-right" rowspan="1" colspan="1">6</td>
+              <td class="text-left" rowspan="1" colspan="1">Per-Packet Overhead Downstream</td>
+            </tr>
+            <tr>
+              <td class="text-right" rowspan="1" colspan="1">6-254</td>
               <td class="text-right" rowspan="1" colspan="1">-</td>
               <td class="text-left" rowspan="1" colspan="1">Unassigned</td>
             </tr>
@@ -2107,7 +2115,7 @@ link-layer trailers and physical-layer framing overhead.<a href="#section-3.2.3-
 <p id="section-3.2.3-3">Because each receiver calculates the Layer 2 rate over the frames as seen on its own interface,
 the per-packet overhead can differ between the receiver and the enforcement point, for example
 when an access node adds or removes a VLAN tag. Servers can signal such differences using the
-Per-Packet Overhead sub-option (see <a href="#overhead" class="auto internal xref">Section 3.2.4</a>) or, in DHCPv6, by signaling node-specific rates
+Per-Packet Overhead sub-options (see <a href="#overhead" class="auto internal xref">Section 3.2.4</a>) or, in DHCPv6, by signaling node-specific rates
 (see <a href="#dhcpv6-server" class="auto internal xref">Section 5.3</a>).<a href="#section-3.2.3-3" class="pilcrow">¶</a></p>
 <p id="section-3.2.3-4">A Layer 3 rate encompasses only the IP header and its payload. This rate calculation is frequently
 utilized by end-user speed test applications and is often regarded as the marketable "product
@@ -2126,7 +2134,7 @@ by CPE implementations available on the market. However, the rates and the accou
 currently configured manually or through proprietary mechanisms. This document provides a
 standardized way to convey this information.<a href="#section-3.2.3-6" class="pilcrow">¶</a></p>
 <p id="section-3.2.3-7">For rates intended to be applied, servers <span class="bcp14">SHOULD</span> signal the rate at the layer at which the
-enforcement point accounts traffic and <span class="bcp14">SHOULD</span> include the Per-Packet Overhead sub-option where the
+enforcement point accounts traffic and <span class="bcp14">SHOULD</span> include the Per-Packet Overhead sub-options where the
 accounting of the enforcement point differs from the size of the packets as seen by the receiver.
 A Layer 2 rate together with the per-packet overhead allows the most precise modeling of a
 bottleneck that accounts traffic at Layer 2. A Layer 3 rate is useful where the enforcement point
@@ -2137,7 +2145,7 @@ indicated by the Rate Type. For example, shapers commonly account for the Layer 
 while the signaled rate may be a Layer 3 rate. In this case, a receiver whose traffic management
 functions support per-packet overhead accounting compensates for the difference between its own
 accounting and the accounting of the enforcement point, as indicated by the Rate Type and the
-Per-Packet Overhead sub-option (see <a href="#overhead" class="auto internal xref">Section 3.2.4</a>), for example using the overhead compensation
+Per-Packet Overhead sub-options (see <a href="#overhead" class="auto internal xref">Section 3.2.4</a>), for example using the overhead compensation
 provided by its shaper. A receiver without such support applies the signaled rate directly or
 approximates the difference, for example by reducing the applied rate by a margin.<a href="#section-3.2.3-8" class="pilcrow">¶</a></p>
 <p id="section-3.2.3-9">DHCPv4 Sub-Option Format:<a href="#section-3.2.3-9" class="pilcrow">¶</a></p>
@@ -2318,24 +2326,32 @@ value discards the entire OPTION_RATE (see <a href="#errors" class="auto interna
           <h4 id="name-per-packet-overhead">
 <a href="#section-3.2.4" class="section-number selfRef">3.2.4. </a><a href="#name-per-packet-overhead" class="section-name selfRef">Per-Packet Overhead</a>
           </h4>
-<p id="section-3.2.4-1">The Per-Packet Overhead sub-option describes the size that the enforcement point of the signaled
+<p id="section-3.2.4-1">The Per-Packet Overhead sub-options describe the size that the enforcement point of the signaled
 rates accounts for each packet, relative to the size of the packet at the layer indicated by the
-Rate Type as seen by the receiver. It allows a receiver to configure its traffic management
+Rate Type as seen by the receiver. They allow a receiver to configure its traffic management
 functions such that they accurately model the enforcement point, independent of differences in
 encapsulation between the receiver and the enforcement point, such as additional VLAN tags or
 cell-based link layers.<a href="#section-3.2.4-1" class="pilcrow">¶</a></p>
-<p id="section-3.2.4-2">DHCPv4 Sub-Option Format:<a href="#section-3.2.4-2" class="pilcrow">¶</a></p>
-<div id="section-3.2.4-3">
-            <div class="alignLeft art-svg artwork" id="section-3.2.4-3.1">
+<p id="section-3.2.4-2">Two sub-options with identical format and semantics are defined. The Per-Packet Overhead
+sub-option (code 4) applies to both directions. If the Per-Packet Overhead Downstream sub-option
+(code 5) is present, it overrides the Per-Packet Overhead sub-option for the downstream
+direction. As the per-packet overhead is typically identical in both directions, and clients
+typically apply only the upstream rate (see <a href="#rate-type" class="auto internal xref">Section 3.2.3</a>), servers usually include only the
+Per-Packet Overhead sub-option.<a href="#section-3.2.4-2" class="pilcrow">¶</a></p>
+<p id="section-3.2.4-3">The format is shown for the Per-Packet Overhead sub-option. The Per-Packet Overhead Downstream
+sub-option uses the same format with a sub-option code of 5.<a href="#section-3.2.4-3" class="pilcrow">¶</a></p>
+<p id="section-3.2.4-4">DHCPv4 Sub-Option Format:<a href="#section-3.2.4-4" class="pilcrow">¶</a></p>
+<div id="section-3.2.4-5">
+            <div class="alignLeft art-svg artwork" id="section-3.2.4-5.1">
 <svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="144" width="528" viewBox="0 0 528 144" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
                 <path d="M 8,64 L 8,128" fill="none" stroke="black"></path>
                 <path d="M 136,64 L 136,96" fill="none" stroke="black"></path>
                 <path d="M 264,64 L 264,128" fill="none" stroke="black"></path>
                 <path d="M 392,96 L 392,128" fill="none" stroke="black"></path>
-                <path d="M 520,64 L 520,96" fill="none" stroke="black"></path>
+                <path d="M 520,64 L 520,128" fill="none" stroke="black"></path>
                 <path d="M 8,64 L 520,64" fill="none" stroke="black"></path>
                 <path d="M 8,96 L 520,96" fill="none" stroke="black"></path>
-                <path d="M 8,128 L 392,128" fill="none" stroke="black"></path>
+                <path d="M 8,128 L 520,128" fill="none" stroke="black"></path>
                 <g class="text">
                   <text x="16" y="36">0</text>
                   <text x="176" y="36">1</text>
@@ -2376,29 +2392,32 @@ cell-based link layers.<a href="#section-3.2.4-1" class="pilcrow">¶</a></p>
                   <text x="44" y="84">SubOpt</text>
                   <text x="100" y="84">Code=4</text>
                   <text x="172" y="84">SubOpt</text>
-                  <text x="224" y="84">Len=5</text>
+                  <text x="224" y="84">Len=6</text>
                   <text x="388" y="84">Overhead</text>
                   <text x="72" y="116">Minimum</text>
                   <text x="132" y="116">Packet</text>
                   <text x="180" y="116">Unit</text>
                   <text x="224" y="116">(MPU)</text>
-                  <text x="328" y="116">Flags</text>
+                  <text x="292" y="116">Cell</text>
+                  <text x="344" y="116">Payload</text>
+                  <text x="436" y="116">Cell</text>
+                  <text x="476" y="116">Size</text>
                 </g>
-              </svg><a href="#section-3.2.4-3.1" class="pilcrow">¶</a>
+              </svg><a href="#section-3.2.4-5.1" class="pilcrow">¶</a>
 </div>
 </div>
-<p id="section-3.2.4-4">DHCPv6 Sub-Option Format:<a href="#section-3.2.4-4" class="pilcrow">¶</a></p>
-<div id="section-3.2.4-5">
-            <div class="alignLeft art-svg artwork" id="section-3.2.4-5.1">
+<p id="section-3.2.4-6">DHCPv6 Sub-Option Format:<a href="#section-3.2.4-6" class="pilcrow">¶</a></p>
+<div id="section-3.2.4-7">
+            <div class="alignLeft art-svg artwork" id="section-3.2.4-7.1">
 <svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="176" width="528" viewBox="0 0 528 176" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
                 <path d="M 8,64 L 8,160" fill="none" stroke="black"></path>
                 <path d="M 136,128 L 136,160" fill="none" stroke="black"></path>
-                <path d="M 264,64 L 264,128" fill="none" stroke="black"></path>
+                <path d="M 264,64 L 264,160" fill="none" stroke="black"></path>
                 <path d="M 520,64 L 520,128" fill="none" stroke="black"></path>
                 <path d="M 8,64 L 520,64" fill="none" stroke="black"></path>
                 <path d="M 8,96 L 520,96" fill="none" stroke="black"></path>
                 <path d="M 8,128 L 520,128" fill="none" stroke="black"></path>
-                <path d="M 8,160 L 136,160" fill="none" stroke="black"></path>
+                <path d="M 8,160 L 264,160" fill="none" stroke="black"></path>
                 <g class="text">
                   <text x="16" y="36">0</text>
                   <text x="176" y="36">1</text>
@@ -2439,72 +2458,89 @@ cell-based link layers.<a href="#section-3.2.4-1" class="pilcrow">¶</a></p>
                   <text x="44" y="84">SubOpt</text>
                   <text x="100" y="84">Code=4</text>
                   <text x="300" y="84">SubOpt</text>
-                  <text x="352" y="84">Len=5</text>
+                  <text x="352" y="84">Len=6</text>
                   <text x="132" y="116">Overhead</text>
                   <text x="328" y="116">Minimum</text>
                   <text x="388" y="116">Packet</text>
                   <text x="436" y="116">Unit</text>
                   <text x="480" y="116">(MPU)</text>
-                  <text x="72" y="148">Flags</text>
+                  <text x="36" y="148">Cell</text>
+                  <text x="88" y="148">Payload</text>
+                  <text x="180" y="148">Cell</text>
+                  <text x="220" y="148">Size</text>
                 </g>
-              </svg><a href="#section-3.2.4-5.1" class="pilcrow">¶</a>
+              </svg><a href="#section-3.2.4-7.1" class="pilcrow">¶</a>
 </div>
 </div>
-<span class="break"></span><dl class="dlParallel" id="section-3.2.4-6">
-            <dt id="section-3.2.4-6.1">Overhead:</dt>
-            <dd style="margin-left: 1.5em" id="section-3.2.4-6.2">
-              <p id="section-3.2.4-6.2.1">A 16-bit signed integer in two's complement and network byte order, indicating the number of
+<span class="break"></span><dl class="dlParallel" id="section-3.2.4-8">
+            <dt id="section-3.2.4-8.1">Overhead:</dt>
+            <dd style="margin-left: 1.5em" id="section-3.2.4-8.2">
+              <p id="section-3.2.4-8.2.1">A 16-bit signed integer in two's complement and network byte order, indicating the number of
 octets the enforcement point accounts per packet in addition to the size of the packet at the
 layer indicated by the Rate Type, as seen by the receiver. The value can be negative, for
 example if the enforcement point does not account for headers that are present on the
-interface of the receiver.<a href="#section-3.2.4-6.2.1" class="pilcrow">¶</a></p>
+interface of the receiver. Where the bottleneck is a physical link rather than a policer, the
+Overhead includes physical-layer overhead that consumes transmission time, such as the
+Ethernet preamble, start frame delimiter, and inter-frame gap.<a href="#section-3.2.4-8.2.1" class="pilcrow">¶</a></p>
 </dd>
             <dd class="break"></dd>
-<dt id="section-3.2.4-6.3">Minimum Packet Unit (MPU):</dt>
-            <dd style="margin-left: 1.5em" id="section-3.2.4-6.4">
-              <p id="section-3.2.4-6.4.1">A 16-bit unsigned integer in network byte order, indicating the minimum size in octets that
+<dt id="section-3.2.4-8.3">Minimum Packet Unit (MPU):</dt>
+            <dd style="margin-left: 1.5em" id="section-3.2.4-8.4">
+              <p id="section-3.2.4-8.4.1">A 16-bit unsigned integer in network byte order, indicating the minimum size in octets that
 the enforcement point accounts per packet, after the Overhead has been added. A value of 0
-indicates that no minimum applies.<a href="#section-3.2.4-6.4.1" class="pilcrow">¶</a></p>
+indicates that no minimum applies.<a href="#section-3.2.4-8.4.1" class="pilcrow">¶</a></p>
 </dd>
             <dd class="break"></dd>
-<dt id="section-3.2.4-6.5">Flags:</dt>
-            <dd style="margin-left: 1.5em" id="section-3.2.4-6.6">
-              <p id="section-3.2.4-6.6.1">An 8-bit field. The most significant bit (A) indicates cell-based accounting as used by
-Asynchronous Transfer Mode (ATM) Adaptation Layer 5 (AAL5), for example on ADSL, ADSL2, and
-ADSL2+ lines, which transport data in ATM cells. With cell-based accounting, the accounted size
-is rounded up to a multiple of 48 octets, each of which is accounted as a 53-octet cell. When
-the A flag is set, the Overhead includes all encapsulation overhead carried within the AAL5
-frame, including the 8-octet AAL5 trailer. The remaining bits are reserved; they <span class="bcp14">MUST</span> be set to
-zero by the sender and <span class="bcp14">MUST</span> be ignored by the receiver.<a href="#section-3.2.4-6.6.1" class="pilcrow">¶</a></p>
+<dt id="section-3.2.4-8.5">Cell Payload:</dt>
+            <dd style="margin-left: 1.5em" id="section-3.2.4-8.6">
+              <p id="section-3.2.4-8.6.1">An 8-bit unsigned integer indicating the number of octets of packet data carried per cell for
+link layers that transport packets in fixed-size cells. A value of 0 indicates that no
+cell-based accounting applies.<a href="#section-3.2.4-8.6.1" class="pilcrow">¶</a></p>
+</dd>
+            <dd class="break"></dd>
+<dt id="section-3.2.4-8.7">Cell Size:</dt>
+            <dd style="margin-left: 1.5em" id="section-3.2.4-8.8">
+              <p id="section-3.2.4-8.8.1">An 8-bit unsigned integer indicating the number of octets accounted per cell, including the
+cell header. If the Cell Payload is 0, the Cell Size <span class="bcp14">MUST</span> be set to 0 by the sender and is
+ignored by the receiver.<a href="#section-3.2.4-8.8.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
 </dl>
-<p id="section-3.2.4-7">For a packet with a size of S octets at the layer indicated by the Rate Type, the size L
-accounted by the enforcement point is calculated as follows:<a href="#section-3.2.4-7" class="pilcrow">¶</a></p>
-<ol start="1" type="1" class="normal type-1" id="section-3.2.4-8">
-<li id="section-3.2.4-8.1">
-              <p id="section-3.2.4-8.1.1">L = max(S + Overhead, MPU)<a href="#section-3.2.4-8.1.1" class="pilcrow">¶</a></p>
+<p id="section-3.2.4-9">For a packet with a size of S octets at the layer indicated by the Rate Type, the size L
+accounted by the enforcement point is calculated as follows:<a href="#section-3.2.4-9" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-3.2.4-10">
+<li id="section-3.2.4-10.1">
+              <p id="section-3.2.4-10.1.1">L = max(S + Overhead, MPU)<a href="#section-3.2.4-10.1.1" class="pilcrow">¶</a></p>
 </li>
-            <li id="section-3.2.4-8.2">
-              <p id="section-3.2.4-8.2.1">If the A flag is set: L = ceil(L / 48) * 53<a href="#section-3.2.4-8.2.1" class="pilcrow">¶</a></p>
+            <li id="section-3.2.4-10.2">
+              <p id="section-3.2.4-10.2.1">If the Cell Payload is not 0: L = ceil(L / Cell Payload) * Cell Size<a href="#section-3.2.4-10.2.1" class="pilcrow">¶</a></p>
 </li>
           </ol>
-<p id="section-3.2.4-9">The Per-Packet Overhead sub-option is optional and supplements the signaled rates to improve the
-accuracy of traffic management. A receiver that applies the signaled rates and whose traffic
+<p id="section-3.2.4-11">Cell-based accounting describes link layers that pad each packet to an integer number of cells.
+The most common example is Asynchronous Transfer Mode (ATM) Adaptation Layer 5 (AAL5), as used
+for example on ADSL, ADSL2, and ADSL2+ lines, which is described by a Cell Payload of 48 and a
+Cell Size of 53. In this case, the Overhead includes all encapsulation overhead carried within
+the AAL5 frame, including the 8-octet AAL5 trailer. A Cell Size smaller than the Cell Payload
+is invalid; a receiver that receives such values ignores the cell-based accounting. Accounting
+models that cannot be described by these parameters can be defined as additional sub-options
+(see <a href="#iana-sub-option-table" class="auto internal xref">Table 3</a>). Examples of parameter values for common deployments are given in
+<a href="#examples" class="auto internal xref">Appendix B</a>.<a href="#section-3.2.4-11" class="pilcrow">¶</a></p>
+<p id="section-3.2.4-12">The Per-Packet Overhead sub-options are optional and supplement the signaled rates to improve
+the accuracy of traffic management. A receiver that applies the signaled rates and whose traffic
 management functions support per-packet overhead accounting <span class="bcp14">SHOULD</span> configure them such that the
 rate of transmitted traffic, calculated over the accounted sizes L, does not exceed the signaled
-rate.<a href="#section-3.2.4-9" class="pilcrow">¶</a></p>
-<p id="section-3.2.4-10">A receiver whose traffic management functions do not support per-packet overhead accounting, or
+rate for the respective direction.<a href="#section-3.2.4-12" class="pilcrow">¶</a></p>
+<p id="section-3.2.4-13">A receiver whose traffic management functions do not support per-packet overhead accounting, or
 support it only partially (e.g., without cell-based accounting or only for a limited range of
-values), <span class="bcp14">MAY</span> ignore the sub-option or those parts of it that it cannot apply, and applies the
-signaled rates as specified in <a href="#rate-type" class="auto internal xref">Section 3.2.3</a>. Such a receiver <span class="bcp14">MAY</span> reduce the applied rate by a
-margin to approximate the accounting of the enforcement point. The inability of a receiver to
-apply the Per-Packet Overhead sub-option, fully or partially, does not render the OPTION_RATE
-invalid.<a href="#section-3.2.4-10" class="pilcrow">¶</a></p>
-<p id="section-3.2.4-11">In the absence of the Per-Packet Overhead sub-option, the receiver assumes an Overhead of 0, an
-MPU of 0, and no cell-based accounting. Clients do not include the Per-Packet Overhead sub-option
-in hints (see <a href="#hints" class="auto internal xref">Section 3.4</a>); servers ignore it if present. The sub-option can be ignored for
-informational rate types.<a href="#section-3.2.4-11" class="pilcrow">¶</a></p>
+values), <span class="bcp14">MAY</span> ignore the sub-options or those
+parts of them that it cannot apply, and applies the signaled rates as specified in
+<a href="#rate-type" class="auto internal xref">Section 3.2.3</a>. Such a receiver <span class="bcp14">MAY</span> reduce the applied rate by a margin to approximate the
+accounting of the enforcement point. The inability of a receiver to apply the Per-Packet
+Overhead sub-options, fully or partially, does not render the OPTION_RATE invalid.<a href="#section-3.2.4-13" class="pilcrow">¶</a></p>
+<p id="section-3.2.4-14">For a direction for which no Per-Packet Overhead sub-option applies, the receiver assumes an
+Overhead of 0, an MPU of 0, and no cell-based accounting. Clients do not include the Per-Packet
+Overhead sub-options in hints (see <a href="#hints" class="auto internal xref">Section 3.4</a>); servers ignore them if present. The sub-options
+can be ignored for informational rate types.<a href="#section-3.2.4-14" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -2619,8 +2655,8 @@ and continue processing the remainder of the OPTION_RATE.<a href="#section-3.5-2
 reserved value that determines the interpretation of the rate parameters (such as an unassigned
 Rate Type), it <span class="bcp14">MUST</span> discard the entire OPTION_RATE. Applying signaled rates without understanding
 their intended interpretation could result in incorrect traffic management. This does not apply
-to the Per-Packet Overhead sub-option: values of this sub-option that a receiver cannot apply do
-not cause the OPTION_RATE to be discarded (see <a href="#overhead" class="auto internal xref">Section 3.2.4</a>).<a href="#section-3.5-3" class="pilcrow">¶</a></p>
+to the Per-Packet Overhead sub-options: values of these sub-options that a receiver cannot apply
+do not cause the OPTION_RATE to be discarded (see <a href="#overhead" class="auto internal xref">Section 3.2.4</a>).<a href="#section-3.5-3" class="pilcrow">¶</a></p>
 <p id="section-3.5-4">A receiver <span class="bcp14">MUST</span> also discard the entire OPTION_RATE if any of the following conditions is met:<a href="#section-3.5-4" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-3.5-5.1">
@@ -3182,7 +3218,7 @@ used by OpenWrt can request OPTION_RATE, send hints, and expose received options
 hexadecimal environment variables to user-defined hook scripts. All client behavior specified in
 this document can therefore be implemented in such scripts, which parse the option, apply the
 processing rules of <a href="#processing" class="auto internal xref">Section 3.3</a>, and configure local traffic management (e.g., via SQM or
-tc/CAKE). The fields of the Per-Packet Overhead sub-option (see <a href="#overhead" class="auto internal xref">Section 3.2.4</a>) map directly to the
+tc/CAKE). The fields of the Per-Packet Overhead sub-options (see <a href="#overhead" class="auto internal xref">Section 3.2.4</a>) map directly to the
 overhead, minimum packet unit, and ATM cell accounting parameters of CAKE. The rates learned on the
 WAN interface can be propagated to LAN clients using the existing custom-option support of the
 OpenWrt DHCPv4 server (dnsmasq) and DHCPv6 server (odhcpd).<a href="#section-9.1-1" class="pilcrow">¶</a></p>
@@ -3216,7 +3252,7 @@ signaling a non-zero rate below this minimum as if it were not present (see <a h
 The appropriate minimum depends on the deployment and the use case of the device and is
 therefore left to the client implementation. For example, a broadband CPE might reject rates
 below 1 Mbps.<a href="#section-10-4" class="pilcrow">¶</a></p>
-<p id="section-10-5">Excessive values of the Overhead or MPU fields of the Per-Packet Overhead sub-option effectively
+<p id="section-10-5">Excessive values of the Overhead or MPU fields of the Per-Packet Overhead sub-options effectively
 reduce the applied rate. Receivers <span class="bcp14">MAY</span> limit these values to a plausible range or ignore the
 sub-option, which does not invalidate the OPTION_RATE (see <a href="#overhead" class="auto internal xref">Section 3.2.4</a>).<a href="#section-10-5" class="pilcrow">¶</a></p>
 <p id="section-10-6">Conversely, an attacker could inject an excessively high rate, a rate value of 0, or an
@@ -3376,7 +3412,12 @@ The Reference column identifies the specification that defines the registered va
               <td class="text-left" rowspan="1" colspan="1">RFC-TBD</td>
             </tr>
             <tr>
-              <td class="text-right" rowspan="1" colspan="1">5-254</td>
+              <td class="text-right" rowspan="1" colspan="1">5</td>
+              <td class="text-left" rowspan="1" colspan="1">Per-Packet Overhead Downstream</td>
+              <td class="text-left" rowspan="1" colspan="1">RFC-TBD</td>
+            </tr>
+            <tr>
+              <td class="text-right" rowspan="1" colspan="1">6-254</td>
               <td class="text-left" rowspan="1" colspan="1">Unassigned</td>
               <td class="text-left" rowspan="1" colspan="1"> </td>
             </tr>
@@ -3527,13 +3568,25 @@ how to make the request successful.<a href="#section-12.5-5" class="pilcrow">¶<
         <dd>
 <span class="refAuthor">IEEE</span>, <span class="refTitle">"IEEE Standard for Local and Metropolitan Area Networks--Bridges and Bridged Networks"</span>, <span class="seriesInfo">IEEE Std 802.1Q-2022</span>, <time datetime="2022" class="refDate">2022</time>. </dd>
 <dd class="break"></dd>
+<dt id="IEEE802.3">[IEEE802.3]</dt>
+        <dd>
+<span class="refAuthor">IEEE</span>, <span class="refTitle">"IEEE Standard for Ethernet"</span>, <span class="seriesInfo">IEEE Std 802.3-2022</span>, <time datetime="2022" class="refDate">2022</time>. </dd>
+<dd class="break"></dd>
 <dt id="RFC1661">[RFC1661]</dt>
         <dd>
 <span class="refAuthor">Simpson, W., Ed.</span>, <span class="refTitle">"The Point-to-Point Protocol (PPP)"</span>, <span class="seriesInfo">STD 51</span>, <span class="seriesInfo">RFC 1661</span>, <span class="seriesInfo">DOI 10.17487/RFC1661</span>, <time datetime="1994-07" class="refDate">July 1994</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc1661">https://www.rfc-editor.org/rfc/rfc1661</a>&gt;</span>. </dd>
 <dd class="break"></dd>
+<dt id="RFC2364">[RFC2364]</dt>
+        <dd>
+<span class="refAuthor">Gross, G.</span>, <span class="refAuthor">Kaycee, M.</span>, <span class="refAuthor">Li, A.</span>, <span class="refAuthor">Malis, A.</span>, and <span class="refAuthor">J. Stephens</span>, <span class="refTitle">"PPP Over AAL5"</span>, <span class="seriesInfo">RFC 2364</span>, <span class="seriesInfo">DOI 10.17487/RFC2364</span>, <time datetime="1998-07" class="refDate">July 1998</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc2364">https://www.rfc-editor.org/rfc/rfc2364</a>&gt;</span>. </dd>
+<dd class="break"></dd>
 <dt id="RFC2516">[RFC2516]</dt>
         <dd>
 <span class="refAuthor">Mamakos, L.</span>, <span class="refAuthor">Lidl, K.</span>, <span class="refAuthor">Evarts, J.</span>, <span class="refAuthor">Carrel, D.</span>, <span class="refAuthor">Simone, D.</span>, and <span class="refAuthor">R. Wheeler</span>, <span class="refTitle">"A Method for Transmitting PPP Over Ethernet (PPPoE)"</span>, <span class="seriesInfo">RFC 2516</span>, <span class="seriesInfo">DOI 10.17487/RFC2516</span>, <time datetime="1999-02" class="refDate">February 1999</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc2516">https://www.rfc-editor.org/rfc/rfc2516</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC2684">[RFC2684]</dt>
+        <dd>
+<span class="refAuthor">Grossman, D.</span> and <span class="refAuthor">J. Heinanen</span>, <span class="refTitle">"Multiprotocol Encapsulation over ATM Adaptation Layer 5"</span>, <span class="seriesInfo">RFC 2684</span>, <span class="seriesInfo">DOI 10.17487/RFC2684</span>, <time datetime="1999-09" class="refDate">September 1999</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc2684">https://www.rfc-editor.org/rfc/rfc2684</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC2865">[RFC2865]</dt>
         <dd>
@@ -3697,18 +3750,128 @@ addresses these limitations.<a href="#appendix-A.5-1" class="pilcrow">¶</a></p>
 </div>
 </section>
 </div>
-<div id="acknowledgments">
+<div id="examples">
 <section id="appendix-B">
+      <h2 id="name-examples-of-per-packet-over">
+<a href="#appendix-B" class="section-number selfRef">Appendix B. </a><a href="#name-examples-of-per-packet-over" class="section-name selfRef">Examples of Per-Packet Overhead Parameters</a>
+      </h2>
+<p id="appendix-B-1">This appendix provides examples of the parameters of the Per-Packet Overhead sub-options (see
+<a href="#overhead" class="auto internal xref">Section 3.2.4</a>) for common deployments. The values are illustrative; the actual values depend on
+the configuration of the access network and of the enforcement point and need to be determined
+by the operator.<a href="#appendix-B-1" class="pilcrow">¶</a></p>
+<p id="appendix-B-2">In all examples, S denotes the size of the packet at the layer indicated by the Rate Type, as
+seen by the receiver. For a Layer 2 rate, S includes the Ethernet header and any VLAN tags and
+encapsulation headers present on the interface of the receiver, but excludes the Ethernet Frame
+Check Sequence (FCS) (see <a href="#rate-type" class="auto internal xref">Section 3.2.3</a>).<a href="#appendix-B-2" class="pilcrow">¶</a></p>
+<span id="name-example-per-packet-overhead"></span><div id="tab-examples">
+<table class="center" id="table-5">
+        <caption>
+<a href="#table-5" class="selfRef">Table 5</a>:
+<a href="#name-example-per-packet-overhead" class="selfRef">Example Per-Packet Overhead Parameters</a>
+        </caption>
+<thead>
+          <tr>
+            <th class="text-left" rowspan="1" colspan="1">Scenario</th>
+            <th class="text-left" rowspan="1" colspan="1">Rate Type</th>
+            <th class="text-right" rowspan="1" colspan="1">Overhead</th>
+            <th class="text-right" rowspan="1" colspan="1">MPU</th>
+            <th class="text-right" rowspan="1" colspan="1">Cell Payload / Size</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="text-left" rowspan="1" colspan="1">Ethernet link as bottleneck</td>
+            <td class="text-left" rowspan="1" colspan="1">Layer 2</td>
+            <td class="text-right" rowspan="1" colspan="1">24</td>
+            <td class="text-right" rowspan="1" colspan="1">84</td>
+            <td class="text-right" rowspan="1" colspan="1">0 / 0</td>
+          </tr>
+          <tr>
+            <td class="text-left" rowspan="1" colspan="1">Policer, VLAN tag added by access node</td>
+            <td class="text-left" rowspan="1" colspan="1">Layer 2</td>
+            <td class="text-right" rowspan="1" colspan="1">4</td>
+            <td class="text-right" rowspan="1" colspan="1">0</td>
+            <td class="text-right" rowspan="1" colspan="1">0 / 0</td>
+          </tr>
+          <tr>
+            <td class="text-left" rowspan="1" colspan="1">Policer accounting IP packets</td>
+            <td class="text-left" rowspan="1" colspan="1">Layer 3</td>
+            <td class="text-right" rowspan="1" colspan="1">0</td>
+            <td class="text-right" rowspan="1" colspan="1">0</td>
+            <td class="text-right" rowspan="1" colspan="1">0 / 0</td>
+          </tr>
+          <tr>
+            <td class="text-left" rowspan="1" colspan="1">ADSL, PPPoE, bridged Ethernet with LLC/SNAP</td>
+            <td class="text-left" rowspan="1" colspan="1">Layer 2</td>
+            <td class="text-right" rowspan="1" colspan="1">18</td>
+            <td class="text-right" rowspan="1" colspan="1">0</td>
+            <td class="text-right" rowspan="1" colspan="1">48 / 53</td>
+          </tr>
+          <tr>
+            <td class="text-left" rowspan="1" colspan="1">ADSL, PPPoA with VC multiplexing</td>
+            <td class="text-left" rowspan="1" colspan="1">Layer 2</td>
+            <td class="text-right" rowspan="1" colspan="1">8</td>
+            <td class="text-right" rowspan="1" colspan="1">0</td>
+            <td class="text-right" rowspan="1" colspan="1">48 / 53</td>
+          </tr>
+        </tbody>
+      </table>
+</div>
+<span class="break"></span><dl class="dlParallel" id="appendix-B-4">
+        <dt id="appendix-B-4.1">Ethernet link as bottleneck:</dt>
+        <dd style="margin-left: 1.5em" id="appendix-B-4.2">
+          <p id="appendix-B-4.2.1">Where the bottleneck is an Ethernet link, for example an Ethernet handoff at the provisioned
+rate, each frame additionally consumes the transmission time of the FCS (4 octets), the
+preamble (7 octets), the start frame delimiter (1 octet), and the inter-frame gap (12 octets)
+<span>[<a href="#IEEE802.3" class="cite xref">IEEE802.3</a>]</span>, resulting in an Overhead of 24 octets. As the minimum Ethernet frame size is 64
+octets including the FCS, the MPU is 84 octets.<a href="#appendix-B-4.2.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="appendix-B-4.3">Policer, VLAN tag added by access node:</dt>
+        <dd style="margin-left: 1.5em" id="appendix-B-4.4">
+          <p id="appendix-B-4.4.1">The enforcement point accounts Ethernet frames without FCS, but the access node adds a VLAN tag
+that is not present on the interface of the receiver, resulting in an Overhead of 4 octets.<a href="#appendix-B-4.4.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="appendix-B-4.5">Policer accounting IP packets:</dt>
+        <dd style="margin-left: 1.5em" id="appendix-B-4.6">
+          <p id="appendix-B-4.6.1">The enforcement point accounts IP packets. No Per-Packet Overhead sub-option is required. A
+receiver that accounts traffic at Layer 2 compensates for its own headers implicitly (see
+<a href="#rate-type" class="auto internal xref">Section 3.2.3</a>).<a href="#appendix-B-4.6.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="appendix-B-4.7">ADSL, PPPoE, bridged Ethernet with LLC/SNAP:</dt>
+        <dd style="margin-left: 1.5em" id="appendix-B-4.8">
+          <p id="appendix-B-4.8.1">The receiver sends PPPoE frames over Ethernet, which are transported over ATM using bridged
+Ethernet encapsulation with LLC/SNAP <span>[<a href="#RFC2684" class="cite xref">RFC2684</a>]</span>. Within the AAL5 frame, the Ethernet frame
+without FCS is preceded by the LLC/SNAP header including padding (10 octets) and followed by
+the AAL5 trailer (8 octets), resulting in an Overhead of 18 octets and cell-based accounting
+with a Cell Payload of 48 and a Cell Size of 53.<a href="#appendix-B-4.8.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="appendix-B-4.9">ADSL, PPPoA with VC multiplexing:</dt>
+        <dd style="margin-left: 1.5em" id="appendix-B-4.10">
+          <p id="appendix-B-4.10.1">The receiver sends PPP frames over ATM using PPP over AAL5 with VC multiplexing <span>[<a href="#RFC2364" class="cite xref">RFC2364</a>]</span>.
+S includes the 2-octet PPP protocol field. The AAL5 trailer (8 octets) results in an Overhead
+of 8 octets, with cell-based accounting using a Cell Payload of 48 and a Cell Size of 53.<a href="#appendix-B-4.10.1" class="pilcrow">¶</a></p>
+</dd>
+      <dd class="break"></dd>
+</dl>
+</section>
+</div>
+<div id="acknowledgments">
+<section id="appendix-C">
       <h2 id="name-acknowledgments">
 <a href="#name-acknowledgments" class="section-name selfRef">Acknowledgments</a>
       </h2>
-<p id="appendix-B-1">The authors would like to thank Glenn Deen and Jason Livingood for their valuable
-review comments and discussion, which helped to significantly improve the clarity,
-applicability, and operational guidance of this document.<a href="#appendix-B-1" class="pilcrow">¶</a></p>
+<p id="appendix-C-1">The authors would like to thank Glenn Deen, Jason Livingood and
+Sebastian Moeller for their valuable review comments and discussion,
+which helped to significantly improve the clarity,
+applicability, and operational guidance of this document.<a href="#appendix-C-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="authors-addresses">
-<section id="appendix-C">
+<section id="appendix-D">
       <h2 id="name-authors-addresses">
 <a href="#name-authors-addresses" class="section-name selfRef">Authors' Addresses</a>
       </h2>
