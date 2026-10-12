@@ -1453,7 +1453,7 @@ ADSL, PPPoA with VC multiplexing:
 # Acknowledgments
 {:numbered="false"}
 
-The authors would like to thank Glenn Deen, Jason Livingood and 
-Sebastian Moeller for their valuable review comments and discussion, 
+The authors would like to thank Glenn Deen, Jason Livingood and
+Sebastian Moeller for their valuable review comments and discussion,
 which helped to significantly improve the clarity,
 applicability, and operational guidance of this document.
