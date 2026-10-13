@@ -2330,12 +2330,12 @@ and does not define a bit field. Receivers <span class="bcp14">MUST</span> inter
 <p id="section-3.2.3-18">The values 4-255 are currently unassigned. A receiver that does not recognize the value of a Rate
 Type or Rate Type Downstream sub-option discards the entire OPTION_RATE (see <a href="#errors" class="auto internal xref">Section 3.7</a>).<a href="#section-3.2.3-18" class="pilcrow">¶</a></p>
 <p id="section-3.2.3-19">For rates intended to be applied, servers <span class="bcp14">SHOULD</span> signal the rate at the layer at which the
-enforcement point accounts traffic and <span class="bcp14">SHOULD</span> include the Per-Packet Overhead sub-options where the
-accounting of the enforcement point differs from the size of the packets as seen by the receiver.
-A Layer 2 rate together with the per-packet overhead allows the most precise modeling of a
-bottleneck that accounts traffic at Layer 2. A Layer 3 rate is useful where the enforcement point
-itself accounts traffic at Layer 3, where the applied rate is intended to match the rates
-measured by end-user speed tests, or for informational purposes.<a href="#section-3.2.3-19" class="pilcrow">¶</a></p>
+enforcement point accounts traffic and <span class="bcp14">SHOULD</span> include the Per-Packet Overhead sub-options whenever
+the accounting of the enforcement point is known, including when all of their values are 0. A Layer
+2 rate together with the per-packet overhead allows the most precise modeling of a bottleneck that
+accounts traffic at Layer 2. A Layer 3 rate is useful where the enforcement point itself accounts
+traffic at Layer 3, where the applied rate is intended to match the rates measured by end-user speed
+tests, or for informational purposes.<a href="#section-3.2.3-19" class="pilcrow">¶</a></p>
 <p id="section-3.2.3-20">A receiver whose traffic management functions account traffic at Layer 3 can apply a Layer 3
 rate directly. The applied rate then closely corresponds to the rate measured by end-user speed
 tests and is identical on every node, independent of the encapsulation used on the interface of
@@ -2580,10 +2580,14 @@ values), <span class="bcp14">MAY</span> ignore the sub-options or those parts of
 signaled rates as specified in <a href="#rate-type" class="auto internal xref">Section 3.2.3</a>. Such a receiver <span class="bcp14">MAY</span> reduce the applied rate by a
 margin to approximate the accounting of the enforcement point. The inability of a receiver to apply
 the Per-Packet Overhead sub-options, fully or partially, does not render the OPTION_RATE invalid.<a href="#section-3.2.4-13" class="pilcrow">¶</a></p>
-<p id="section-3.2.4-14">For a direction for which no Per-Packet Overhead sub-option applies, the receiver assumes an
-Overhead of 0, an MPU of 0, and no cell-based accounting. Clients do not include the Per-Packet
-Overhead sub-options in hints (see <a href="#hints" class="auto internal xref">Section 3.5</a>); servers ignore them if present. The sub-options can
-be ignored for a direction with an informational Rate Type.<a href="#section-3.2.4-14" class="pilcrow">¶</a></p>
+<p id="section-3.2.4-14">For a direction for which no Per-Packet Overhead sub-option applies, the server does not provide
+information about the accounting of the enforcement point. In this case, the receiver uses its
+local configuration, if any, or otherwise assumes an Overhead of 0, an MPU of 0, and no cell-based
+accounting. If a Per-Packet Overhead sub-option applies to a direction, its values take precedence
+over the local configuration of the receiver for that direction, including values of 0, which
+indicate that the enforcement point does not account any additional overhead.<a href="#section-3.2.4-14" class="pilcrow">¶</a></p>
+<p id="section-3.2.4-15">Clients do not include the Per-Packet Overhead sub-options in hints (see <a href="#hints" class="auto internal xref">Section 3.5</a>); servers ignore
+them if present. The sub-options can be ignored for a direction with an informational Rate Type.<a href="#section-3.2.4-15" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -3286,13 +3290,13 @@ considerations for network management. When combined with appropriately configur
 deployed, L4S-compatible queue management, these per-subscriber rate parameters help to concentrate
 congestion control at a well-defined bottleneck and minimize queuing delay in the access segment.<a href="#section-8-1" class="pilcrow">¶</a></p>
 <p id="section-8-2">Operators should signal the rate at the layer at which the enforcement point accounts traffic,
-together with the per-packet overhead of the enforcement point where it differs from the
-packets as seen by the receiver (see <a href="#overhead" class="auto internal xref">Section 3.2.4</a>). This allows clients to model the actual
-bottleneck precisely, including additional encapsulations and cell-based link layers. Where
-contracted rates are specified as payload rates, for example due to regulatory requirements,
-operators typically configure the enforcement point such that the payload rate achieved with
-maximum-sized packets meets the contracted rate; the signaled rate and overhead then describe
-the configuration of the enforcement point, not the contracted payload rate.<a href="#section-8-2" class="pilcrow">¶</a></p>
+together with the per-packet overhead of the enforcement point whenever it is known (see
+<a href="#overhead" class="auto internal xref">Section 3.2.4</a>). This allows clients to model the actual bottleneck precisely, including additional
+encapsulations and cell-based link layers. Where contracted rates are specified as payload rates,
+for example due to regulatory requirements, operators typically configure the enforcement point such
+that the payload rate achieved with maximum-sized packets meets the contracted rate; the signaled
+rate and overhead then describe the configuration of the enforcement point, not the contracted
+payload rate.<a href="#section-8-2" class="pilcrow">¶</a></p>
 <p id="section-8-3">Very-high-bit-rate Digital Subscriber Line 2 (VDSL2) commonly uses Packet Transfer Mode (PTM) with
 64/65-octet encapsulation instead of ATM cells. Its effect corresponds to a constant reduction of
 the available rate and can be included in the signaled rate, without requiring cell-based
@@ -4007,9 +4011,9 @@ that is not present on the interface of the receiver, resulting in an Overhead o
         <dd class="break"></dd>
 <dt id="appendix-B-4.5">Policer accounting IP packets:</dt>
         <dd style="margin-left: 1.5em" id="appendix-B-4.6">
-          <p id="appendix-B-4.6.1">The enforcement point accounts IP packets. No Per-Packet Overhead sub-option is required. A
-receiver that accounts traffic at Layer 2 compensates for its own headers implicitly (see
-<a href="#rate-type" class="auto internal xref">Section 3.2.3</a>).<a href="#appendix-B-4.6.1" class="pilcrow">¶</a></p>
+          <p id="appendix-B-4.6.1">The enforcement point accounts IP packets. The Per-Packet Overhead sub-option is included with all
+values set to 0, indicating that no additional overhead applies. A receiver that accounts
+traffic at Layer 2 compensates for its own headers implicitly (see <a href="#rate-type" class="auto internal xref">Section 3.2.3</a>).<a href="#appendix-B-4.6.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
 <dt id="appendix-B-4.7">ADSL, PPPoE, bridged Ethernet with LLC/SNAP:</dt>
@@ -4051,7 +4055,8 @@ For each DHCPACK or Reply message received on an interface:
     keep the applied rates unchanged; done
   type_up := Rate Type (3), or 0 (Informational L2) if absent
   type_down := Rate Type Downstream (4), or type_up
-  ovh_up := Per-Packet Overhead (5), or defaults if absent
+  ovh_up := Per-Packet Overhead (5), or local configuration
+            or defaults if absent
   ovh_down := Per-Packet Overhead Downstream (6), or ovh_up
   for each direction (upstream, downstream):
     rate := rate sub-option of the direction, or 0 if absent
