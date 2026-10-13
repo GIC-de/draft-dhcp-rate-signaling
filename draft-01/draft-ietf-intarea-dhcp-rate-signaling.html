@@ -1591,28 +1591,33 @@ port.<a href="#section-2-3.8.1" class="pilcrow">¶</a></p>
 of the path, for example a policer at the BNG or an access link.<a href="#section-2-3.10.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
-<dt id="section-2-3.11">Receiver</dt>
+<dt id="section-2-3.11">Provisioned Rate</dt>
         <dd style="margin-left: 1.5em" id="section-2-3.12">
-          <p id="section-2-3.12.1">Any node that processes a received DHCP Rate Option, including DHCP clients, relay agents
-(including Lightweight DHCPv6 Relay Agents <span>[<a href="#RFC6221" class="cite xref">RFC6221</a>]</span> and Layer 2 DHCPv4 Relay Agents
-<span>[<a href="#TR101" class="cite xref">TR101</a>]</span>), and DHCP snooping devices.<a href="#section-2-3.12.1" class="pilcrow">¶</a></p>
+          <p id="section-2-3.12.1">The rate configured for a subscriber according to the subscribed service, typically enforced
+at the enforcement point (e.g., the BNG). The rates signaled by the DHCP Rate Option are
+typically derived from the provisioned rates.<a href="#section-2-3.12.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
-<dt id="section-2-3.13">Subscriber</dt>
+<dt id="section-2-3.13">Receiver</dt>
         <dd style="margin-left: 1.5em" id="section-2-3.14">
-          <p id="section-2-3.14.1">The individual, organization, or entity that maintains a contractual relationship with a
-Broadband Service Provider for network access services. Within the network infrastructure,
-a subscriber is typically represented by an authenticated logical session (e.g., IPoE or PPPoE)
-and an associated policy profile that dictates service attributes, including provisioned
-upstream and downstream data rates.<a href="#section-2-3.14.1" class="pilcrow">¶</a></p>
+          <p id="section-2-3.14.1">Any node that processes a received DHCP Rate Option, including DHCP clients, relay agents
+(including Lightweight DHCPv6 Relay Agents <span>[<a href="#RFC6221" class="cite xref">RFC6221</a>]</span> and Layer 2 DHCPv4 Relay Agents
+<span>[<a href="#TR101" class="cite xref">TR101</a>]</span>), and DHCP snooping devices.<a href="#section-2-3.14.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
-<dt id="section-2-3.15">Upstream</dt>
+<dt id="section-2-3.15">Subscriber</dt>
         <dd style="margin-left: 1.5em" id="section-2-3.16">
-          <p id="section-2-3.16.1">The direction of traffic from the client towards the network. For a client, this corresponds
+          <p id="section-2-3.16.1">The customer of a network access service. Within the network, a subscriber is typically
+represented by a subscriber session at the BNG (e.g., an IPoE or PPPoE session), to which the
+provisioned rates and other per-subscriber policies are applied.<a href="#section-2-3.16.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-2-3.17">Upstream</dt>
+        <dd style="margin-left: 1.5em" id="section-2-3.18">
+          <p id="section-2-3.18.1">The direction of traffic from the client towards the network. For a client, this corresponds
 to traffic sent on the interface on which the DHCP Rate Option was received. For a relay agent
 or snooping device, this corresponds to traffic received on the client-facing interface or
-port.<a href="#section-2-3.16.1" class="pilcrow">¶</a></p>
+port.<a href="#section-2-3.18.1" class="pilcrow">¶</a></p>
 </dd>
       <dd class="break"></dd>
 </dl>
@@ -1811,16 +1816,21 @@ sub-option codes above 255 as unrecognized sub-option codes (see <a href="#error
             </tr>
             <tr>
               <td class="text-right" rowspan="1" colspan="1">4</td>
-              <td class="text-right" rowspan="1" colspan="1">6</td>
-              <td class="text-left" rowspan="1" colspan="1">Per-Packet Overhead</td>
+              <td class="text-right" rowspan="1" colspan="1">1</td>
+              <td class="text-left" rowspan="1" colspan="1">Rate Type Downstream</td>
             </tr>
             <tr>
               <td class="text-right" rowspan="1" colspan="1">5</td>
               <td class="text-right" rowspan="1" colspan="1">6</td>
+              <td class="text-left" rowspan="1" colspan="1">Per-Packet Overhead</td>
+            </tr>
+            <tr>
+              <td class="text-right" rowspan="1" colspan="1">6</td>
+              <td class="text-right" rowspan="1" colspan="1">6</td>
               <td class="text-left" rowspan="1" colspan="1">Per-Packet Overhead Downstream</td>
             </tr>
             <tr>
-              <td class="text-right" rowspan="1" colspan="1">6-254</td>
+              <td class="text-right" rowspan="1" colspan="1">7-254</td>
               <td class="text-right" rowspan="1" colspan="1">-</td>
               <td class="text-left" rowspan="1" colspan="1">Unassigned</td>
             </tr>
@@ -1968,8 +1978,9 @@ order.<a href="#section-3.2.1-1" class="pilcrow">¶</a></p>
 </div>
 <p id="section-3.2.1-6">A value of 0 indicates that no rate is signaled for the upstream direction. A receiver that has
 previously applied an upstream rate learned from the DHCP Rate Option <span class="bcp14">MUST</span> remove that rate and
-revert to its default configuration for the upstream direction. If the Rate Type indicates an
-informational rate, a value of 0 indicates that no upstream rate information is available.<a href="#section-3.2.1-6" class="pilcrow">¶</a></p>
+revert to its default configuration for the upstream direction. If the Rate Type of the upstream
+direction indicates an informational rate, a value of 0 indicates that no upstream rate information
+is available.<a href="#section-3.2.1-6" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="rate-downstream">
@@ -2101,8 +2112,9 @@ byte order.<a href="#section-3.2.2-1" class="pilcrow">¶</a></p>
 </div>
 <p id="section-3.2.2-6">A value of 0 indicates that no rate is signaled for the downstream direction. A receiver that has
 previously applied a downstream rate learned from the DHCP Rate Option <span class="bcp14">MUST</span> remove that rate and
-revert to its default configuration for the downstream direction. If the Rate Type indicates an
-informational rate, a value of 0 indicates that no downstream rate information is available.<a href="#section-3.2.2-6" class="pilcrow">¶</a></p>
+revert to its default configuration for the downstream direction. If the Rate Type of the downstream
+direction indicates an informational rate, a value of 0 indicates that no downstream rate
+information is available.<a href="#section-3.2.2-6" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="rate-type">
@@ -2114,9 +2126,17 @@ informational rate, a value of 0 indicates that no downstream rate information i
 are intended to be applied by the receiver or are provided for informational purposes only. For
 rates intended to be applied, the rate type indicates the layer at which the enforcement point
 accounts traffic, so that receivers can model this accounting.<a href="#section-3.2.3-1" class="pilcrow">¶</a></p>
-<p id="section-3.2.3-2">DHCPv4 Sub-Option Format:<a href="#section-3.2.3-2" class="pilcrow">¶</a></p>
-<div id="section-3.2.3-3">
-            <div class="alignLeft art-svg artwork" id="section-3.2.3-3.1">
+<p id="section-3.2.3-2">Two sub-options with identical format and semantics are defined. The Rate Type sub-option (code 3)
+applies to both directions. If the Rate Type Downstream sub-option (code 4) is present, it overrides
+the Rate Type sub-option for the downstream direction. This allows a server, for example, to signal
+an upstream rate to be applied together with an informational downstream rate, or rates accounted at
+different layers in each direction. Throughout this document, the Rate Type of a direction refers to
+the rate type applicable to that direction.<a href="#section-3.2.3-2" class="pilcrow">¶</a></p>
+<p id="section-3.2.3-3">The format is shown for the Rate Type sub-option. The Rate Type Downstream sub-option uses the
+same format with a sub-option code of 4.<a href="#section-3.2.3-3" class="pilcrow">¶</a></p>
+<p id="section-3.2.3-4">DHCPv4 Sub-Option Format:<a href="#section-3.2.3-4" class="pilcrow">¶</a></p>
+<div id="section-3.2.3-5">
+            <div class="alignLeft art-svg artwork" id="section-3.2.3-5.1">
 <svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="112" width="400" viewBox="0 0 400 112" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
                 <path d="M 8,64 L 8,96" fill="none" stroke="black"></path>
                 <path d="M 136,64 L 136,96" fill="none" stroke="black"></path>
@@ -2159,12 +2179,12 @@ accounts traffic, so that receivers can model this accounting.<a href="#section-
                   <text x="292" y="84">Rate</text>
                   <text x="332" y="84">Type</text>
                 </g>
-              </svg><a href="#section-3.2.3-3.1" class="pilcrow">¶</a>
+              </svg><a href="#section-3.2.3-5.1" class="pilcrow">¶</a>
 </div>
 </div>
-<p id="section-3.2.3-4">DHCPv6 Sub-Option Format:<a href="#section-3.2.3-4" class="pilcrow">¶</a></p>
-<div id="section-3.2.3-5">
-            <div class="alignLeft art-svg artwork" id="section-3.2.3-5.1">
+<p id="section-3.2.3-6">DHCPv6 Sub-Option Format:<a href="#section-3.2.3-6" class="pilcrow">¶</a></p>
+<div id="section-3.2.3-7">
+            <div class="alignLeft art-svg artwork" id="section-3.2.3-7.1">
 <svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="144" width="528" viewBox="0 0 528 144" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
                 <path d="M 8,64 L 8,128" fill="none" stroke="black"></path>
                 <path d="M 136,96 L 136,128" fill="none" stroke="black"></path>
@@ -2217,10 +2237,10 @@ accounts traffic, so that receivers can model this accounting.<a href="#section-
                   <text x="36" y="116">Rate</text>
                   <text x="76" y="116">Type</text>
                 </g>
-              </svg><a href="#section-3.2.3-5.1" class="pilcrow">¶</a>
+              </svg><a href="#section-3.2.3-7.1" class="pilcrow">¶</a>
 </div>
 </div>
-<p id="section-3.2.3-6">The initial assignment of rate types is as follows:<a href="#section-3.2.3-6" class="pilcrow">¶</a></p>
+<p id="section-3.2.3-8">The initial assignment of rate types is as follows:<a href="#section-3.2.3-8" class="pilcrow">¶</a></p>
 <span id="name-rate-types"></span><div id="rate-type-table">
 <table class="center" id="table-2">
             <caption>
@@ -2257,73 +2277,78 @@ accounts traffic, so that receivers can model this accounting.<a href="#section-
             </tbody>
           </table>
 </div>
-<p id="section-3.2.3-8">A Layer 2 rate encompasses the Ethernet frame as sent or received on the interface of the
+<p id="section-3.2.3-10">A Layer 2 rate encompasses the Ethernet frame as sent or received on the interface of the
 receiver, including the Ethernet header, any VLAN tags <span>[<a href="#IEEE802.1Q" class="cite xref">IEEE802.1Q</a>]</span> present on that interface,
 and the complete Ethernet payload, including any encapsulation headers carried within it (e.g.,
 PPPoE and PPP headers). It excludes the Ethernet Frame Check Sequence (FCS), preamble, start
 frame delimiter (SFD), and inter-packet gap (IPG) <span>[<a href="#IEEE802.3" class="cite xref">IEEE802.3</a>]</span>. For link layers other than Ethernet, the
 Layer 2 rate is calculated analogously over the link-layer header and payload, excluding
-link-layer trailers and physical-layer framing overhead.<a href="#section-3.2.3-8" class="pilcrow">¶</a></p>
-<p id="section-3.2.3-9">A Layer 3 rate encompasses only the IP header and its payload. This rate calculation is frequently
+link-layer trailers and physical-layer framing overhead.<a href="#section-3.2.3-10" class="pilcrow">¶</a></p>
+<p id="section-3.2.3-11">A Layer 3 rate encompasses only the IP header and its payload. This rate calculation is frequently
 utilized by end-user speed test applications and is often regarded as the marketable "product
 bandwidth". Its primary advantage is its independence from the variable overhead introduced by
 differing numbers of VLAN tags or tunnel encapsulations, which makes it suitable for comparison
-with end-user measurements.<a href="#section-3.2.3-9" class="pilcrow">¶</a></p>
-<p id="section-3.2.3-10">Because each receiver calculates the Layer 2 rate over the frames as seen on its own interface,
+with end-user measurements.<a href="#section-3.2.3-11" class="pilcrow">¶</a></p>
+<p id="section-3.2.3-12">Because each receiver calculates the Layer 2 rate over the frames as seen on its own interface,
 the per-packet overhead can differ between the receiver and the enforcement point, for example
 when an access node adds or removes a VLAN tag. Servers can signal such differences using the
 Per-Packet Overhead sub-options (see <a href="#overhead" class="auto internal xref">Section 3.2.4</a>) or, in DHCPv6, by signaling node-specific rates
-(see <a href="#dhcpv6-server" class="auto internal xref">Section 5.3</a>).<a href="#section-3.2.3-10" class="pilcrow">¶</a></p>
-<p id="section-3.2.3-11">If the rate type is set to 2 (Layer 2 rate) or 3 (Layer 3 rate), the receiver is expected
-to apply the signaled rates to its local traffic management functions, such as traffic shapers,
-policers, or Active Queue Management (AQM) parameters, as described in this document.<a href="#section-3.2.3-11" class="pilcrow">¶</a></p>
-<p id="section-3.2.3-12">If the rate type is set to 0 (Informational Layer 2 rate) or 1 (Informational Layer 3 rate),
-the signaled rates are informational only and <span class="bcp14">MUST</span> be interpreted at the respective networking
-layer. A receiver of an informational rate type <span class="bcp14">SHOULD</span> process these values without altering
-its traffic shapers, policers, or AQM parameters. These values accommodate deployments where
-the network exposes the provisioned service tier to the Customer Premises Equipment (CPE) solely
-to populate user interfaces, facilitate telemetry, or serve as a metric to select a path with
-higher throughput, all without otherwise altering the device's localized forwarding behavior.<a href="#section-3.2.3-12" class="pilcrow">¶</a></p>
-<p id="section-3.2.3-13">In the absence of the Rate Type sub-option, a receiver <span class="bcp14">MUST</span> interpret the signaled values as an
-Informational Layer 2 rate (rate type 0). Consequently, a server that intends the signaled rates
-to be applied to local traffic management functions <span class="bcp14">MUST</span> include the Rate Type sub-option with
-a value of 2 (Layer 2 rate) or 3 (Layer 3 rate).<a href="#section-3.2.3-13" class="pilcrow">¶</a></p>
-<p id="section-3.2.3-14">The initial assignments are structured such that the least significant bit indicates the networking
+(see <a href="#dhcpv6-server" class="auto internal xref">Section 5.3</a>).<a href="#section-3.2.3-12" class="pilcrow">¶</a></p>
+<p id="section-3.2.3-13">If the Rate Type of a direction is set to 2 (Layer 2 rate) or 3 (Layer 3 rate), the receiver is
+expected to apply the signaled rate of that direction to its local traffic management functions,
+such as traffic shapers, policers, or Active Queue Management (AQM) parameters, as described in this
+document.<a href="#section-3.2.3-13" class="pilcrow">¶</a></p>
+<p id="section-3.2.3-14">If the Rate Type of a direction is set to 0 (Informational Layer 2 rate) or 1 (Informational Layer 3
+rate), the signaled rate of that direction is informational only and <span class="bcp14">MUST</span> be interpreted at the
+respective networking layer. A receiver of an informational rate type <span class="bcp14">SHOULD</span> process these values
+without altering its traffic shapers, policers, or AQM parameters. These values accommodate
+deployments where the network exposes the provisioned service tier to the Customer Premises
+Equipment (CPE) solely to populate user interfaces, facilitate telemetry, or serve as a metric to
+select a path with higher throughput, all without otherwise altering the device's localized
+forwarding behavior.<a href="#section-3.2.3-14" class="pilcrow">¶</a></p>
+<p id="section-3.2.3-15">For a direction for which no Rate Type sub-option applies, a receiver <span class="bcp14">MUST</span> interpret the signaled
+value as an Informational Layer 2 rate (rate type 0). Consequently, a server that intends the
+signaled rates to be applied to local traffic management functions <span class="bcp14">MUST</span> include a Rate Type
+sub-option with a value of 2 (Layer 2 rate) or 3 (Layer 3 rate) that applies to the respective
+direction.<a href="#section-3.2.3-15" class="pilcrow">¶</a></p>
+<p id="section-3.2.3-16">The initial assignments are structured such that the least significant bit indicates the networking
 layer (0 for Layer 2, 1 for Layer 3). This structure is a property of the initial assignments only
 and does not define a bit field. Receivers <span class="bcp14">MUST</span> interpret the Rate Type as an enumerated value and
-<span class="bcp14">MUST NOT</span> infer the semantics of an unrecognized value from its individual bits.<a href="#section-3.2.3-14" class="pilcrow">¶</a></p>
-<p id="section-3.2.3-15">The values 4-255 are currently unassigned. A receiver that does not recognize the Rate Type
-value discards the entire OPTION_RATE (see <a href="#errors" class="auto internal xref">Section 3.5</a>).<a href="#section-3.2.3-15" class="pilcrow">¶</a></p>
-<p id="section-3.2.3-16">For rates intended to be applied, servers <span class="bcp14">SHOULD</span> signal the rate at the layer at which the
+<span class="bcp14">MUST NOT</span> infer the semantics of an unrecognized value from its individual bits.<a href="#section-3.2.3-16" class="pilcrow">¶</a></p>
+<p id="section-3.2.3-17">The values 4-255 are currently unassigned. A receiver that does not recognize the value of a Rate
+Type or Rate Type Downstream sub-option discards the entire OPTION_RATE (see <a href="#errors" class="auto internal xref">Section 3.5</a>).<a href="#section-3.2.3-17" class="pilcrow">¶</a></p>
+<p id="section-3.2.3-18">For rates intended to be applied, servers <span class="bcp14">SHOULD</span> signal the rate at the layer at which the
 enforcement point accounts traffic and <span class="bcp14">SHOULD</span> include the Per-Packet Overhead sub-options where the
 accounting of the enforcement point differs from the size of the packets as seen by the receiver.
 A Layer 2 rate together with the per-packet overhead allows the most precise modeling of a
 bottleneck that accounts traffic at Layer 2. A Layer 3 rate is useful where the enforcement point
 itself accounts traffic at Layer 3, where the applied rate is intended to match the rates
-measured by end-user speed tests, or for informational purposes.<a href="#section-3.2.3-16" class="pilcrow">¶</a></p>
-<p id="section-3.2.3-17">A receiver whose traffic management functions account traffic at Layer 3 can apply a Layer 3
+measured by end-user speed tests, or for informational purposes.<a href="#section-3.2.3-18" class="pilcrow">¶</a></p>
+<p id="section-3.2.3-19">A receiver whose traffic management functions account traffic at Layer 3 can apply a Layer 3
 rate directly. The applied rate then closely corresponds to the rate measured by end-user speed
 tests and is identical on every node, independent of the encapsulation used on the interface of
 the receiver or on any other segment of the path. A receiver whose traffic management functions
 account traffic at a lower layer compensates implicitly for the headers between Layer 3 and its
 accounting layer, such as Ethernet, VLAN, and PPPoE headers, so that the applied rate still
-corresponds to the signaled Layer 3 rate.<a href="#section-3.2.3-17" class="pilcrow">¶</a></p>
-<p id="section-3.2.3-18">The traffic management functions of a receiver do not necessarily account traffic at the layer
+corresponds to the signaled Layer 3 rate.<a href="#section-3.2.3-19" class="pilcrow">¶</a></p>
+<p id="section-3.2.3-20">The traffic management functions of a receiver do not necessarily account traffic at the layer
 indicated by the Rate Type. For example, shapers commonly account for the Layer 2 frame length,
 while the signaled rate may be a Layer 3 rate. In this case, a receiver whose traffic management
 functions support per-packet overhead accounting compensates for the difference between its own
 accounting and the accounting of the enforcement point, as indicated by the Rate Type and the
 Per-Packet Overhead sub-options (see <a href="#overhead" class="auto internal xref">Section 3.2.4</a>), for example using the overhead compensation
 provided by its shaper. A receiver without such support applies the signaled rate directly or
-approximates the difference, for example by reducing the applied rate by a margin.<a href="#section-3.2.3-18" class="pilcrow">¶</a></p>
-<p id="section-3.2.3-19">From the perspective of a client, the upstream rate is the relevant one: downstream traffic is
-typically already shaped by the network before it reaches the client, whereas upstream traffic
-is enforced by the network only after it has left the client. A client therefore typically
-applies only the upstream rate to its traffic management functions and uses the downstream rate
-for informational purposes, even if the Rate Type indicates a rate to be applied. A client <span class="bcp14">MAY</span>
-additionally apply the downstream rate, for example by shaping received traffic. Intermediate
-nodes, such as relay agents and snooping devices, typically apply the rates in both directions.<a href="#section-3.2.3-19" class="pilcrow">¶</a></p>
-<p id="section-3.2.3-20">A client <span class="bcp14">MAY</span> indicate its preferred rate type as a hint (see <a href="#hints" class="auto internal xref">Section 3.4</a>).<a href="#section-3.2.3-20" class="pilcrow">¶</a></p>
+approximates the difference, for example by reducing the applied rate by a margin.<a href="#section-3.2.3-20" class="pilcrow">¶</a></p>
+<p id="section-3.2.3-21">From the perspective of a client, the upstream rate is the relevant one: downstream traffic is
+typically already shaped by the network before it reaches the client, whereas upstream traffic is
+enforced by the network only after it has left the client. A client therefore typically applies only
+the upstream rate to its traffic management functions and uses the downstream rate for informational
+purposes, even if the Rate Type of the downstream direction indicates a rate to be applied. Servers
+can signal this explicitly by including a Rate Type Downstream sub-option with an informational rate
+type. A client <span class="bcp14">MAY</span> additionally apply a downstream rate that is intended to be applied, for example
+by shaping received traffic. Intermediate nodes, such as relay agents and snooping devices,
+typically apply the rates in both directions.<a href="#section-3.2.3-21" class="pilcrow">¶</a></p>
+<p id="section-3.2.3-22">A client <span class="bcp14">MAY</span> indicate its preferred rate type as a hint (see <a href="#hints" class="auto internal xref">Section 3.4</a>).<a href="#section-3.2.3-22" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="overhead">
@@ -2333,18 +2358,20 @@ nodes, such as relay agents and snooping devices, typically apply the rates in b
           </h4>
 <p id="section-3.2.4-1">The Per-Packet Overhead sub-options describe the size that the enforcement point of the signaled
 rates accounts for each packet, relative to the size of the packet at the layer indicated by the
-Rate Type as seen by the receiver. They allow a receiver to configure its traffic management
-functions such that they accurately model the enforcement point, independent of differences in
-encapsulation between the receiver and the enforcement point, such as additional VLAN tags or
-cell-based link layers.<a href="#section-3.2.4-1" class="pilcrow">¶</a></p>
-<p id="section-3.2.4-2">Two sub-options with identical format and semantics are defined. The Per-Packet Overhead
-sub-option (code 4) applies to both directions. If the Per-Packet Overhead Downstream sub-option
-(code 5) is present, it overrides the Per-Packet Overhead sub-option for the downstream
-direction. As the per-packet overhead is typically identical in both directions, and clients
-typically apply only the upstream rate (see <a href="#rate-type" class="auto internal xref">Section 3.2.3</a>), servers usually include only the
-Per-Packet Overhead sub-option.<a href="#section-3.2.4-2" class="pilcrow">¶</a></p>
+Rate Type of the respective direction, as seen by the receiver. They allow a receiver to configure
+its traffic management functions such that they accurately model the enforcement point, independent
+of differences in encapsulation between the receiver and the enforcement point, such as additional
+VLAN tags or cell-based link layers.<a href="#section-3.2.4-1" class="pilcrow">¶</a></p>
+<p id="section-3.2.4-2">Two sub-options with identical format and semantics are defined. The Per-Packet Overhead sub-option
+(code 5) applies to both directions. If the Per-Packet Overhead Downstream sub-option (code 6) is
+present, it overrides the Per-Packet Overhead sub-option for the downstream direction. As the
+per-packet overhead is typically identical in both directions, and clients typically apply only the
+upstream rate (see <a href="#rate-type" class="auto internal xref">Section 3.2.3</a>), servers usually include only the Per-Packet Overhead sub-option.
+As the Overhead is relative to the layer indicated by the Rate Type of the respective direction, a
+server that signals different Rate Types for the two directions includes a Per-Packet Overhead
+Downstream sub-option where the Overhead differs as a result.<a href="#section-3.2.4-2" class="pilcrow">¶</a></p>
 <p id="section-3.2.4-3">The format is shown for the Per-Packet Overhead sub-option. The Per-Packet Overhead Downstream
-sub-option uses the same format with a sub-option code of 5.<a href="#section-3.2.4-3" class="pilcrow">¶</a></p>
+sub-option uses the same format with a sub-option code of 6.<a href="#section-3.2.4-3" class="pilcrow">¶</a></p>
 <p id="section-3.2.4-4">DHCPv4 Sub-Option Format:<a href="#section-3.2.4-4" class="pilcrow">¶</a></p>
 <div id="section-3.2.4-5">
             <div class="alignLeft art-svg artwork" id="section-3.2.4-5.1">
@@ -2395,7 +2422,7 @@ sub-option uses the same format with a sub-option code of 5.<a href="#section-3.
                   <text x="496" y="52">0</text>
                   <text x="512" y="52">1</text>
                   <text x="44" y="84">SubOpt</text>
-                  <text x="100" y="84">Code=4</text>
+                  <text x="100" y="84">Code=5</text>
                   <text x="172" y="84">SubOpt</text>
                   <text x="224" y="84">Len=6</text>
                   <text x="388" y="84">Overhead</text>
@@ -2461,7 +2488,7 @@ sub-option uses the same format with a sub-option code of 5.<a href="#section-3.
                   <text x="496" y="52">0</text>
                   <text x="512" y="52">1</text>
                   <text x="44" y="84">SubOpt</text>
-                  <text x="100" y="84">Code=4</text>
+                  <text x="100" y="84">Code=5</text>
                   <text x="300" y="84">SubOpt</text>
                   <text x="352" y="84">Len=6</text>
                   <text x="132" y="116">Overhead</text>
@@ -2482,11 +2509,11 @@ sub-option uses the same format with a sub-option code of 5.<a href="#section-3.
             <dd style="margin-left: 1.5em" id="section-3.2.4-8.2">
               <p id="section-3.2.4-8.2.1">A 16-bit signed integer in two's complement and network byte order, indicating the number of
 octets the enforcement point accounts per packet in addition to the size of the packet at the
-layer indicated by the Rate Type, as seen by the receiver. The value can be negative, for
-example if the enforcement point does not account for headers that are present on the
-interface of the receiver. Where the bottleneck is a physical link rather than a policer, the
-Overhead includes physical-layer overhead that consumes transmission time, such as the
-Ethernet preamble, start frame delimiter (SFD), and inter-packet gap (IPG).<a href="#section-3.2.4-8.2.1" class="pilcrow">¶</a></p>
+layer indicated by the Rate Type of the respective direction, as seen by the receiver. The value
+can be negative, for example if the enforcement point does not account for headers that are
+present on the interface of the receiver. Where the bottleneck is a physical link rather than a
+policer, the Overhead includes physical-layer overhead that consumes transmission time, such as
+the Ethernet preamble, start frame delimiter (SFD), and inter-packet gap (IPG).<a href="#section-3.2.4-8.2.1" class="pilcrow">¶</a></p>
 </dd>
             <dd class="break"></dd>
 <dt id="section-3.2.4-8.3">Minimum Packet Unit (MPU):</dt>
@@ -2511,8 +2538,8 @@ ignored by the receiver.<a href="#section-3.2.4-8.8.1" class="pilcrow">¶</a></p
 </dd>
           <dd class="break"></dd>
 </dl>
-<p id="section-3.2.4-9">For a packet with a size of S octets at the layer indicated by the Rate Type, the size L
-accounted by the enforcement point is calculated as follows:<a href="#section-3.2.4-9" class="pilcrow">¶</a></p>
+<p id="section-3.2.4-9">For a packet with a size of S octets at the layer indicated by the Rate Type of the respective
+direction, the size L accounted by the enforcement point is calculated as follows:<a href="#section-3.2.4-9" class="pilcrow">¶</a></p>
 <ol start="1" type="1" class="normal type-1" id="section-3.2.4-10">
 <li id="section-3.2.4-10.1">
               <p id="section-3.2.4-10.1.1">L = max(S + Overhead, MPU)<a href="#section-3.2.4-10.1.1" class="pilcrow">¶</a></p>
@@ -2544,8 +2571,8 @@ margin to approximate the accounting of the enforcement point. The inability of 
 the Per-Packet Overhead sub-options, fully or partially, does not render the OPTION_RATE invalid.<a href="#section-3.2.4-13" class="pilcrow">¶</a></p>
 <p id="section-3.2.4-14">For a direction for which no Per-Packet Overhead sub-option applies, the receiver assumes an
 Overhead of 0, an MPU of 0, and no cell-based accounting. Clients do not include the Per-Packet
-Overhead sub-options in hints (see <a href="#hints" class="auto internal xref">Section 3.4</a>); servers ignore them if present. The sub-options
-can be ignored for informational rate types.<a href="#section-3.2.4-14" class="pilcrow">¶</a></p>
+Overhead sub-options in hints (see <a href="#hints" class="auto internal xref">Section 3.4</a>); servers ignore them if present. The sub-options can
+be ignored for a direction with an informational Rate Type.<a href="#section-3.2.4-14" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -2566,7 +2593,7 @@ in their entirety, regardless of whether the previous rates were learned via DHC
 <ul class="normal">
 <li class="normal" id="section-3.3-4.1">
             <p id="section-3.3-4.1.1">If a rate sub-option is present, the receiver applies the signaled rate for the corresponding
-direction, subject to the Rate Type (see <a href="#rate-type" class="auto internal xref">Section 3.2.3</a>).<a href="#section-3.3-4.1.1" class="pilcrow">¶</a></p>
+direction, subject to the Rate Type of that direction (see <a href="#rate-type" class="auto internal xref">Section 3.2.3</a>).<a href="#section-3.3-4.1.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-3.3-4.2">
             <p id="section-3.3-4.2.1">If a rate sub-option is absent, or carries a value of 0, the receiver <span class="bcp14">MUST</span> remove any rate
@@ -2574,8 +2601,9 @@ previously applied for the corresponding direction and revert to its default con
 that direction.<a href="#section-3.3-4.2.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-3.3-4.3">
-            <p id="section-3.3-4.3.1">If the Rate Type is informational, the receiver <span class="bcp14">SHOULD</span> remove any rates previously applied to
-its traffic management functions and revert to its default configuration.<a href="#section-3.3-4.3.1" class="pilcrow">¶</a></p>
+            <p id="section-3.3-4.3.1">If the Rate Type of a direction is informational, the receiver <span class="bcp14">SHOULD</span> remove any rate
+previously applied to its traffic management functions for that direction and revert to its
+default configuration for that direction.<a href="#section-3.3-4.3.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
 <p id="section-3.3-5">Consequently, an OPTION_RATE without any sub-options instructs the receiver to revert to its
@@ -2583,7 +2611,7 @@ default configuration for both directions. Because some DHCPv4 client implementa
 options with a length of zero, servers <span class="bcp14">SHOULD NOT</span> send an OPTION_RATE without sub-options in
 DHCPv4. To remove previously signaled rates for both directions, a server instead includes an
 OPTION_RATE containing rate sub-options with a value of 0.<a href="#section-3.3-5" class="pilcrow">¶</a></p>
-<p id="section-3.3-6">If the rates, rate type, and per-packet overhead contained in a valid OPTION_RATE are identical
+<p id="section-3.3-6">If the rates, rate types, and per-packet overhead contained in a valid OPTION_RATE are identical
 to the currently applied ones, the receiver <span class="bcp14">SHOULD NOT</span> reconfigure its traffic management
 functions.<a href="#section-3.3-6" class="pilcrow">¶</a></p>
 <p id="section-3.3-7">If a DHCPACK or Reply message does not contain an OPTION_RATE, the receiver <span class="bcp14">MUST</span> retain the
@@ -2626,7 +2654,9 @@ direction, for example due to the capacity of its physical interface. It does no
 specific service rate.<a href="#section-3.4-2.1.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-3.4-2.2">
-            <p id="section-3.4-2.2.1">The Rate Type sub-option indicates the rate type preferred by the client.<a href="#section-3.4-2.2.1" class="pilcrow">¶</a></p>
+            <p id="section-3.4-2.2.1">The Rate Type sub-option indicates the rate type preferred by the client. A client <span class="bcp14">MAY</span> include
+a Rate Type Downstream sub-option to indicate a different preference for the downstream
+direction.<a href="#section-3.4-2.2.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-3.4-2.3">
             <p id="section-3.4-2.3.1">An absent sub-option, or a rate value of 0, indicates that the client has no preference or
@@ -2824,7 +2854,7 @@ DHCPOFFER and DHCPACK messages. If no rate information is configured for the cli
 <span class="bcp14">MAY</span> omit the OPTION_RATE. Because a missing OPTION_RATE leaves previously applied rates unchanged,
 a server that needs to remove previously signaled rates <span class="bcp14">MUST</span> include an OPTION_RATE without the
 respective rate sub-options or with a rate value of 0, as specified in <a href="#processing" class="auto internal xref">Section 3.3</a>.<a href="#section-4.3-1" class="pilcrow">¶</a></p>
-<p id="section-4.3-2">The server <span class="bcp14">MAY</span> derive the specific upstream and downstream rates and rate type from local
+<p id="section-4.3-2">The server <span class="bcp14">MAY</span> derive the specific upstream and downstream rates and rate types from local
 configuration profiles, centralized Authentication, Authorization, and Accounting (AAA) systems such
 as RADIUS, or external policy servers.<a href="#section-4.3-2" class="pilcrow">¶</a></p>
 <p id="section-4.3-3">A server <span class="bcp14">MAY</span> include the OPTION_RATE in its responses even if the client did not request it via
@@ -3413,16 +3443,21 @@ The Reference column identifies the specification that defines the registered va
             </tr>
             <tr>
               <td class="text-right" rowspan="1" colspan="1">4</td>
-              <td class="text-left" rowspan="1" colspan="1">Per-Packet Overhead</td>
+              <td class="text-left" rowspan="1" colspan="1">Rate Type Downstream</td>
               <td class="text-left" rowspan="1" colspan="1">RFC-TBD</td>
             </tr>
             <tr>
               <td class="text-right" rowspan="1" colspan="1">5</td>
+              <td class="text-left" rowspan="1" colspan="1">Per-Packet Overhead</td>
+              <td class="text-left" rowspan="1" colspan="1">RFC-TBD</td>
+            </tr>
+            <tr>
+              <td class="text-right" rowspan="1" colspan="1">6</td>
               <td class="text-left" rowspan="1" colspan="1">Per-Packet Overhead Downstream</td>
               <td class="text-left" rowspan="1" colspan="1">RFC-TBD</td>
             </tr>
             <tr>
-              <td class="text-right" rowspan="1" colspan="1">6-254</td>
+              <td class="text-right" rowspan="1" colspan="1">7-254</td>
               <td class="text-left" rowspan="1" colspan="1">Unassigned</td>
               <td class="text-left" rowspan="1" colspan="1"> </td>
             </tr>
@@ -3443,7 +3478,7 @@ The Reference column identifies the specification that defines the registered va
         </h3>
 <p id="section-12.4-1">IANA is requested to create a new registry titled "DHCP Rate Types" within the
 "Dynamic Host Configuration Protocol (DHCP) and Bootstrap Protocol (BOOTP) Parameters"
-registry group. This registry defines the values of the Rate Type sub-option (Code 3)
+registry group. This registry defines the values of the Rate Type sub-options (codes 3 and 4)
 used in both the DHCPv4 OPTION_RATE (TBD1) and the DHCPv6 OPTION_RATE (TBD2).<a href="#section-12.4-1" class="pilcrow">¶</a></p>
 <p id="section-12.4-2">The allocation policy of this new registry is Specification Required (Section 4.6 of <span>[<a href="#RFC8126" class="cite xref">RFC8126</a>]</span>).
 See more details in Section <a href="#experts" class="auto internal xref">12.5</a>.<a href="#section-12.4-2" class="pilcrow">¶</a></p>
@@ -3764,10 +3799,10 @@ addresses these limitations.<a href="#appendix-A.5-1" class="pilcrow">¶</a></p>
 <a href="#overhead" class="auto internal xref">Section 3.2.4</a>) for common deployments. The values are illustrative; the actual values depend on
 the configuration of the access network and of the enforcement point and need to be determined
 by the operator.<a href="#appendix-B-1" class="pilcrow">¶</a></p>
-<p id="appendix-B-2">In all examples, S denotes the size of the packet at the layer indicated by the Rate Type, as
-seen by the receiver. For a Layer 2 rate, S includes the Ethernet header and any VLAN tags and
-encapsulation headers present on the interface of the receiver, but excludes the Ethernet Frame
-Check Sequence (FCS) (see <a href="#rate-type" class="auto internal xref">Section 3.2.3</a>).<a href="#appendix-B-2" class="pilcrow">¶</a></p>
+<p id="appendix-B-2">In all examples, S denotes the size of the packet at the layer indicated by the Rate Type of the
+respective direction, as seen by the receiver. For a Layer 2 rate, S includes the Ethernet header
+and any VLAN tags and encapsulation headers present on the interface of the receiver, but excludes
+the Ethernet Frame Check Sequence (FCS) (see <a href="#rate-type" class="auto internal xref">Section 3.2.3</a>).<a href="#appendix-B-2" class="pilcrow">¶</a></p>
 <span id="name-example-per-packet-overhead"></span><div id="tab-examples">
 <table class="center" id="table-5">
         <caption>
@@ -3880,14 +3915,15 @@ discrepancies, the referenced sections take precedence.<a href="#appendix-C-1" c
 For each DHCPACK or Reply message received on an interface:
   if no OPTION_RATE is present:
     keep the applied rates unchanged; done
-  if the OPTION_RATE is malformed or the Rate Type is unknown:
+  if the OPTION_RATE is malformed or a Rate Type is unknown:
     keep the applied rates unchanged; done
-  type := Rate Type sub-option, or 0 (Informational L2) if absent
-  ovh_up := Per-Packet Overhead (4), or defaults if absent
-  ovh_down := Per-Packet Overhead Downstream (5), or ovh_up
+  type_up := Rate Type (3), or 0 (Informational L2) if absent
+  type_down := Rate Type Downstream (4), or type_up
+  ovh_up := Per-Packet Overhead (5), or defaults if absent
+  ovh_down := Per-Packet Overhead Downstream (6), or ovh_up
   for each direction (upstream, downstream):
     rate := rate sub-option of the direction, or 0 if absent
-    if type is informational or rate is 0:
+    if type of the direction is informational or rate is 0:
       revert the direction to the default configuration
     else:
       rate := min(rate, capacity of the physical link)
