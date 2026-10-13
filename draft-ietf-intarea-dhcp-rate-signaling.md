@@ -277,12 +277,12 @@ encapsulation conforms to the requirements of each base protocol. Specifically, 
 8-bit option code set to TBD1 alongside an 8-bit length field, whereas DHCPv6 utilizes a 16-bit
 option code set to TBD2 alongside a 16-bit length field.
 
-While the underlying semantics of the rate information remain identical across both IP versions,
-the internal payload sizing differs to align with the conventions of each respective protocol.
-For DHCPv4, the encapsulated sub-options utilize an 8-bit sub-option code and an 8-bit sub-option
-length field, mirroring the format of DHCPv4 Option 82 (Relay Agent Information Option) {{?RFC3046}}.
-Conversely, for DHCPv6, the encapsulated sub-options utilize a 16-bit sub-option code and a
-16-bit sub-option length field.
+While the underlying semantics of the rate information remain identical across both IP versions, the
+internal payload sizing differs to align with the conventions of each respective protocol. For
+DHCPv4, the encapsulated sub-options utilize an 8-bit sub-option code and an 8-bit sub-option length
+field, mirroring the format of DHCPv4 Option 82 (Relay Agent Information Option) {{?RFC3046}}.
+Conversely, for DHCPv6, the encapsulated sub-options utilize a 16-bit sub-option code and a 16-bit
+sub-option length field.
 
 Section 9 of {{?RFC7227}} recommends avoiding sub-options in DHCPv6. This document nevertheless
 uses sub-options with a code space shared by DHCPv4 and DHCPv6, so that a single registry and
@@ -507,13 +507,19 @@ management functions SHOULD apply an upstream rate that is intended to be applie
 downstream rate that is intended to be applied. Relay agents and snooping devices MAY apply rates
 that are intended to be applied in either direction (see {{dhcpv4}}, {{dhcpv6}}, and {{snooping}}).
 
+A receiver that does not apply a rate that is intended to be applied, for example because it does
+not support the required traffic management functions or because applying the downstream rate is
+optional for clients, SHOULD treat that rate as an informational rate of the respective layer. In
+particular, such a receiver can expose the rate in its management interfaces (see {{operations}}).
+
 If the Rate Type of a direction is set to 0 (Informational Layer 2 rate) or 1 (Informational Layer 3
 rate), the signaled rate of that direction is informational only and refers to the respective
 networking layer. A receiver of an informational rate type SHOULD process these values without
-altering its traffic shapers, policers, or AQM parameters. These values accommodate deployments
-where the network exposes the provisioned service tier to the Customer Premises Equipment (CPE)
-solely to populate user interfaces, facilitate telemetry, or serve as a metric to select a path with
-higher throughput, all without otherwise altering the device's localized forwarding behavior.
+altering its traffic shapers, policers, or AQM parameters, unless explicitly configured otherwise by
+local policy. These values accommodate deployments where the network exposes the provisioned service
+tier to the Customer Premises Equipment (CPE) solely to populate user interfaces, facilitate
+telemetry, or serve as a metric to select a path with higher throughput, all without otherwise
+altering the device's localized forwarding behavior.
 
 For a direction for which no Rate Type sub-option applies, a receiver MUST interpret the signaled
 value as an Informational Layer 2 rate (rate type 0). Consequently, a server that intends the
@@ -689,9 +695,9 @@ in their entirety, regardless of whether the previous rates were learned via DHC
 - If a rate sub-option is absent, or carries a value of 0, the receiver MUST remove any rate
   previously applied for the corresponding direction and revert to its default configuration for
   that direction.
-- If the Rate Type of a direction is informational, the receiver SHOULD remove any rate
-  previously applied to its traffic management functions for that direction and revert to its
-  default configuration for that direction.
+- If the Rate Type of a direction is informational, the receiver MUST remove any rate previously
+  applied to its traffic management functions for that direction based on the DHCP Rate Option
+  and revert to its default configuration for that direction.
 
 Consequently, an OPTION_RATE without any sub-options instructs the receiver to revert to its default
 configuration for both directions. Because some DHCPv4 client implementations discard options with a
@@ -774,14 +780,14 @@ of any hint it sent.
 Hints are addressed to the server only. Relay agents and snooping devices MUST NOT use an
 OPTION_RATE contained in a client message to configure their traffic management. As intermediate
 nodes can derive their enforcement from the signaled rates, honoring a hint can also lower the
-enforcement in the network for that client. This never exceeds the provisioned rate and therefore
-only affects the client that sent the hint.
+enforcement in the network for that client. As the resulting rate never exceeds the provisioned
+rate, this only affects the client that sent the hint.
 
 ## Appearance in Messages {#appearance}
 
 {{tab-appearance-v4}} and {{tab-appearance-v6}} list the messages in which the OPTION_RATE can
-appear. The OPTION_RATE MUST NOT be included in any other message. Receivers MUST ignore an
-OPTION_RATE contained in any other message.
+appear. The OPTION_RATE MUST NOT be included in any other message. Servers and receivers MUST
+ignore an OPTION_RATE contained in any other message.
 
 | Message                                  | Use of OPTION_RATE                         |
 | :--------------------------------------- | :----------------------------------------- |
@@ -794,7 +800,7 @@ OPTION_RATE contained in any other message.
 | :--------------------------------------- | :----------------------------------------- |
 | Solicit, Request, Renew, Rebind, Information-request | Hint (see {{hints}})           |
 | Advertise                                | Server selection (see {{dhcpv6-server}})   |
-| Reply                                    | Rate information (see {{processing}})      |
+| Reply to Solicit, Request, Renew, Rebind, or Information-request | Rate information (see {{processing}}) |
 | Relay-forward                            | Support indication, length 0 (see {{dhcpv6-relay}}) |
 | Relay-reply                              | Rate information for the relay agent (see {{dhcpv6-relay}}) |
 {: #tab-appearance-v6 title="Appearance of OPTION_RATE in DHCPv6 Messages"}
@@ -1556,6 +1562,9 @@ For each DHCPACK or Reply message received on an interface:
     rate := rate sub-option of the direction, or 0 if absent
     if type of the direction is informational or rate is 0:
       revert the direction to the default configuration
+    else if the rate is not applied (e.g., not supported):
+      revert the direction to the default configuration
+      and treat the rate as informational
     else:
       rate := min(rate, capacity of the physical link)
       apply rate with the overhead of the direction,
