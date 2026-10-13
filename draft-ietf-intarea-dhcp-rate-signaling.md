@@ -162,21 +162,21 @@ the Low Latency, Low Loss, and Scalable Throughput (L4S) architecture {{?RFC9330
 the CPE can additionally provide low latency for L4S traffic.
 
 ~~~ aasvg
-                   Without rate signaling
+                        Without rate signaling
 
-+-------------+  bursts at 1 Gbps  +--------+     +--------------------+
-|     CPE     |------------------->| Access |---->|        BNG         |
-|             |                    +--------+     |  ingress policer   |
-+-------------+                                   |  100 Mbps: drops   |
-                                                  +--------------------+
++-------------+  bursts at 1 Gbps +--------+     +------------------+
+|     CPE     |------------------>| Access |---->|        BNG       |
+|             |                   +--------+     | ingress policer  |
+|             |                                  | 100 Mbps: drops  |
++-------------+                                  +------------------+
 
-                   With rate signaling
+                         With rate signaling
 
-+-------------+  shaped 100 Mbps   +--------+     +--------------------+
-|     CPE     |------------------->| Access |---->|        BNG         |
-| shaper, AQM |                    +--------+     |  ingress policer   |
-| 100 Mbps    |                                   |  100 Mbps: idle    |
-+-------------+                                   +--------------------+
++-------------+  shaped 100 Mbps  +--------+     +------------------+
+|     CPE     |------------------>| Access |---->|        BNG       |
+| shaper, AQM |                   +--------+     | ingress policer  |
+| 100 Mbps    |                                  | 100 Mbps: idle   |
++-------------+                                  +------------------+
 ~~~
 {: #fig-policer title="Upstream Policing at the BNG With and Without CPE Shaping"}
 
