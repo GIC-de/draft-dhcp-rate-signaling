@@ -536,12 +536,12 @@ The values 4-255 are currently unassigned. A receiver that does not recognize th
 Type or Rate Type Downstream sub-option discards the entire OPTION_RATE (see {{errors}}).
 
 For rates intended to be applied, servers SHOULD signal the rate at the layer at which the
-enforcement point accounts traffic and SHOULD include the Per-Packet Overhead sub-options where the
-accounting of the enforcement point differs from the size of the packets as seen by the receiver.
-A Layer 2 rate together with the per-packet overhead allows the most precise modeling of a
-bottleneck that accounts traffic at Layer 2. A Layer 3 rate is useful where the enforcement point
-itself accounts traffic at Layer 3, where the applied rate is intended to match the rates
-measured by end-user speed tests, or for informational purposes.
+enforcement point accounts traffic and SHOULD include the Per-Packet Overhead sub-options whenever
+the accounting of the enforcement point is known, including when all of their values are 0. A Layer
+2 rate together with the per-packet overhead allows the most precise modeling of a bottleneck that
+accounts traffic at Layer 2. A Layer 3 rate is useful where the enforcement point itself accounts
+traffic at Layer 3, where the applied rate is intended to match the rates measured by end-user speed
+tests, or for informational purposes.
 
 A receiver whose traffic management functions account traffic at Layer 3 can apply a Layer 3
 rate directly. The applied rate then closely corresponds to the rate measured by end-user speed
@@ -672,10 +672,15 @@ signaled rates as specified in {{rate-type}}. Such a receiver MAY reduce the app
 margin to approximate the accounting of the enforcement point. The inability of a receiver to apply
 the Per-Packet Overhead sub-options, fully or partially, does not render the OPTION_RATE invalid.
 
-For a direction for which no Per-Packet Overhead sub-option applies, the receiver assumes an
-Overhead of 0, an MPU of 0, and no cell-based accounting. Clients do not include the Per-Packet
-Overhead sub-options in hints (see {{hints}}); servers ignore them if present. The sub-options can
-be ignored for a direction with an informational Rate Type.
+For a direction for which no Per-Packet Overhead sub-option applies, the server does not provide
+information about the accounting of the enforcement point. In this case, the receiver uses its
+local configuration, if any, or otherwise assumes an Overhead of 0, an MPU of 0, and no cell-based
+accounting. If a Per-Packet Overhead sub-option applies to a direction, its values take precedence
+over the local configuration of the receiver for that direction, including values of 0, which
+indicate that the enforcement point does not account any additional overhead.
+
+Clients do not include the Per-Packet Overhead sub-options in hints (see {{hints}}); servers ignore
+them if present. The sub-options can be ignored for a direction with an informational Rate Type.
 
 ## Rate Processing {#processing}
 
@@ -1150,13 +1155,13 @@ deployed, L4S-compatible queue management, these per-subscriber rate parameters 
 congestion control at a well-defined bottleneck and minimize queuing delay in the access segment.
 
 Operators should signal the rate at the layer at which the enforcement point accounts traffic,
-together with the per-packet overhead of the enforcement point where it differs from the
-packets as seen by the receiver (see {{overhead}}). This allows clients to model the actual
-bottleneck precisely, including additional encapsulations and cell-based link layers. Where
-contracted rates are specified as payload rates, for example due to regulatory requirements,
-operators typically configure the enforcement point such that the payload rate achieved with
-maximum-sized packets meets the contracted rate; the signaled rate and overhead then describe
-the configuration of the enforcement point, not the contracted payload rate.
+together with the per-packet overhead of the enforcement point whenever it is known (see
+{{overhead}}). This allows clients to model the actual bottleneck precisely, including additional
+encapsulations and cell-based link layers. Where contracted rates are specified as payload rates,
+for example due to regulatory requirements, operators typically configure the enforcement point such
+that the payload rate achieved with maximum-sized packets meets the contracted rate; the signaled
+rate and overhead then describe the configuration of the enforcement point, not the contracted
+payload rate.
 
 Very-high-bit-rate Digital Subscriber Line 2 (VDSL2) commonly uses Packet Transfer Mode (PTM) with
 64/65-octet encapsulation instead of ATM cells. Its effect corresponds to a constant reduction of
@@ -1525,9 +1530,9 @@ Policer, VLAN tag added by access node:
   that is not present on the interface of the receiver, resulting in an Overhead of 4 octets.
 
 Policer accounting IP packets:
-: The enforcement point accounts IP packets. No Per-Packet Overhead sub-option is required. A
-  receiver that accounts traffic at Layer 2 compensates for its own headers implicitly (see
-  {{rate-type}}).
+: The enforcement point accounts IP packets. The Per-Packet Overhead sub-option is included with all
+  values set to 0, indicating that no additional overhead applies. A receiver that accounts
+  traffic at Layer 2 compensates for its own headers implicitly (see {{rate-type}}).
 
 ADSL, PPPoE, bridged Ethernet with LLC/SNAP:
 : The receiver sends PPPoE frames over Ethernet, which are transported over ATM using bridged
@@ -1556,7 +1561,8 @@ For each DHCPACK or Reply message received on an interface:
     keep the applied rates unchanged; done
   type_up := Rate Type (3), or 0 (Informational L2) if absent
   type_down := Rate Type Downstream (4), or type_up
-  ovh_up := Per-Packet Overhead (5), or defaults if absent
+  ovh_up := Per-Packet Overhead (5), or local configuration
+            or defaults if absent
   ovh_down := Per-Packet Overhead Downstream (6), or ovh_up
   for each direction (upstream, downstream):
     rate := rate sub-option of the direction, or 0 if absent
