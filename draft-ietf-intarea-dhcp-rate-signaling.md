@@ -108,10 +108,10 @@ of the physical link that connects the Customer Premises Equipment (CPE) to the 
 provisioned rate is commonly enforced at the Broadband Network Gateway (BNG) {{TR101}}, which limits
 the traffic of each subscriber to the purchased service tier. In addition, the upstream rate can be
 limited by an access device connected to the CPE, such as an Optical Network Terminal (ONT)
-{{G.984.1}}, a DSL modem, or a cable modem, or within the access network, for example by the
-upstream bandwidth allocation of a passive optical network, by the synchronization rate of a DSL
-line, or by the upstream rate limit enforced by a cable modem. The CPE is typically unaware of these
-rates and sends at the speed of its physical link.
+{{G.984.1}}, a Digital Subscriber Line (DSL) modem, or a cable modem, or within the access network,
+for example by the upstream bandwidth allocation of a passive optical network, by the
+synchronization rate of a DSL line, or by the upstream rate limit enforced by a cable modem. The CPE
+is typically unaware of these rates and sends at the speed of its physical link.
 
 In the upstream direction, the provisioned rate is typically enforced at the BNG on traffic
 received from the subscriber. Per-subscriber queuing in the upstream direction is not supported
@@ -270,10 +270,11 @@ Upstream
 
 # DHCP Rate Option
 
-The DHCP Rate Option specified in this document is a container option with a sub-option structure for
-both DHCPv4 and DHCPv6. The top-level option encapsulation conforms to the
-requirements of each base protocol. Specifically, DHCPv4 utilizes an 8-bit option
-code set to TBD1 alongside an 8-bit length field, whereas DHCPv6 utilizes a 16-bit
+The DHCP Rate Option (OPTION_RATE) specified in this document is a container option with a
+sub-option structure for both DHCPv4 and DHCPv6. This document uses OPTION_RATE to refer to both the
+DHCPv4 option (OPTION_V4_RATE) and the DHCPv6 option (OPTION_V6_RATE). The top-level option
+encapsulation conforms to the requirements of each base protocol. Specifically, DHCPv4 utilizes an
+8-bit option code set to TBD1 alongside an 8-bit length field, whereas DHCPv6 utilizes a 16-bit
 option code set to TBD2 alongside a 16-bit length field.
 
 While the underlying semantics of the rate information remain identical across both IP versions,
@@ -332,7 +333,7 @@ DHCPv4 and DHCPv6 share a single sub-option code space, which is limited to the 
 sub-option codes 256-65535 MUST NOT be sent. Receivers treat reserved sub-option codes and DHCPv6
 sub-option codes above 255 as unrecognized sub-option codes (see {{errors}}).
 
-The initial assignment of DHCP Rate Sub-options is as follows:
+The initial assignment of sub-options is as follows:
 
 | Code  | Length | Description                                        |
 |------:| ------:| -------------------------------------------------- |
@@ -480,12 +481,12 @@ The initial assignment of rate types is as follows:
 {: #rate-type-table title="Rate Types"}
 
 A Layer 2 rate encompasses the Ethernet frame as sent or received on the interface of the receiver,
-including the Ethernet header, any VLAN tags {{IEEE802.1Q}} present on that interface, and the
-complete Ethernet payload, including any encapsulation headers carried within it (e.g., PPPoE and
-PPP headers). It excludes the Ethernet Frame Check Sequence (FCS), preamble, start frame delimiter
-(SFD), and inter-packet gap (IPG) {{IEEE802.3}}. For link layers other than Ethernet, the Layer 2
-rate is calculated analogously over the link-layer header and payload, excluding link-layer trailers
-and physical-layer framing overhead.
+including the Ethernet header, any Virtual LAN (VLAN) tags {{IEEE802.1Q}} present on that interface,
+and the complete Ethernet payload, including any encapsulation headers carried within it (e.g.,
+PPPoE and PPP headers). It excludes the Ethernet Frame Check Sequence (FCS), preamble, start frame
+delimiter (SFD), and inter-packet gap (IPG) {{IEEE802.3}}. For link layers other than Ethernet, the
+Layer 2 rate is calculated analogously over the link-layer header and payload, excluding link-layer
+trailers and physical-layer framing overhead.
 
 A Layer 3 rate encompasses only the IP header and its payload. This rate calculation is frequently
 utilized by end-user speed test applications and is often regarded as the marketable "product
@@ -643,14 +644,14 @@ direction, the size L accounted by the enforcement point is calculated as follow
 
 Cell-based accounting describes link layers that pad each packet to an integer number of cells. The
 most common example is Asynchronous Transfer Mode (ATM) Adaptation Layer 5 (AAL5), as used for
-example on ADSL, ADSL2, and ADSL2+ lines, which is described by a Cell Payload of 48 and a Cell Size
-of 53. In this case, the Overhead includes all encapsulation overhead carried within the AAL5 frame,
-including the 8-octet AAL5 trailer, and the signaled rate corresponds to the rate of ATM cells, for
-example the synchronization rate of the ADSL line. A Cell Size smaller than the Cell Payload is
-invalid; a receiver that receives such values ignores the cell-based accounting. Accounting models
-that cannot be described by these parameters can be defined as additional sub-options (see
-{{iana-sub-option-table}}). Examples of parameter values for common deployments are given in
-{{examples}}.
+example on Asymmetric Digital Subscriber Line (ADSL), ADSL2, and ADSL2+ lines, which is described by
+a Cell Payload of 48 and a Cell Size of 53. In this case, the Overhead includes all encapsulation
+overhead carried within the AAL5 frame, including the 8-octet AAL5 trailer, and the signaled rate
+corresponds to the rate of ATM cells, for example the synchronization rate of the ADSL line. A Cell
+Size smaller than the Cell Payload is invalid; a receiver that receives such values ignores the
+cell-based accounting. Accounting models that cannot be described by these parameters can be defined
+as additional sub-options (see {{iana-sub-option-table}}). Examples of parameter values for common
+deployments are given in {{examples}}.
 
 The Per-Packet Overhead sub-options are optional and supplement the signaled rates to improve the
 accuracy of traffic management. A receiver that applies the signaled rates and whose traffic
@@ -841,14 +842,14 @@ instance MUST be processed.
 
 A client may receive an OPTION_RATE indicating an Available Rate that exceeds the maximum physical
 link speed of its upstream or downstream interfaces (e.g., signaling 2 Gbps to a CPE with a 1 Gbps
-WAN port). In such scenarios, the client SHOULD cap the applied traffic shaping, policing, or Active
-Queue Management (AQM) parameters to the maximum capacity of the physical link.
+Wide Area Network (WAN) port). In such scenarios, the client SHOULD cap the applied traffic shaping,
+policing, or Active Queue Management (AQM) parameters to the maximum capacity of the physical link.
 
 # DHCPv4 {#dhcpv4}
 
 ## DHCPv4 Rate Option
 
-The DHCPv4 OPTION_RATE code is TBD1.
+The option code of OPTION_V4_RATE is TBD1.
 
 ~~~ aasvg
   0                   1                   2                   3
@@ -917,9 +918,9 @@ controlled by the renewal (T1) time value.
 
 ## DHCPv4 Relay Agent Behavior
 
-DHCPv4 Relay Agents, including Layer 2 DHCPv4 Relay Agents {{TR101}}, MAY extract the OPTION_RATE from
-DHCPACK messages traversing the network. Relay agents that perform localized traffic management MAY
-utilize these extracted values to dynamically instantiate shapers and policers on their
+DHCPv4 relay agents, including Layer 2 DHCPv4 Relay Agents {{TR101}}, MAY extract the OPTION_RATE
+from DHCPACK messages traversing the network. Relay agents that perform localized traffic management
+MAY utilize these extracted values to dynamically instantiate shapers and policers on their
 client-facing interfaces. Relay agents SHOULD remove rates applied for a client when the
 corresponding binding is removed. Layer 2 DHCPv4 Relay Agents MUST only process an OPTION_RATE
 contained in DHCPACK messages received on trusted, network-facing ports.
@@ -936,7 +937,7 @@ behavior specified in this document applies to it.
 
 ## DHCPv6 Rate Option
 
-The DHCPv6 OPTION_RATE code is TBD2.
+The option code of OPTION_V6_RATE is TBD2.
 
 ~~~ aasvg
   0                   1                   2                   3
@@ -1105,8 +1106,8 @@ server co-located with a CPE or another gateway, to inform clients about the rat
 them. In this case, the signaled rates indicate the maximum rate a client can expect through the
 network it is attached to. Examples include:
 
-- VPN gateways or tunnel endpoints that shape traffic towards their peers and whose processing
-  capacity exceeds the capacity of the upstream connection.
+- Virtual Private Network (VPN) gateways or tunnel endpoints that shape traffic towards their peers
+  and whose processing capacity exceeds the capacity of the upstream connection.
 - Public Wi-Fi hotspots that enforce per-user rate limits, where clients can align their sending
   rate with the enforced limit to avoid policer drops.
 - Applications on end devices that use the signaled rates as an initial estimate, e.g., to
@@ -1151,10 +1152,11 @@ operators typically configure the enforcement point such that the payload rate a
 maximum-sized packets meets the contracted rate; the signaled rate and overhead then describe
 the configuration of the enforcement point, not the contracted payload rate.
 
-VDSL2 commonly uses Packet Transfer Mode (PTM) with 64/65-octet encapsulation instead of ATM cells.
-Its effect corresponds to a constant reduction of the available rate and can be included in the
-signaled rate, without requiring cell-based accounting. Per-packet overhead of PTM, such as the
-Ethernet FCS, can be signaled using the Overhead field (see {{overhead}}).
+Very-high-bit-rate Digital Subscriber Line 2 (VDSL2) commonly uses Packet Transfer Mode (PTM) with
+64/65-octet encapsulation instead of ATM cells. Its effect corresponds to a constant reduction of
+the available rate and can be included in the signaled rate, without requiring cell-based
+accounting. Per-packet overhead of PTM, such as the Ethernet FCS, can be signaled using the Overhead
+field (see {{overhead}}).
 
 Where intermediate nodes enforce the signaled rates, operators should ensure that the enforcement
 at the intermediate node is not triggered by a client that shapes its traffic to the signaled
@@ -1202,11 +1204,12 @@ modifying the DHCP client software. The DHCPv4 client (BusyBox udhcpc) and DHCPv
 used by OpenWrt can request OPTION_RATE, send hints, and expose received options of unknown type as
 hexadecimal environment variables to user-defined hook scripts. All client behavior specified in
 this document can therefore be implemented in such scripts, which parse the option, apply the
-processing rules of {{processing}}, and configure local traffic management (e.g., via SQM or
-tc/CAKE). The fields of the Per-Packet Overhead sub-options (see {{overhead}}) map directly to the
-overhead, minimum packet unit, and ATM cell accounting parameters of CAKE. The rates learned on the
-WAN interface can be propagated to LAN clients using the existing custom-option support of the
-OpenWrt DHCPv4 server (dnsmasq) and DHCPv6 server (odhcpd).
+processing rules of {{processing}}, and configure local traffic management (e.g., via Smart Queue
+Management (SQM) or the Common Applications Kept Enhanced (CAKE) queue discipline). The fields of
+the Per-Packet Overhead sub-options (see {{overhead}}) map directly to the overhead, minimum packet
+unit, and ATM cell accounting parameters of CAKE. The rates learned on the WAN interface can be
+propagated to LAN clients using the existing custom-option support of the OpenWrt DHCPv4 server
+(dnsmasq) and DHCPv6 server (odhcpd).
 
 # Security Considerations {#security}
 
@@ -1288,6 +1291,10 @@ is subject to the operator's applicable privacy policies.
 
 # IANA Considerations
 
+IANA is requested to replace TBD1 and TBD2 throughout this document with the values assigned as
+specified below. RFC Editor: please replace "RFC XXXX" throughout this document with the RFC number
+assigned to this document, and remove this note.
+
 If feasible, IANA is requested to assign the same numeric value for TBD1 and TBD2. This is a
 convenience for implementers and not a requirement.
 
@@ -1296,10 +1303,11 @@ convenience for implementers and not a requirement.
 IANA is requested to assign a new DHCP Option Code (TBD1) in the "BOOTP Vendor Extensions and
 DHCP Options" registry as follows:
 
-- Name: OPTION_RATE
+- Tag: TBD1
+- Name: OPTION_V4_RATE
 - Data Length: N
 - Meaning: DHCP Rate Option
-- Reference: RFC-TBD
+- Reference: RFC XXXX
 
 ## DHCPv6 Option
 
@@ -1307,10 +1315,10 @@ IANA is requested to assign a new DHCPv6 Option Code (TBD2) in the "Option Codes
 follows:
 
 - Value: TBD2
-- Description: OPTION_RATE
+- Description: OPTION_V6_RATE
 - Client ORO: Yes
 - Singleton Option: Yes
-- Reference: RFC-TBD
+- Reference: RFC XXXX
 
 ## DHCP Rate Sub-Options Registry
 
@@ -1325,23 +1333,25 @@ See more details in Section {{experts}}{:format="counter"}.
 The initial content of this registry is listed in {{iana-sub-option-table}}.
 The registry covers the values 0-255. Each assigned value identifies the same sub-option in both
 the DHCPv4 and the DHCPv6 OPTION_RATE.
-The Reference column identifies the specification that defines the registered value.
+The Length column indicates the length of the sub-option value in octets for sub-options with a
+fixed length. The Reference column identifies the specification that defines the registered
+value.
 
 As the "DHCP Rate Sub-Options" and "DHCP Rate Types" registries also apply to DHCPv6, IANA is
 requested to add a reference to both registries in the "Dynamic Host Configuration Protocol for
 IPv6 (DHCPv6)" registry group.
 
-| Value | Description                                        | Reference |
-| ----: | :------------------------------------------------- | :-------- |
-|     0 | Reserved                                           |           |
-|     1 | Available Rate Upstream in bits per second (bps)   | RFC-TBD   |
-|     2 | Available Rate Downstream in bits per second (bps) | RFC-TBD   |
-|     3 | Rate Type                                          | RFC-TBD   |
-|     4 | Rate Type Downstream                               | RFC-TBD   |
-|     5 | Per-Packet Overhead                                | RFC-TBD   |
-|     6 | Per-Packet Overhead Downstream                     | RFC-TBD   |
-| 7-254 | Unassigned                                         |           |
-|   255 | Reserved                                           |           |
+| Value | Description                                        | Length | Reference |
+| ----: | :------------------------------------------------- | -----: | :-------- |
+|     0 | Reserved                                           |      - |           |
+|     1 | Available Rate Upstream in bits per second (bps)   |      8 | RFC XXXX  |
+|     2 | Available Rate Downstream in bits per second (bps) |      8 | RFC XXXX  |
+|     3 | Rate Type                                          |      1 | RFC XXXX  |
+|     4 | Rate Type Downstream                               |      1 | RFC XXXX  |
+|     5 | Per-Packet Overhead                                |      6 | RFC XXXX  |
+|     6 | Per-Packet Overhead Downstream                     |      6 | RFC XXXX  |
+| 7-254 | Unassigned                                         |      - |           |
+|   255 | Reserved                                           |      - |           |
 {: #iana-sub-option-table title="Sub-Options"}
 
 ## DHCP Rate Types Registry
@@ -1358,10 +1368,10 @@ The initial content of this registry is listed in {{iana-rate-type-table}}.
 
 | Value | Description                | Reference |
 | ----: | :------------------------- | :-------- |
-|     0 | Informational Layer 2 rate | RFC-TBD   |
-|     1 | Informational Layer 3 rate | RFC-TBD   |
-|     2 | Layer 2 rate               | RFC-TBD   |
-|     3 | Layer 3 rate               | RFC-TBD   |
+|     0 | Informational Layer 2 rate | RFC XXXX  |
+|     1 | Informational Layer 3 rate | RFC XXXX  |
+|     2 | Layer 2 rate               | RFC XXXX  |
+|     3 | Layer 3 rate               | RFC XXXX  |
 | 4-255 | Unassigned                 |           |
 {: #iana-rate-type-table title="Rate Types"}
 
@@ -1386,11 +1396,10 @@ assignments should follow the structure of the initial assignments, in which the
 bit indicates the networking layer (0 for Layer 2, 1 for Layer 3) (see {{rate-type}}). This
 structure is a guideline for allocation and is not a strict requirement.
 
-Registration requests are to be sent to the experts and are evaluated within a three-week review
-period on the advice of one or more designated experts. Within the review period, the designated
-experts will either approve or deny the registration request, communicating this decision to the
-review list and IANA. Denials should include an explanation and, if applicable, suggestions as to
-how to make the request successful.
+Registration requests are submitted to IANA, which forwards them to the designated experts for
+evaluation. The designated experts aim to complete their evaluation within three weeks and inform
+IANA of their decision. Denials should include an explanation and, if applicable, suggestions as
+to how to make the request successful.
 
 --- back
 
@@ -1478,9 +1487,11 @@ addresses these limitations.
 # Examples of Per-Packet Overhead Parameters {#examples}
 
 This appendix provides examples of the parameters of the Per-Packet Overhead sub-options (see
-{{overhead}}) for common deployments. The values are illustrative; the actual values depend on
-the configuration of the access network and of the enforcement point and need to be determined
-by the operator.
+{{overhead}}) for common deployments. The ADSL examples use bridged Ethernet with Logical Link
+Control (LLC) and Subnetwork Access Protocol (SNAP) encapsulation {{?RFC2684}}, and PPP over ATM
+(PPPoA) with Virtual Circuit (VC) multiplexing {{?RFC2364}}. The values are illustrative; the actual
+values depend on the configuration of the access network and of the enforcement point and need to be
+determined by the operator.
 
 In all examples, S denotes the size of the packet at the layer indicated by the Rate Type of the
 respective direction, as seen by the receiver. For a Layer 2 rate, S includes the Ethernet header
@@ -1531,7 +1542,7 @@ This appendix summarizes the processing of the DHCP Rate Option by a receiver as
 {{rate-type}}, {{overhead}}, {{processing}}, and {{errors}}. It is informative; in case of
 discrepancies, the referenced sections take precedence.
 
-~~~
+~~~ pseudocode
 For each DHCPACK or Reply message received on an interface:
   if no OPTION_RATE is present:
     keep the applied rates unchanged; done
