@@ -204,10 +204,11 @@ characteristics reported by the access node {{TR101}}.
 ## Applicability
 
 The mechanism defined in this document is primarily designed for broadband access networks using
-IPoE or Point-to-Point Protocol over Ethernet (PPPoE) {{?RFC2516}}. In PPPoE deployments, DHCPv6
-is commonly used over the PPP session for IPv6 Prefix Delegation and conveys the options in the
-same way (see {{pppoe}}). The options are defined for both DHCPv4 and DHCPv6 to support
-IPv4-only, IPv6-only, and dual-stack deployments.
+IPoE or Point-to-Point Protocol over Ethernet (PPPoE) {{?RFC2516}}. In PPPoE deployments, DHCPv6 is
+commonly used over the PPP session for IPv6 Prefix Delegation and conveys the options in the same
+way (see {{pppoe}}). The options are defined for both DHCPv4 and DHCPv6 to support IPv4-only,
+IPv6-only, and dual-stack deployments. A minimal implementation, which supports only the upstream
+rate and its Rate Type, is described in {{minimal}}.
 
 Unlike auto-configuration protocols such as TR-069 {{TR069}}, which are not deployed by all
 operators and are typically not available for customer-owned CPE, DHCP is supported by virtually
@@ -860,7 +861,8 @@ policing, or Active Queue Management (AQM) parameters to the maximum capacity of
 
 ## DHCPv4 Rate Option
 
-The option code of OPTION_V4_RATE is TBD1.
+The option code of OPTION_V4_RATE is TBD1. The messages in which it can appear are listed in
+{{appearance}}.
 
 ~~~ aasvg
   0                   1                   2                   3
@@ -948,7 +950,8 @@ behavior specified in this document applies to it.
 
 ## DHCPv6 Rate Option
 
-The option code of OPTION_V6_RATE is TBD2.
+The option code of OPTION_V6_RATE is TBD2. The messages in which it can appear are listed in
+{{appearance}}.
 
 ~~~ aasvg
   0                   1                   2                   3
