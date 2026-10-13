@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-08-25T00:36:47.374030+00:00",
+  "timestamp": "2026-10-13T04:23:48.858377+00:00",
   "repo": "GIC-de/draft-dhcp-rate-signaling",
   "labels": [
     {
@@ -211,10 +211,12 @@
       "assignees": [
         "GIC-de"
       ],
-      "labels": [],
+      "labels": [
+        "resolved"
+      ],
       "body": "Here, `MUST NOT` is incorrect; `SHOULD NOT` is a more appropriate choice, as CPE application remains possible.\n\n```\nIf the rate type is set to 0, the explicitly signaled rates are\ninformational only.  Devices receiving this rate type MUST NOT apply\nthe specified rate limits to their physical interfaces, traffic\nshapers, policers, or Active Queue Management (AQM) parameters. \n```",
       "createdAt": "2026-07-24T10:20:42Z",
-      "updatedAt": "2026-07-26T17:39:10Z",
+      "updatedAt": "2026-10-12T21:24:48Z",
       "closedAt": null,
       "comments": [
         {
@@ -237,10 +239,12 @@
       "assignees": [
         "GIC-de"
       ],
-      "labels": [],
+      "labels": [
+        "resolved"
+      ],
       "body": "Here, `MUST` is incorrect; `SHOULD` is a more appropriate choice, as CPE application remains possible.\n```\nIf a client receives rate limits embedded within the PPP\nauthentication reply message and concurrently receives the DHCP\nOPTION_RATE, the explicitly signaled DHCP OPTION_RATE MUST take\npriority.  This precedence ensures that the standardized, dynamic\nDHCP signaling supersedes fragmented or proprietary rate limits\npreviously negotiated during the PPP authentication phase.\n```\n\n",
       "createdAt": "2026-07-24T19:41:43Z",
-      "updatedAt": "2026-07-26T11:11:35Z",
+      "updatedAt": "2026-10-12T21:24:38Z",
       "closedAt": null,
       "comments": [
         {
@@ -274,11 +278,15 @@
       "state": "OPEN",
       "author": "moeller0",
       "authorAssociation": "NONE",
-      "assignees": [],
-      "labels": [],
+      "assignees": [
+        "GIC-de"
+      ],
+      "labels": [
+        "resolved"
+      ],
       "body": "For the purpose of actually configuring CPE-side traffic shapers (required for allowing AQMs to actually be useful, when the interface egress rate exceeds the contracted bottleneck rate) the applicable gross L2-rate is necessary, so make that mandatory. L3-payload rates can be nice to report in that these could match closely to what end users see in capacity tests but make these second-class citizens here and mandate L2-rates. This might require a change in the options to always report L2 and L3 rates.",
       "createdAt": "2026-07-25T09:36:03Z",
-      "updatedAt": "2026-07-26T13:16:51Z",
+      "updatedAt": "2026-10-12T21:22:54Z",
       "closedAt": null,
       "comments": [
         {
@@ -294,6 +302,20 @@
           "body": "> you cannot perfectly convert L2 to L3 and vice versa because both require assuming an average packet size.\n\nI respectfully beg to differ, knowing all applicable overhead (general and per-packet) I can very much deduce for a given L- packet how much transmission time it will consume on L2. My goal here is to make sure the proposed mechanism will include the required information tp make that happen.\n\n\n> So while most providers would likely prefer to apply an L2 rate, regulatory authorities in some countries strictly enforce L3 rates.\n\nI would argue providers opt for L2 rate shaping, as that is the only thing that makes sense given the reasons to traffic shape in the first place... And regulatory agencies might simply just want that advertised/contracted rates are communicated as easy to confirm in on-line speedtests TCP/HTTPS payload rates. I have yet to see a regulation requiring true L3-traffic shaping (see my example calculations how that would require an ISP to increase the L2-rate for smaller packets). The German regulatory agency (agreeing with BEREC guidelines) expects that the advertised maximum datarate is specified as L4-payload rate, but at the same time (also in agreement with BEREC) notes that this rate does not need to be the actual limit rate... So providers simply set their L2-shapers such that for the typical speedtest configuration (maximum MSS/MTU sized packets) the L4-payload rate exceeds the contracted rate....\n\n\n> In a large ISP I worked with, this went so far that the provider could not sell a 1000 Mbps product if the CPE lacked 2.5G ports, because a 1G physical port simply cannot deliver 1000 Mbps at L3 due to framing overhead.\n\nI could be wrong, but that very much sounds like the situation in Germany. However quite a number of ISPs opted to do exactly that offer nominal 1000 Mbps plans that are limited by Gigabit ethernet ports to actually only deliver around 940 Mbps. The national regulatory agency seems to tolerate this and even baked this into its official method to confirm whether ISPs actually fulfill their contracted rates, as a 10% discount, that is ISPs simply need to deliver >= 90% of the advertised rates as payload rates.\n\n\n\n> If a CPE cannot install L3 shapers directly, it needs to internally convert the rate based on its own local stack, accounting for its specific VLAN headers, PPPoE encapsulation, and other overhead.\n\nI disagree, unless the bottleneck operates on L3 (and L2 has ample reserve capacity to absorb the cost on L2-overhead) this will not work out well. A competent shaper needs to faithfully model the true bottleneck, its bottleneck rate, its per-packet overhead and quirky encapsulations like ATM/AAL5, otherwise it will fail to properly shape the traffic in some (probably mot too likely) scenarios. This ID, should in my opinion clearly document and strongly encourage providers to do the right thing here.",
           "createdAt": "2026-07-26T13:16:51Z",
           "updatedAt": "2026-07-26T13:16:51Z"
+        },
+        {
+          "author": "GIC-de",
+          "authorAssociation": "OWNER",
+          "body": "@moeller0 please review changes in https://github.com/GIC-de/draft-dhcp-rate-signaling/pull/13",
+          "createdAt": "2026-10-12T21:00:25Z",
+          "updatedAt": "2026-10-12T21:00:25Z"
+        },
+        {
+          "author": "GIC-de",
+          "authorAssociation": "OWNER",
+          "body": "Regarding the rate layer specifically:\n\n- For rates intended to be applied, the Rate Type now indicates the **layer at which the\n  enforcement point accounts traffic**. The draft recommends signaling the rate at that layer\n  together with the per-packet overhead, and states that a Layer 2 rate with overhead allows\n  the most precise modeling of a Layer 2 bottleneck.\n- Layer 3 rates remain available where the enforcement point itself accounts at Layer 3, or\n  where the applied rate is intended to closely match speed test results, independent of the\n  encapsulation on each segment.\n- Correction to my earlier comment: the absence of the Rate Type sub-option now means\n  *Informational Layer 2 rate*; servers must explicitly signal type 2 or 3 for rates to be\n  applied.\n- You are right that, with known per-packet overhead, the conversion between layers is exact\n  per packet and does not require an average packet size. My argument only applies to\n  shapers without per-packet overhead compensation.\n- The operational considerations now note that payload-based contracted rates (e.g., per\n  BEREC guidelines) are typically met by configuring the enforcement point accordingly, and\n  that the signaled values describe the enforcement point, not the contracted payload rate.\n\nRather than mandating Layer 2 rates, we would like to keep both and let the Rate Type describe\nthe actual accounting of the enforcement point. Feedback on whether this addresses your\nconcern is very welcome.",
+          "createdAt": "2026-10-12T21:22:53Z",
+          "updatedAt": "2026-10-12T21:22:53Z"
         }
       ]
     },
@@ -305,13 +327,25 @@
       "state": "OPEN",
       "author": "moeller0",
       "authorAssociation": "NONE",
-      "assignees": [],
-      "labels": [],
+      "assignees": [
+        "GIC-de"
+      ],
+      "labels": [
+        "resolved"
+      ],
       "body": "To properly configure a traffic shaper one needs at least both the true L2-bottleneck rate (or a somewhat lower estimate thereof, e.g. if reporting sync rates of DSL links using PTM the reported rate should be derated for PTM's 64/65 encoding) and the applicable effective per-packet overhead (applicable in that all effective parts are accounted, e.g. ethernet's inter frame gap is not a data, but \"radio-silence\" worth 12 octets worth of transmission time). As the overhead is hard to deduce even when the true effective bottleneck rate is known, let's add two more mandatory fields to report here downstream and upstream per-packet overhead.\nGiven the goal of this method is to allow competent CPE-side traffic shaping/scheduling/queue management, let's make sure we mandate the necessary pieces of information to actually make that happen.",
       "createdAt": "2026-07-25T09:44:59Z",
-      "updatedAt": "2026-07-25T09:44:59Z",
+      "updatedAt": "2026-10-12T21:23:30Z",
       "closedAt": null,
-      "comments": []
+      "comments": [
+        {
+          "author": "GIC-de",
+          "authorAssociation": "OWNER",
+          "body": "Thanks a lot for the detailed feedback in #8, #9, and #10. As these issues are closely related,\nhere is a combined response. The corresponding changes are part of the next revision.\n\n**Per-packet overhead (#9):** We added a *Per-Packet Overhead* sub-option (code 4) carrying:\n\n- a signed **Overhead** (octets accounted per packet in addition to the packet size at the\n  signaled layer, as seen by the receiver); where the bottleneck is a physical link, this\n  includes physical-layer overhead such as preamble, SFD, and inter-frame gap,\n- a **Minimum Packet Unit (MPU)**, and\n- **cell-based accounting** parameters (Cell Payload and Cell Size, see #10).\n\nThe accounted size of a packet is calculated as `L = max(S + Overhead, MPU)`, followed by\n`L = ceil(L / Cell Payload) * Cell Size` if cell-based accounting applies. This maps directly\nto shaper parameters such as overhead, mpu, and atm in CAKE.\n\nSub-option 4 applies to both directions, as the overhead is typically identical and most\nclients only apply the upstream rate. Where the overhead differs, an optional *Per-Packet\nOverhead Downstream* sub-option (code 5) overrides it for the downstream direction.\n\nPTM 64/65 encoding on VDSL2 and G.fast is expected to be folded into the signaled rate, as you\nsuggested, with per-packet PTM overhead signaled via the Overhead field.\n\n**Mandatory vs. optional:** We decided to keep the overhead sub-options optional, while\nrecommending that servers include them (SHOULD) and that receivers with suitable traffic\nmanagement functions apply them (SHOULD). Many CPE, including simple script-based\nimplementations, cannot apply all of these parameters, and we do not want the inability to\napply the overhead to invalidate the rate information itself. Receivers that cannot apply the\noverhead may approximate it, e.g., by reducing the applied rate by a margin.\n\n**Examples:** A new appendix provides example values for common deployments: Ethernet link as\nbottleneck (Overhead 24, MPU 84), a VLAN tag added by the access node, Layer 3 policers, and\nADSL with PPPoE over bridged LLC/SNAP (Overhead 18, cells 48/53) and PPPoA with VC\nmultiplexing (Overhead 8, cells 48/53). The values are relative to the Ethernet frame (or PPP\nframe) without FCS as seen by the receiver, which is why they differ from the CAKE keywords\nthat are relative to the IP packet.\n\nThree questions where your input would be very valuable:\n\n1. Are Overhead, MPU, and cell-based accounting sufficient, or are there other effects worth\n   covering?\n2. Would you be willing to review, or contribute to, the example values in the appendix?\n3. Do you see a need to signal both an applied Layer 2 rate and an informational payload rate\n   at the same time (e.g., for display in the CPE user interface)? The current format carries\n   a single Rate Type per option.\n\nWe would appreciate your review of the updated text.",
+          "createdAt": "2026-10-12T21:23:26Z",
+          "updatedAt": "2026-10-12T21:23:26Z"
+        }
+      ]
     },
     {
       "number": 10,
@@ -324,12 +358,22 @@
       "assignees": [
         "GIC-de"
       ],
-      "labels": [],
+      "labels": [
+        "resolved"
+      ],
       "body": "The canonical example for a quirky encapsulation is ATM/AAL5 that mandates that all data frames are packed into an integer number of ATM cells with the last cell(s) carrying up to 47 bytes of padding. While I hope that no modern encapsulation will ever become that baroque, let's not base the option's utility on my hopes. To solve this we should add a way to signal quirky encapsulations, or maybe relevant encasulations?",
       "createdAt": "2026-07-25T09:48:44Z",
-      "updatedAt": "2026-07-26T11:04:02Z",
+      "updatedAt": "2026-10-12T21:24:12Z",
       "closedAt": null,
-      "comments": []
+      "comments": [
+        {
+          "author": "GIC-de",
+          "authorAssociation": "OWNER",
+          "body": "Rather than an enumeration of encapsulations, which would require a new IANA registry, the\n*Per-Packet Overhead* sub-options describe cell-based accounting parametrically with two\nfields, **Cell Payload** and **Cell Size**:\n\n- ATM/AAL5 (e.g., ADSL) is signaled as Cell Payload 48 and Cell Size 53, with all\n  encapsulation overhead within the AAL5 frame, including the 8-octet AAL5 trailer, carried in\n  the Overhead field.\n- Any other link layer that pads each packet to an integer number of fixed-size cells can be\n  expressed with its own values, without registry changes or an update of the RFC.\n- Accounting models that cannot be described by these parameters can be defined as additional\n  sub-options in the existing \"DHCP Rate Sub-Options\" registry (Specification Required), e.g.,\n  based on a Broadband Forum specification.\n\nPTM 64/65 on VDSL2 and G.fast is intentionally not modeled as cell-based accounting, as it\nencodes a continuous octet stream rather than padding individual packets; its effect is\nexpected to be folded into the signaled rate.\n\nFeedback on whether this approach covers the \"funky\" encapsulations you have in mind would be\nvery welcome.",
+          "createdAt": "2026-10-12T21:24:11Z",
+          "updatedAt": "2026-10-12T21:24:11Z"
+        }
+      ]
     },
     {
       "number": 11,
@@ -342,10 +386,12 @@
       "assignees": [
         "GIC-de"
       ],
-      "labels": [],
+      "labels": [
+        "resolved"
+      ],
       "body": "The concepts focus on the WAN side of a CPE device, but the concept is also useful to apply in a LAN environment to communicate the available WAN bandwidth to a client device.\n\nAs a specific use-case, we employ server-side shaping in VPN tunneling applications which primarily cap at CPU capacity of the terminating devices, however this might still be above the WAN bandwidth. Having such a DHCP option available also for LAN is very useful to employ bandwidth limits.\n\nI don't think the concept needs functional changes, however this can be taken into the Problem Statements.\nPotentially this case needs clarification in how e.g. a case of a Multi-Gbit WAN and Single-Gbit LAN shall be handled.",
       "createdAt": "2026-07-25T15:55:18Z",
-      "updatedAt": "2026-07-29T10:53:49Z",
+      "updatedAt": "2026-10-12T21:24:27Z",
       "closedAt": null,
       "comments": [
         {
@@ -419,7 +465,7 @@
       "labels": [],
       "body": "+ Zero Length Options (#1)\r\n+ DHCPv4/v6 Code Points (TBD1 and 2) (#2)\r\n+ DHCPv6 Sub-Options Format (#3)",
       "createdAt": "2026-06-16T20:03:12Z",
-      "updatedAt": "2026-07-01T13:38:56Z",
+      "updatedAt": "2026-10-11T15:00:43Z",
       "baseRepository": "GIC-de/draft-dhcp-rate-signaling",
       "baseRefName": "main",
       "baseRefOid": "548653231f04bceeeb1d2c6afb8d845509bc1785",
@@ -475,6 +521,55 @@
               "body": "```suggestion\n|    0 |      - | Reserved                                         |\n```",
               "createdAt": "2026-07-01T13:26:37Z",
               "updatedAt": "2026-07-01T13:27:39Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 13,
+      "id": "PR_kwDOSj3KQc8AAAABH3LMfQ",
+      "title": "Clarify use case, add LAN applicability, and address full review",
+      "url": "https://github.com/GIC-de/draft-dhcp-rate-signaling/pull/13",
+      "state": "OPEN",
+      "author": "GIC-de",
+      "authorAssociation": "OWNER",
+      "assignees": [
+        "GIC-de"
+      ],
+      "labels": [],
+      "body": "## Summary\r\n\r\nThis PR revises the draft based on feedback from the last IETF presentation and subsequent\r\nmailing list discussions. The main feedback was that the use case was not clear to everyone:\r\nreaders who had faced the problem, or had deployed proprietary alternatives, supported the\r\ndraft, while others questioned why the CPE needs to know its rate if the BNG already enforces\r\nit, or why shaping is not simply implemented in the BNG. In addition, it was requested to make\r\nthe option applicable to LAN environments as well (#11), and to improve the accuracy of rate\r\nsignaling for traffic shaping by describing the accounting of the enforcement point, including\r\nper-packet overhead and cell-based link layers (#8, #9, #10).\r\n\r\nBesides clarifying the motivation, the PR addresses a full technical and editorial review,\r\nincluding undefined behaviors, security considerations, RFC compliance, alignment with current\r\nDHCP specifications, and implementability with existing DHCP clients.\r\n\r\n## Motivation and Use Case\r\n\r\n- **Rewritten Introduction** with a clear structure: *Problem Statement*, *Solution Overview*,\r\n  and *Applicability*.\r\n- **Problem Statement** now explains the actual mechanism:\r\n  - Upstream rates are commonly enforced by **ingress policers** at the BNG, as per-subscriber\r\n    upstream queuing is not supported by all BNG platforms or only with restrictions and\r\n    reduced scale. A CPE sending at line rate causes policer drops, sawtooth throughput, and\r\n    poor speed test results.\r\n  - Other upstream bottlenecks: access devices (ONT, DSL modem, cable modem) and limitations\r\n    within the access network (PON upstream allocation, DSL synchronization rate, cable modem\r\n    rate limits).\r\n  - Upstream **prioritization at the CPE** (DNS, VoIP, gaming, video conferencing, TCP ACKs,\r\n    selected clients) is ineffective unless the CPE is the bottleneck.\r\n  - Downstream rates are mainly informational for the CPE but relevant for intermediate nodes.\r\n- **Solution Overview** with a figure showing upstream policing with and without CPE shaping.\r\n  BNG enforcement remains in place; the CPE shaper prevents it from being triggered.\r\n- **New Appendix \"Design Rationale\"** addressing frequently raised questions: why BNG\r\n  enforcement alone is not sufficient, why upstream shaping is not performed at the BNG\r\n  (including NAT limitations), why not TR-069 or manual configuration, why DHCP, and the\r\n  limitations of existing proprietary solutions, while CPE implementations already provide\r\n  Layer 2 and Layer 3 shaping functions.\r\n- **Abstract** rewritten accordingly, including intermediate nodes and LAN applicability.\r\n\r\n## LAN Applicability (closes #11)\r\n\r\n- New section *Local Area Networks* under *Deployment Scenarios*: use cases (VPN gateways,\r\n  Wi-Fi hotspots with per-user limits, applications using the rates as initial estimate),\r\n  propagation of WAN rates to LAN clients, recommendation of informational rate types for\r\n  shared capacity, and the requirement that clients do not use signaled rates as a replacement\r\n  for congestion control.\r\n- Direction definitions (*Upstream*, *Downstream*) are now relative to the interface on which\r\n  the option is received, independent of broadband terminology.\r\n\r\n## Rate Types and Per-Packet Overhead (refs #8, #9, #10)\r\n\r\n- **Rate Types:** type 1 is now *Informational Layer 3 rate*. Absence of the Rate Type\r\n  sub-option means *Informational Layer 2 rate*; servers must explicitly signal type 2 or 3\r\n  for rates to be applied. Precise Layer 2 rate definition (VLAN tags and PPPoE headers\r\n  included; FCS, preamble, SFD, and IPG excluded).\r\n- For applied rates, the Rate Type indicates the **layer at which the enforcement point\r\n  accounts traffic**, so that receivers can model this accounting. New term *Enforcement\r\n  Point*.\r\n- **Layer 3 rates** closely correspond to speed test results and are identical on every node,\r\n  independent of encapsulation; receivers shaping at a lower layer compensate for the headers\r\n  implicitly.\r\n- **New optional *Per-Packet Overhead* sub-options:** code 4 applies to both directions, code\r\n  5 overrides it for downstream. Each carries a signed overhead (including physical-layer\r\n  overhead such as preamble, SFD, and IPG where the bottleneck is a physical link), a minimum\r\n  packet unit (MPU), and parametric **cell-based accounting** (cell payload and cell size,\r\n  e.g., 48/53 for ATM/AAL5 on ADSL), without requiring an additional registry. The parameters\r\n  map directly to shaper parameters such as those of CAKE.\r\n- Receivers that cannot apply the overhead, fully or partially, still apply the signaled\r\n  rates; the option remains valid.\r\n- Guidance on applying rates at a different accounting layer, on PPPoE interfaces, and on\r\n  VDSL2 PTM encapsulation.\r\n- **New Appendix with example parameter values** for Ethernet links, VLAN tags added by the\r\n  access node, Layer 3 policers, and ADSL with PPPoE over LLC/SNAP and PPPoA.\r\n- Rate Type section restructured into format, definitions, semantics, and server and\r\n  receiver guidance.\r\n\r\n## Protocol Changes and Clarifications\r\n\r\n- **New section *Rate Processing*:** deliberately stateless processing that can be implemented\r\n  by simple DHCP client hook scripts:\r\n  - the last valid OPTION_RATE wins, regardless of DHCPv4 or DHCPv6, maintained per interface;\r\n  - an absent rate sub-option or a value of 0 resets that direction;\r\n  - a message without OPTION_RATE leaves the applied rates unchanged;\r\n  - rates are not bound to the lease; they are reset when the link or session is terminated;\r\n  - no reconfiguration if rates, rate type, and overhead are unchanged;\r\n  - optional correction factor for intermediate nodes (e.g., +1%) so that CPE shaping does not\r\n    trigger enforcement, while non-supporting CPE are still policed.\r\n- **New section *Client Hints*:** hints indicate client capacity; honoring a hint can only\r\n  lower the signaled rate. Relays and snooping devices must not use client-supplied values.\r\n- **Error Handling:** length validation, malformed option handling, multiple instances\r\n  (RFC 3396 concatenation for DHCPv4), sub-option codes 0 and 255 reserved, shared 0-255 code\r\n  space for DHCPv4 and DHCPv6.\r\n- **Server behavior:** aligned for DHCPv4 and DHCPv6; explicit rules for removing previously\r\n  signaled rates; DHCPFORCERENEW (RFC 3203/6704) and Reconfigure (with RKAP) for mid-lease\r\n  updates; DSL actual line rate guidance.\r\n- **Relay agent behavior:** DHCPv6 relays process only their own Relay-reply; optional\r\n  zero-length OPTION_RATE in Relay-forward as support indication; devices modifying the\r\n  client's option act as server or proxy; trusted-port processing for Layer 2 relays and\r\n  snooping devices.\r\n- **Assumption of one client per physical or logical port** for intermediate nodes.\r\n- **New Appendix \"Example Receiver Processing\"** summarizing the complete processing as\r\n  pseudocode for implementers.\r\n\r\n## Security, Privacy, and Operations\r\n\r\n- Security Considerations extended: all signaling paths, DHCP snooping / DHCPv6-Shield,\r\n  configurable minimum rate sanity checks, removal of rate limits, excessive overhead values,\r\n  resource exhaustion on intermediate nodes, unauthenticated client hints, rogue servers in\r\n  LANs.\r\n- New *Privacy Considerations* section (RFC 7844, fingerprinting via hints).\r\n- Operational Considerations extended: choice of rate type and overhead, payload-based\r\n  contracted rates, VDSL2 PTM, correction factors, actual line rates, update latency, and\r\n  measuring client support.\r\n- New *Implementation Status* section (RFC 7942) including a feasibility analysis for OpenWrt\r\n  (udhcpc, odhcp6c, dnsmasq, odhcpd, CAKE) without changes to the DHCP client software.\r\n\r\n## IANA and References\r\n\r\n- Category changed to **Standards Track**.\r\n- Registries use **Specification Required**, allowing e.g. Broadband Forum TRs as\r\n  specifications; DHCP Rate Types registry restored; Designated Expert guidelines extended.\r\n- New sub-options *Per-Packet Overhead* (code 4) and *Per-Packet Overhead Downstream*\r\n  (code 5); no additional registries.\r\n- DHCPv6 option registration includes *Client ORO* and *Singleton Option*.\r\n- RFC 8415 replaced by **RFC 9915** (no technical impact; section numbers unchanged).\r\n- New references: RFC 2364, 2684, 3203, 3396, 4649, 6704, 7227, 7610, 7844, 7942,\r\n  IEEE 802.1Q, IEEE 802.3; corrected TR-069 reference.\r\n- Justification for the use of sub-options with respect to RFC 7227.\r\n\r\n## Editorial\r\n\r\n- Additional discussion venue (broadband@ietf.org) moved into the venue section, so it is\r\n  removed by the RFC Editor, with proper links.\r\n- Consistent RFC 9915 message names and IEEE 802.3 terminology, neutral IETF wording (removed\r\n  promotional language), consistent terminology (client-facing, Layer 2 DHCPv4 Relay Agent,\r\n  Receiver, Enforcement Point).\r\n- Body restructured: *Error Handling* moved next to *Rate Processing*, *PPPoE* and *Local Area\r\n  Networks* grouped under *Deployment Scenarios*, *Interaction with AQM and L4S* merged into\r\n  the Introduction.\r\n\r\n## Review Notes\r\n\r\n- Large diff due to restructuring; reviewing the rendered HTML is recommended.\r\n- Feedback is particularly welcome on the Introduction and the Design Rationale appendix, as\r\n  they address the main concerns raised during the last presentation, and on the\r\n  *Per-Packet Overhead* sub-options and the example values (#8, #9, #10).",
+      "createdAt": "2026-10-11T21:42:49Z",
+      "updatedAt": "2026-10-12T21:36:47Z",
+      "baseRepository": "GIC-de/draft-dhcp-rate-signaling",
+      "baseRefName": "main",
+      "baseRefOid": "47498ded0ed7805376a4bf72cc3124b79440e5ba",
+      "headRepository": "GIC-de/draft-dhcp-rate-signaling",
+      "headRefName": "draft-01",
+      "headRefOid": "816cb5b342f786c9bb11fdefdb2cffe52fa85d98",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOSj3KQc8AAAABR5djPg",
+          "commit": {
+            "abbreviatedOid": "17a9ac7"
+          },
+          "author": "github-actions",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-10-12T21:21:22Z",
+          "updatedAt": "2026-10-12T21:21:23Z",
+          "comments": [
+            {
+              "originalPosition": 1675,
+              "body": "````suggestion\nThe authors would like to thank Glenn Deen, Jason Livingood and\nSebastian Moeller for their valuable review comments and discussion,\n````",
+              "createdAt": "2026-10-12T21:21:22Z",
+              "updatedAt": "2026-10-12T21:21:23Z"
             }
           ]
         }
