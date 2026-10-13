@@ -231,23 +231,23 @@ Table of Contents
    Loss, and Scalable Throughput (L4S) architecture [RFC9330], the queue
    at the CPE can additionally provide low latency for L4S traffic.
 
-                   Without rate signaling
+                           Without rate signaling
 
-+-------------+  bursts at 1 Gbps  +--------+     +--------------------+
-|     CPE     |------------------->| Access |---->|        BNG         |
-|             |                    +--------+     |  ingress policer   |
-+-------------+                                   |  100 Mbps: drops   |
-                                                  +--------------------+
+   +-------------+  bursts at 1 Gbps +--------+     +------------------+
+   |     CPE     |------------------>| Access |---->|        BNG       |
+   |             |                   +--------+     | ingress policer  |
+   |             |                                  | 100 Mbps: drops  |
+   +-------------+                                  +------------------+
 
-                   With rate signaling
+                            With rate signaling
 
-+-------------+  shaped 100 Mbps   +--------+     +--------------------+
-|     CPE     |------------------->| Access |---->|        BNG         |
-| shaper, AQM |                    +--------+     |  ingress policer   |
-| 100 Mbps    |                                   |  100 Mbps: idle    |
-+-------------+                                   +--------------------+
+   +-------------+  shaped 100 Mbps  +--------+     +------------------+
+   |     CPE     |------------------>| Access |---->|        BNG       |
+   | shaper, AQM |                   +--------+     | ingress policer  |
+   | 100 Mbps    |                                  | 100 Mbps: idle   |
+   +-------------+                                  +------------------+
 
- Figure 1: Upstream Policing at the BNG With and Without CPE Shaping
+    Figure 1: Upstream Policing at the BNG With and Without CPE Shaping
 
    The enforcement at the BNG remains in place.  The shaper at the CPE
    does not replace this enforcement but prevents it from being
