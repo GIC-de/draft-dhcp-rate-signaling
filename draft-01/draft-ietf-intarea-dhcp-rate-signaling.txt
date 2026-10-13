@@ -624,13 +624,21 @@ Table of Contents
    snooping devices MAY apply rates that are intended to be applied in
    either direction (see Section 4, Section 5, and Section 6).
 
+   A receiver that does not apply a rate that is intended to be applied,
+   for example because it does not support the required traffic
+   management functions or because applying the downstream rate is
+   optional for clients, SHOULD treat that rate as an informational rate
+   of the respective layer.  In particular, such a receiver can expose
+   the rate in its management interfaces (see Section 8).
+
    If the Rate Type of a direction is set to 0 (Informational Layer 2
    rate) or 1 (Informational Layer 3 rate), the signaled rate of that
    direction is informational only and refers to the respective
    networking layer.  A receiver of an informational rate type SHOULD
    process these values without altering its traffic shapers, policers,
-   or AQM parameters.  These values accommodate deployments where the
-   network exposes the provisioned service tier to the Customer Premises
+   or AQM parameters, unless explicitly configured otherwise by local
+   policy.  These values accommodate deployments where the network
+   exposes the provisioned service tier to the Customer Premises
    Equipment (CPE) solely to populate user interfaces, facilitate
    telemetry, or serve as a metric to select a path with higher
    throughput, all without otherwise altering the device's localized
@@ -858,9 +866,9 @@ Table of Contents
       for that direction.
 
    *  If the Rate Type of a direction is informational, the receiver
-      SHOULD remove any rate previously applied to its traffic
-      management functions for that direction and revert to its default
-      configuration for that direction.
+      MUST remove any rate previously applied to its traffic management
+      functions for that direction based on the DHCP Rate Option and
+      revert to its default configuration for that direction.
 
    Consequently, an OPTION_RATE without any sub-options instructs the
    receiver to revert to its default configuration for both directions.
@@ -966,15 +974,16 @@ Table of Contents
    devices MUST NOT use an OPTION_RATE contained in a client message to
    configure their traffic management.  As intermediate nodes can derive
    their enforcement from the signaled rates, honoring a hint can also
-   lower the enforcement in the network for that client.  This never
-   exceeds the provisioned rate and therefore only affects the client
-   that sent the hint.
+   lower the enforcement in the network for that client.  As the
+   resulting rate never exceeds the provisioned rate, this only affects
+   the client that sent the hint.
 
 3.6.  Appearance in Messages
 
    Table 3 and Table 4 list the messages in which the OPTION_RATE can
    appear.  The OPTION_RATE MUST NOT be included in any other message.
-   Receivers MUST ignore an OPTION_RATE contained in any other message.
+   Servers and receivers MUST ignore an OPTION_RATE contained in any
+   other message.
 
     +=======================================+========================+
     | Message                               | Use of OPTION_RATE     |
@@ -990,24 +999,25 @@ Table of Contents
 
           Table 3: Appearance of OPTION_RATE in DHCPv4 Messages
 
-      +=============================+===============================+
-      | Message                     | Use of OPTION_RATE            |
-      +=============================+===============================+
-      | Solicit, Request, Renew,    | Hint (see Section 3.5)        |
-      | Rebind, Information-request |                               |
-      +-----------------------------+-------------------------------+
-      | Advertise                   | Server selection (see         |
-      |                             | Section 5.3)                  |
-      +-----------------------------+-------------------------------+
-      | Reply                       | Rate information (see         |
-      |                             | Section 3.3)                  |
-      +-----------------------------+-------------------------------+
-      | Relay-forward               | Support indication, length 0  |
-      |                             | (see Section 5.4)             |
-      +-----------------------------+-------------------------------+
-      | Relay-reply                 | Rate information for the      |
-      |                             | relay agent (see Section 5.4) |
-      +-----------------------------+-------------------------------+
+   +===================================+===============================+
+   | Message                           | Use of OPTION_RATE            |
+   +===================================+===============================+
+   | Solicit, Request, Renew, Rebind,  | Hint (see Section 3.5)        |
+   | Information-request               |                               |
+   +-----------------------------------+-------------------------------+
+   | Advertise                         | Server selection (see         |
+   |                                   | Section 5.3)                  |
+   +-----------------------------------+-------------------------------+
+   | Reply to Solicit, Request, Renew, | Rate information (see         |
+   | Rebind, or Information-request    | Section 3.3)                  |
+   +-----------------------------------+-------------------------------+
+   | Relay-forward                     | Support indication, length    |
+   |                                   | 0 (see Section 5.4)           |
+   +-----------------------------------+-------------------------------+
+   | Relay-reply                       | Rate information for the      |
+   |                                   | relay agent (see              |
+   |                                   | Section 5.4)                  |
+   +-----------------------------------+-------------------------------+
 
            Table 4: Appearance of OPTION_RATE in DHCPv6 Messages
 
@@ -2132,6 +2142,9 @@ Appendix C.  Example Receiver Processing
        rate := rate sub-option of the direction, or 0 if absent
        if type of the direction is informational or rate is 0:
          revert the direction to the default configuration
+       else if the rate is not applied (e.g., not supported):
+         revert the direction to the default configuration
+         and treat the rate as informational
        else:
          rate := min(rate, capacity of the physical link)
          apply rate with the overhead of the direction,
