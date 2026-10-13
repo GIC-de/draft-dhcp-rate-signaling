@@ -286,7 +286,8 @@ Table of Contents
    used over the PPP session for IPv6 Prefix Delegation and conveys the
    options in the same way (see Section 7.1).  The options are defined
    for both DHCPv4 and DHCPv6 to support IPv4-only, IPv6-only, and dual-
-   stack deployments.
+   stack deployments.  A minimal implementation, which supports only the
+   upstream rate and its Rate Type, is described in Section 3.4.
 
    Unlike auto-configuration protocols such as TR-069 [TR069], which are
    not deployed by all operators and are typically not available for
@@ -1095,7 +1096,8 @@ Table of Contents
 
 4.1.  DHCPv4 Rate Option
 
-   The option code of OPTION_V4_RATE is TBD1.
+   The option code of OPTION_V4_RATE is TBD1.  The messages in which it
+   can appear are listed in Section 3.6.
 
      0                   1                   2                   3
      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -1203,7 +1205,8 @@ Table of Contents
 
 5.1.  DHCPv6 Rate Option
 
-   The option code of OPTION_V6_RATE is TBD2.
+   The option code of OPTION_V6_RATE is TBD2.  The messages in which it
+   can appear are listed in Section 3.6.
 
      0                   1                   2                   3
      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
