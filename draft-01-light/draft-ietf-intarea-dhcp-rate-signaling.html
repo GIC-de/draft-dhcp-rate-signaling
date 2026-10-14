@@ -13,13 +13,15 @@ signal the intended upstream and downstream rates of a network connection to cli
 intermediate nodes. In many broadband access networks, the provisioned upstream rate is enforced at
 the service edge by ingress policers, while the Customer Premises Equipment (CPE) sends at the speed
 of its physical link. The resulting policer drops cause unstable and reduced throughput and render
-upstream prioritization at the CPE ineffective. By learning the available rate via DHCP, the CPE can
-shape its upstream traffic, moving the queue to the CPE, where it can be managed by prioritization,
-Active Queue Management (AQM), and the Low Latency, Low Loss, and Scalable Throughput (L4S)
-architecture. Intermediate nodes acting as DHCP relay agents or performing DHCP snooping can use the
-same information to instantiate per-subscriber shapers and policers. These options are also
-applicable within local area networks, for example to inform end devices about the capacity of the
-upstream connection. 
+upstream prioritization at the CPE ineffective. By learning the intended upstream rate via DHCP, the
+CPE can shape its upstream traffic, moving the queue to the CPE, where it can be managed by
+prioritization, Active Queue Management (AQM), and the Low Latency, Low Loss, and Scalable
+Throughput (L4S) architecture. Intermediate nodes acting as DHCP relay agents or performing DHCP
+snooping can use the same information to instantiate per-subscriber shapers and policers. All rates
+are Layer 3 rates, which match the speed perceived by users and can be applied directly to common
+traffic shapers without encapsulation-specific calculations. These options are also applicable
+within local area networks, for example to inform end devices about the capacity of the upstream
+connection. 
     " name="description">
 <meta content="xml2rfc 3.34.1" name="generator">
 <meta content="DHCP" name="keyword">
@@ -1103,13 +1105,15 @@ signal the intended upstream and downstream rates of a network connection to cli
 intermediate nodes. In many broadband access networks, the provisioned upstream rate is enforced at
 the service edge by ingress policers, while the Customer Premises Equipment (CPE) sends at the speed
 of its physical link. The resulting policer drops cause unstable and reduced throughput and render
-upstream prioritization at the CPE ineffective. By learning the available rate via DHCP, the CPE can
-shape its upstream traffic, moving the queue to the CPE, where it can be managed by prioritization,
-Active Queue Management (AQM), and the Low Latency, Low Loss, and Scalable Throughput (L4S)
-architecture. Intermediate nodes acting as DHCP relay agents or performing DHCP snooping can use the
-same information to instantiate per-subscriber shapers and policers. These options are also
-applicable within local area networks, for example to inform end devices about the capacity of the
-upstream connection.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
+upstream prioritization at the CPE ineffective. By learning the intended upstream rate via DHCP, the
+CPE can shape its upstream traffic, moving the queue to the CPE, where it can be managed by
+prioritization, Active Queue Management (AQM), and the Low Latency, Low Loss, and Scalable
+Throughput (L4S) architecture. Intermediate nodes acting as DHCP relay agents or performing DHCP
+snooping can use the same information to instantiate per-subscriber shapers and policers. All rates
+are Layer 3 rates, which match the speed perceived by users and can be applied directly to common
+traffic shapers without encapsulation-specific calculations. These options are also applicable
+within local area networks, for example to inform end devices about the capacity of the upstream
+connection.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
 </section>
 <section class="note rfcEditorRemove" id="section-note.1">
       <h2 id="name-about-this-document">
@@ -1194,7 +1198,7 @@ upstream connection.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
             <p id="section-toc.1-1.2.1"><a href="#section-2" class="auto internal xref">2</a>.  <a href="#name-conventions-and-definitions" class="internal xref">Conventions and Definitions</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3">
-            <p id="section-toc.1-1.3.1"><a href="#section-3" class="auto internal xref">3</a>.  <a href="#name-rate-options" class="internal xref">Rate Options</a></p>
+            <p id="section-toc.1-1.3.1"><a href="#section-3" class="auto internal xref">3</a>.  <a href="#name-rate-option" class="internal xref">Rate Option</a></p>
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.1">
                 <p id="section-toc.1-1.3.2.1.1"><a href="#section-3.1" class="auto internal xref">3.1</a>.  <a href="#name-layer-3-rates" class="internal xref">Layer 3 Rates</a></p>
@@ -1214,7 +1218,7 @@ upstream connection.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
             <p id="section-toc.1-1.4.1"><a href="#section-4" class="auto internal xref">4</a>.  <a href="#name-dhcpv4" class="internal xref">DHCPv4</a></p>
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.1">
-                <p id="section-toc.1-1.4.2.1.1"><a href="#section-4.1" class="auto internal xref">4.1</a>.  <a href="#name-dhcpv4-rate-options" class="internal xref">DHCPv4 Rate Options</a></p>
+                <p id="section-toc.1-1.4.2.1.1"><a href="#section-4.1" class="auto internal xref">4.1</a>.  <a href="#name-dhcpv4-rate-option" class="internal xref">DHCPv4 Rate Option</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.2">
                 <p id="section-toc.1-1.4.2.2.1"><a href="#section-4.2" class="auto internal xref">4.2</a>.  <a href="#name-dhcpv4-client-behavior" class="internal xref">DHCPv4 Client Behavior</a></p>
@@ -1231,7 +1235,7 @@ upstream connection.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
             <p id="section-toc.1-1.5.1"><a href="#section-5" class="auto internal xref">5</a>.  <a href="#name-dhcpv6" class="internal xref">DHCPv6</a></p>
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.1">
-                <p id="section-toc.1-1.5.2.1.1"><a href="#section-5.1" class="auto internal xref">5.1</a>.  <a href="#name-dhcpv6-rate-options" class="internal xref">DHCPv6 Rate Options</a></p>
+                <p id="section-toc.1-1.5.2.1.1"><a href="#section-5.1" class="auto internal xref">5.1</a>.  <a href="#name-dhcpv6-rate-option" class="internal xref">DHCPv6 Rate Option</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.2">
                 <p id="section-toc.1-1.5.2.2.1"><a href="#section-5.2" class="auto internal xref">5.2</a>.  <a href="#name-dhcpv6-client-behavior" class="internal xref">DHCPv6 Client Behavior</a></p>
@@ -1279,10 +1283,10 @@ upstream connection.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
             <p id="section-toc.1-1.12.1"><a href="#section-12" class="auto internal xref">12</a>. <a href="#name-iana-considerations" class="internal xref">IANA Considerations</a></p>
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12.2.1">
-                <p id="section-toc.1-1.12.2.1.1"><a href="#section-12.1" class="auto internal xref">12.1</a>.  <a href="#name-dhcpv4-options" class="internal xref">DHCPv4 Options</a></p>
+                <p id="section-toc.1-1.12.2.1.1"><a href="#section-12.1" class="auto internal xref">12.1</a>.  <a href="#name-dhcpv4-option" class="internal xref">DHCPv4 Option</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12.2.2">
-                <p id="section-toc.1-1.12.2.2.1"><a href="#section-12.2" class="auto internal xref">12.2</a>.  <a href="#name-dhcpv6-options" class="internal xref">DHCPv6 Options</a></p>
+                <p id="section-toc.1-1.12.2.2.1"><a href="#section-12.2" class="auto internal xref">12.2</a>.  <a href="#name-dhcpv6-option" class="internal xref">DHCPv6 Option</a></p>
 </li>
             </ul>
 </li>
@@ -1316,7 +1320,7 @@ upstream connection.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
                 <p id="section-toc.1-1.14.2.5.1"><a href="#appendix-A.5" class="auto internal xref">A.5</a>.  <a href="#name-why-only-layer-3-rates" class="internal xref">Why Only Layer 3 Rates?</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.14.2.6">
-                <p id="section-toc.1-1.14.2.6.1"><a href="#appendix-A.6" class="auto internal xref">A.6</a>.  <a href="#name-why-separate-options-instea" class="internal xref">Why Separate Options Instead of a Container Option?</a></p>
+                <p id="section-toc.1-1.14.2.6.1"><a href="#appendix-A.6" class="auto internal xref">A.6</a>.  <a href="#name-why-a-single-fixed-format-o" class="internal xref">Why a Single Fixed-Format Option?</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.14.2.7">
                 <p id="section-toc.1-1.14.2.7.1"><a href="#appendix-A.7" class="auto internal xref">A.7</a>.  <a href="#name-relation-to-access-line-inf" class="internal xref">Relation to Access Line Information</a></p>
@@ -1404,11 +1408,10 @@ exceed the capacity of the upstream connection (see <a href="#lan" class="auto i
         <h3 id="name-solution-overview">
 <a href="#section-1.2" class="section-number selfRef">1.2. </a><a href="#name-solution-overview" class="section-name selfRef">Solution Overview</a>
         </h3>
-<p id="section-1.2-1">This document defines four DHCP options: an upstream rate option and a downstream rate option for
-each of DHCPv4 and DHCPv6. Each option carries exactly one value, the intended rate for one
-direction as a 64-bit unsigned integer in bits per second. The rate is always a Layer 3 rate: it
-refers to the IP header and payload of each packet (see <a href="#layer3" class="auto internal xref">Section 3.1</a>). No other parameters are
-defined.<a href="#section-1.2-1" class="pilcrow">¶</a></p>
+<p id="section-1.2-1">This document defines a Rate Option for each of DHCPv4 and DHCPv6. The option has a fixed format
+and carries exactly two values: the intended upstream rate and the intended downstream rate, each as
+a 64-bit unsigned integer in bits per second. The rates are always Layer 3 rates: they refer to the
+IP header and payload of each packet as transmitted on the link of the receiver (see <a href="#layer3" class="auto internal xref">Section 3.1</a>).<a href="#section-1.2-1" class="pilcrow">¶</a></p>
 <p id="section-1.2-2">If the CPE knows the upstream rate, it can shape its upstream traffic to this rate, regardless of
 where the bottleneck is located. The queue then builds at the CPE, where it can be managed using
 prioritization, Active Queue Management (AQM) <span>[<a href="#RFC7567" class="cite xref">RFC7567</a>]</span>, and flow queuing <span>[<a href="#RFC8290" class="cite xref">RFC8290</a>]</span>. Under
@@ -1569,14 +1572,14 @@ protocols.<a href="#section-2-3.2.1" class="pilcrow">¶</a></p>
 <dt id="section-2-3.7">Upstream</dt>
         <dd style="margin-left: 1.5em" id="section-2-3.8">
           <p id="section-2-3.8.1">The direction of traffic from the client towards the network. For a client, this corresponds to
-traffic sent over the link on which the rate options were received. For a relay agent or
+traffic sent over the link on which the Rate Option was received. For a relay agent or
 snooping device, this corresponds to traffic received on the client-facing interface or port.<a href="#section-2-3.8.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
 <dt id="section-2-3.9">Downstream</dt>
         <dd style="margin-left: 1.5em" id="section-2-3.10">
           <p id="section-2-3.10.1">The direction of traffic from the network towards the client. For a client, this corresponds to
-traffic received over the link on which the rate options were received. For a relay agent or
+traffic received over the link on which the Rate Option was received. For a relay agent or
 snooping device, this corresponds to traffic sent on the client-facing interface or port.<a href="#section-2-3.10.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
@@ -1586,45 +1589,59 @@ snooping device, this corresponds to traffic sent on the client-facing interface
 of the path, for example a policer at the BNG or an access link.<a href="#section-2-3.12.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
-<dt id="section-2-3.13">Intermediate Node</dt>
+<dt id="section-2-3.13">Intended Rate</dt>
         <dd style="margin-left: 1.5em" id="section-2-3.14">
-          <p id="section-2-3.14.1">A relay agent or snooping device on the path between a client and a server that processes the
-rate options, for example a BNG acting as a DHCP relay agent or an access node performing DHCP
-snooping.<a href="#section-2-3.14.1" class="pilcrow">¶</a></p>
+          <p id="section-2-3.14.1">The maximum rate, in a given direction, at which the network intends to forward the traffic of a
+client. Traffic exceeding the intended rate is subject to being dropped or delayed at the
+enforcement point. The intended rate is not a guarantee: the achievable rate can be lower, for
+example due to congestion elsewhere in the network. The Rate Option signals the intended rates;
+this document also refers to them as the signaled rates.<a href="#section-2-3.14.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
-<dt id="section-2-3.15">Layer 3 Rate</dt>
+<dt id="section-2-3.15">Intermediate Node</dt>
         <dd style="margin-left: 1.5em" id="section-2-3.16">
-          <p id="section-2-3.16.1">A rate calculated over the IP header and IP payload of each packet (see <a href="#layer3" class="auto internal xref">Section 3.1</a>).<a href="#section-2-3.16.1" class="pilcrow">¶</a></p>
+          <p id="section-2-3.16.1">A relay agent or snooping device on the path between a client and a server that processes the Rate
+Option, for example a BNG acting as a DHCP relay agent or an access node performing DHCP snooping.<a href="#section-2-3.16.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
-<dt id="section-2-3.17">Provisioned Rate</dt>
+<dt id="section-2-3.17">Layer 3 Rate</dt>
         <dd style="margin-left: 1.5em" id="section-2-3.18">
-          <p id="section-2-3.18.1">The rate configured for a subscriber according to the subscribed service, typically enforced
-at the enforcement point (e.g., the BNG). The signaled rates are typically derived from the
-provisioned rates.<a href="#section-2-3.18.1" class="pilcrow">¶</a></p>
+          <p id="section-2-3.18.1">A rate calculated over the outermost IP header of each packet and its payload, as transmitted on
+the link of the receiver (see <a href="#layer3" class="auto internal xref">Section 3.1</a>).<a href="#section-2-3.18.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
-<dt id="section-2-3.19">Rate Options</dt>
+<dt id="section-2-3.19">Provisioned Rate</dt>
         <dd style="margin-left: 1.5em" id="section-2-3.20">
-          <p id="section-2-3.20.1">Collectively, the options defined in this document: OPTION_V4_UPSTREAM_RATE,
-OPTION_V4_DOWNSTREAM_RATE, OPTION_V6_UPSTREAM_RATE, and OPTION_V6_DOWNSTREAM_RATE. The upstream
-rate option refers to OPTION_V4_UPSTREAM_RATE or OPTION_V6_UPSTREAM_RATE, and the downstream rate
-option to OPTION_V4_DOWNSTREAM_RATE or OPTION_V6_DOWNSTREAM_RATE.<a href="#section-2-3.20.1" class="pilcrow">¶</a></p>
+          <p id="section-2-3.20.1">The rate configured in the network for a subscriber according to the subscribed service, typically
+enforced at the enforcement point (e.g., the BNG). The intended rates are typically derived from
+the provisioned rates.<a href="#section-2-3.20.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
-<dt id="section-2-3.21">Receiver</dt>
+<dt id="section-2-3.21">Rate Option</dt>
         <dd style="margin-left: 1.5em" id="section-2-3.22">
-          <p id="section-2-3.22.1">Any node that processes a received rate option, including DHCP clients, relay agents (including
-Lightweight DHCPv6 Relay Agents <span>[<a href="#RFC6221" class="cite xref">RFC6221</a>]</span> and Layer 2 DHCPv4 Relay Agents <span>[<a href="#TR101" class="cite xref">TR101</a>]</span>), and DHCP
-snooping devices.<a href="#section-2-3.22.1" class="pilcrow">¶</a></p>
+          <p id="section-2-3.22.1">The DHCPv4 Rate Option (OPTION_V4_RATE) or the DHCPv6 Rate Option (OPTION_V6_RATE) defined in this
+document. Where the distinction is not relevant, this document refers to both as the Rate Option.<a href="#section-2-3.22.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
-<dt id="section-2-3.23">Subscriber</dt>
+<dt id="section-2-3.23">Binding</dt>
         <dd style="margin-left: 1.5em" id="section-2-3.24">
-          <p id="section-2-3.24.1">The customer of a network access service. Within the network, a subscriber is typically
+          <p id="section-2-3.24.1">The state that an intermediate node maintains for a client, associating the client with its
+client-facing port or session and with the addresses or prefixes leased to it, for example the
+subscriber session of a BNG or the binding table of a snooping device.<a href="#section-2-3.24.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-2-3.25">Receiver</dt>
+        <dd style="margin-left: 1.5em" id="section-2-3.26">
+          <p id="section-2-3.26.1">Any node that processes a received Rate Option, including DHCP clients, relay agents (including
+Lightweight DHCPv6 Relay Agents <span>[<a href="#RFC6221" class="cite xref">RFC6221</a>]</span> and Layer 2 DHCPv4 Relay Agents <span>[<a href="#TR101" class="cite xref">TR101</a>]</span>), and DHCP
+snooping devices.<a href="#section-2-3.26.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-2-3.27">Subscriber</dt>
+        <dd style="margin-left: 1.5em" id="section-2-3.28">
+          <p id="section-2-3.28.1">The customer of a network access service. Within the network, a subscriber is typically
 represented by a subscriber session at the BNG (e.g., an IPoE or PPPoE session), to which the
-provisioned rates and other per-subscriber policies are applied.<a href="#section-2-3.24.1" class="pilcrow">¶</a></p>
+provisioned rates and other per-subscriber policies are applied.<a href="#section-2-3.28.1" class="pilcrow">¶</a></p>
 </dd>
       <dd class="break"></dd>
 </dl>
@@ -1632,50 +1649,92 @@ provisioned rates and other per-subscriber policies are applied.<a href="#sectio
 </div>
 <div id="rate-options">
 <section id="section-3">
-      <h2 id="name-rate-options">
-<a href="#section-3" class="section-number selfRef">3. </a><a href="#name-rate-options" class="section-name selfRef">Rate Options</a>
+      <h2 id="name-rate-option">
+<a href="#section-3" class="section-number selfRef">3. </a><a href="#name-rate-option" class="section-name selfRef">Rate Option</a>
       </h2>
-<p id="section-3-1">This document defines one upstream rate option and one downstream rate option for each of DHCPv4
-and DHCPv6. The encoding of each option follows the conventions of the respective base protocol
-(see <a href="#dhcpv4" class="auto internal xref">Section 4</a> and <a href="#dhcpv6" class="auto internal xref">Section 5</a>). The semantics of the four options are identical and are specified
-in this section.<a href="#section-3-1" class="pilcrow">¶</a></p>
-<p id="section-3-2">The value of each rate option is a 64-bit unsigned integer in network byte order, indicating the
-intended rate for the respective direction in bits per second (bps). The 64-bit format allows rates
-beyond the approximately 4.29 Gbit/s that can be represented by 32-bit rate attributes in bits per
-second, such as those defined in <span>[<a href="#RFC4679" class="cite xref">RFC4679</a>]</span>.<a href="#section-3-2" class="pilcrow">¶</a></p>
-<p id="section-3-3">A value of 0 indicates that no rate is signaled for the respective direction. A receiver that has
-previously applied a rate learned from a rate option for that direction <span class="bcp14">MUST</span> remove that rate and
-revert to its default configuration for that direction (see <a href="#processing" class="auto internal xref">Section 3.3</a>).<a href="#section-3-3" class="pilcrow">¶</a></p>
+<p id="section-3-1">This document defines one Rate Option for each of DHCPv4 and DHCPv6. The encoding of the option
+follows the conventions of the respective base protocol (see <a href="#dhcpv4" class="auto internal xref">Section 4</a> and <a href="#dhcpv6" class="auto internal xref">Section 5</a>). The value
+of the option has the same fixed format in both protocols, and its semantics are identical and are
+specified in this section.<a href="#section-3-1" class="pilcrow">¶</a></p>
+<p id="section-3-2">The value of the Rate Option consists of two fields, in the following order:<a href="#section-3-2" class="pilcrow">¶</a></p>
+<span class="break"></span><dl class="dlParallel" id="section-3-3">
+        <dt id="section-3-3.1">Upstream Rate:</dt>
+        <dd style="margin-left: 1.5em" id="section-3-3.2">
+          <p id="section-3-3.2.1">A 64-bit unsigned integer in network byte order, indicating the intended rate for the upstream
+direction in bits per second (bps).<a href="#section-3-3.2.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-3-3.3">Downstream Rate:</dt>
+        <dd style="margin-left: 1.5em" id="section-3-3.4">
+          <p id="section-3-3.4.1">A 64-bit unsigned integer in network byte order, indicating the intended rate for the downstream
+direction in bits per second (bps).<a href="#section-3-3.4.1" class="pilcrow">¶</a></p>
+</dd>
+      <dd class="break"></dd>
+</dl>
+<p id="section-3-4">The 64-bit format allows rates beyond the approximately 4.29 Gbit/s that can be represented by
+32-bit rate attributes in bits per second, such as those defined in <span>[<a href="#RFC4679" class="cite xref">RFC4679</a>]</span>.<a href="#section-3-4" class="pilcrow">¶</a></p>
+<p id="section-3-5">A value of 0 in either field indicates that no rate is signaled for the respective direction. A
+receiver that has previously applied a rate learned from a Rate Option for that direction <span class="bcp14">MUST</span>
+remove that rate and revert to its default configuration for that direction (see <a href="#processing" class="auto internal xref">Section 3.3</a>).<a href="#section-3-5" class="pilcrow">¶</a></p>
 <div id="layer3">
 <section id="section-3.1">
         <h3 id="name-layer-3-rates">
 <a href="#section-3.1" class="section-number selfRef">3.1. </a><a href="#name-layer-3-rates" class="section-name selfRef">Layer 3 Rates</a>
         </h3>
-<p id="section-3.1-1">All rates signaled by the rate options are Layer 3 rates. A Layer 3 rate is calculated over the IP
-header (including any IPv6 extension headers) and the IP payload of each packet. It excludes all
-headers and trailers below the IP layer, such as Ethernet headers, Virtual LAN (VLAN) tags, PPPoE
-and PPP headers, and the Ethernet Frame Check Sequence (FCS), as well as all physical-layer
-overhead.<a href="#section-3.1-1" class="pilcrow">¶</a></p>
-<p id="section-3.1-2">Layer 3 rates have the following properties:<a href="#section-3.1-2" class="pilcrow">¶</a></p>
+<p id="section-3.1-1">All rates signaled by the Rate Option are Layer 3 rates. A Layer 3 rate is calculated over the
+outermost IP header of each packet (including any IPv6 extension headers) and its payload, as
+transmitted or received on the link of the receiver. For a client, this is the link on which the
+Rate Option was received; for a relay agent or snooping device, it is the client-facing link. The
+Layer 3 rate excludes all headers and trailers below the outermost IP header, such as Ethernet
+headers, Virtual LAN (VLAN) tags, PPPoE and PPP headers, and the Ethernet Frame Check Sequence
+(FCS), as well as all physical-layer overhead.<a href="#section-3.1-1" class="pilcrow">¶</a></p>
+<p id="section-3.1-2">Consequently, any tunnel or translation applied by the receiver itself is part of the Layer 3 rate.
+For example:<a href="#section-3.1-2" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-3.1-3.1">
-            <p id="section-3.1-3.1.1">They correspond to the speed perceived by users and measured by common speed test applications,
-and to the rate in which service tiers are typically described and marketed.<a href="#section-3.1-3.1.1" class="pilcrow">¶</a></p>
+            <p id="section-3.1-3.1.1">For a client acting as a Dual-Stack Lite (DS-Lite) Basic Bridging BroadBand (B4) element
+<span>[<a href="#RFC6333" class="cite xref">RFC6333</a>]</span> or as a Mapping of Address and Port with Encapsulation (MAP-E) Customer Edge
+<span>[<a href="#RFC7597" class="cite xref">RFC7597</a>]</span>, the Layer 3 rate covers the outer IPv6 header and the encapsulated IPv4 packet.<a href="#section-3.1-3.1.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-3.1-3.2">
-            <p id="section-3.1-3.2.1">They are independent of the encapsulation used on the link of the receiver and on any other
-segment of the path. A single value applies at every node, regardless of VLAN tags or tunnel
-headers that are added or removed between the receiver and the enforcement point.<a href="#section-3.1-3.2.1" class="pilcrow">¶</a></p>
+            <p id="section-3.1-3.2.1">For a client using translation, such as Mapping of Address and Port using Translation (MAP-T)
+<span>[<a href="#RFC7599" class="cite xref">RFC7599</a>]</span> or the customer-side translator of 464XLAT <span>[<a href="#RFC6877" class="cite xref">RFC6877</a>]</span>, the Layer 3 rate covers the
+translated packet as transmitted on the link.<a href="#section-3.1-3.2.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-3.1-3.3">
-            <p id="section-3.1-3.3.1">They can be applied directly by traffic management functions that account traffic at the IP
-layer, such as shapers attached to a PPP or IP interface, or shapers that can be configured to
-account the network-layer packet size (see <a href="#application" class="auto internal xref">Section 3.2</a>).<a href="#section-3.1-3.3.1" class="pilcrow">¶</a></p>
+            <p id="section-3.1-3.3.1">For a client that encapsulates traffic in an IP-based tunnel on the link of the receiver, such as
+an IPsec, Generic Routing Encapsulation (GRE), or Layer 2 Tunneling Protocol (L2TP) tunnel, the
+Layer 3 rate covers the outer IP header and all headers and payload carried within it.<a href="#section-3.1-3.3.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
-<p id="section-3.1-4">The rate options do not describe the per-packet accounting of the enforcement point. Operators
+<p id="section-3.1-4">A receiver that applies its traffic management functions to the inner traffic of such a tunnel or
+translation, rather than to the packets on the link, accounts for the resulting difference locally,
+as the encapsulation or translation is performed by the receiver itself. Encapsulations added or
+removed by other nodes between the receiver and the enforcement point, such as an L2TP tunnel
+between an L2TP Access Concentrator (LAC) and an L2TP Network Server (LNS) <span>[<a href="#RFC3931" class="cite xref">RFC3931</a>]</span>, are
+not part of the Layer 3 rate of the receiver; they are treated like any other difference in
+accounting at the enforcement point (see <a href="#operations" class="auto internal xref">Section 8</a>).<a href="#section-3.1-4" class="pilcrow">¶</a></p>
+<p id="section-3.1-5">Layer 3 rates have the following properties:<a href="#section-3.1-5" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-3.1-6.1">
+            <p id="section-3.1-6.1.1">They correspond to the speed perceived by users and measured by common speed test applications,
+and to the rate in which service tiers are typically described and marketed.<a href="#section-3.1-6.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-3.1-6.2">
+            <p id="section-3.1-6.2.1">They are independent of the link-layer encapsulation used on the link of the receiver and on any
+other segment of the path. Unless an IP-based tunnel is added or removed between the receiver and
+the enforcement point, a single value applies at every node, regardless of VLAN tags or PPPoE
+headers that are added or removed along the path.<a href="#section-3.1-6.2.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-3.1-6.3">
+            <p id="section-3.1-6.3.1">They can be applied directly by traffic management functions that account traffic at the IP
+layer, such as shapers attached to a PPP or IP interface, or shapers that can be configured to
+account the network-layer packet size (see <a href="#application" class="auto internal xref">Section 3.2</a>).<a href="#section-3.1-6.3.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+<p id="section-3.1-7">The Rate Option does not describe the per-packet accounting of the enforcement point. Operators
 account for differences between the Layer 3 rate and the accounting of the enforcement point when
-configuring the signaled rate or the enforcement point (see <a href="#operations" class="auto internal xref">Section 8</a>).<a href="#section-3.1-4" class="pilcrow">¶</a></p>
+configuring the signaled rates or the enforcement point (see <a href="#operations" class="auto internal xref">Section 8</a>).<a href="#section-3.1-7" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="application">
@@ -1683,7 +1742,7 @@ configuring the signaled rate or the enforcement point (see <a href="#operations
         <h3 id="name-traffic-management-using-si">
 <a href="#section-3.2" class="section-number selfRef">3.2. </a><a href="#name-traffic-management-using-si" class="section-name selfRef">Traffic Management Using Signaled Rates</a>
         </h3>
-<p id="section-3.2-1">The rate options convey rates that are intended to be applied to local traffic management functions,
+<p id="section-3.2-1">The Rate Option conveys rates that are intended to be applied to local traffic management functions,
 such as traffic shapers, policers, or AQM parameters. A client that supports such traffic management
 functions <span class="bcp14">SHOULD</span> apply the upstream rate and <span class="bcp14">MAY</span> apply the downstream rate. Relay agents and
 snooping devices <span class="bcp14">MAY</span> apply the rates in either direction (see <a href="#dhcpv4" class="auto internal xref">Section 4</a>, <a href="#dhcpv6" class="auto internal xref">Section 5</a>, and
@@ -1717,15 +1776,16 @@ default configuration of the receiver.<a href="#section-3.2-5" class="pilcrow">�
         <h3 id="name-rate-processing">
 <a href="#section-3.3" class="section-number selfRef">3.3. </a><a href="#name-rate-processing" class="section-name selfRef">Rate Processing</a>
         </h3>
-<p id="section-3.3-1">The processing of the rate options is stateless with respect to the DHCP protocol version and the
+<p id="section-3.3-1">The processing of the Rate Option is stateless with respect to the DHCP protocol version and the
 DHCP lease, such that it can be implemented by simple event-driven scripts on the client. A receiver
 only needs to retain the rate currently in effect for each direction.<a href="#section-3.3-1" class="pilcrow">¶</a></p>
 <p id="section-3.3-2">Rates are maintained per link and per direction. DHCPv4 and DHCPv6 messages received over the same
 link share the rates in effect, even if they are processed on different logical interfaces of the
 receiver.<a href="#section-3.3-2" class="pilcrow">¶</a></p>
-<p id="section-3.3-3">Each valid rate option received in a DHCPv4 DHCPACK message or a DHCPv6 Reply message (or, for
-DHCPv6 relay agents, in the corresponding Relay-reply message) replaces the rate in effect for the
-corresponding direction, regardless of whether the previous rate was learned via DHCPv4 or DHCPv6:<a href="#section-3.3-3" class="pilcrow">¶</a></p>
+<p id="section-3.3-3">Each valid Rate Option received in a DHCPv4 DHCPACK message or a DHCPv6 Reply message (or, for
+DHCPv6 relay agents, in the corresponding Relay-reply message) replaces the rates in effect for both
+directions, regardless of whether the previous rates were learned via DHCPv4 or DHCPv6. For each
+direction:<a href="#section-3.3-3" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-3.3-4.1">
             <p id="section-3.3-4.1.1">If the value is non-zero, the receiver applies the signaled rate as specified in <a href="#application" class="auto internal xref">Section 3.2</a>.<a href="#section-3.3-4.1.1" class="pilcrow">¶</a></p>
@@ -1734,39 +1794,41 @@ corresponding direction, regardless of whether the previous rate was learned via
             <p id="section-3.3-4.2.1">If the value is 0, the receiver <span class="bcp14">MUST</span> remove any rate previously applied for that direction and
 revert to its default configuration for that direction.<a href="#section-3.3-4.2.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="section-3.3-4.3">
-            <p id="section-3.3-4.3.1">If the rate option for a direction is absent, the receiver <span class="bcp14">MUST</span> retain the rate in effect for that
-direction unchanged.<a href="#section-3.3-4.3.1" class="pilcrow">¶</a></p>
-</li>
         </ul>
-<p id="section-3.3-5">If a signaled rate is identical to the rate currently in effect, the receiver <span class="bcp14">SHOULD NOT</span> reconfigure
-its traffic management functions.<a href="#section-3.3-5" class="pilcrow">¶</a></p>
-<p id="section-3.3-6">For clients, the rates in effect are not bound to the lifetime of the DHCP lease from which they
+<p id="section-3.3-5">If a DHCPACK or Reply message does not contain a Rate Option, the receiver <span class="bcp14">MUST</span> retain the rates in
+effect unchanged.<a href="#section-3.3-5" class="pilcrow">¶</a></p>
+<p id="section-3.3-6">If a signaled rate is identical to the rate currently in effect, the receiver <span class="bcp14">SHOULD NOT</span> reconfigure
+its traffic management functions.<a href="#section-3.3-6" class="pilcrow">¶</a></p>
+<p id="section-3.3-7">For clients, the rates in effect are not bound to the lifetime of the DHCP lease from which they
 were learned. Relay agents and snooping devices remove the rates applied for a client together with
-the corresponding binding (see <a href="#dhcpv4" class="auto internal xref">Section 4</a>, <a href="#dhcpv6-relay" class="auto internal xref">Section 5.4</a>, and <a href="#snooping" class="auto internal xref">Section 6</a>). A receiver <span class="bcp14">MUST</span>
+the corresponding binding (see <a href="#dhcpv4" class="auto internal xref">Section 4</a>, <a href="#dhcpv6-relay" class="auto internal xref">Section 5.4</a>, and <a href="#snooping" class="auto internal xref">Section 6</a>). An intermediate node
+that does not maintain bindings removes the rates applied for a client when the lease or the
+longest valid lifetime conveyed in the message that carried the Rate Option expires without being
+extended, or when the client-facing port or session is terminated. A receiver <span class="bcp14">MUST</span>
 revert to its default configuration when the underlying link or session (e.g., the PPPoE session) is
-terminated.<a href="#section-3.3-6" class="pilcrow">¶</a></p>
-<p id="section-3.3-7">Relay agents and snooping devices apply signaled rates to the traffic of an individual client.
+terminated.<a href="#section-3.3-7" class="pilcrow">¶</a></p>
+<p id="section-3.3-8">Relay agents and snooping devices apply signaled rates to the traffic of an individual client.
 This document assumes that each such client is associated with a dedicated physical or logical
 client-facing port, such as an access line or a per-client VLAN (e.g., the 1:1 VLAN model
 described in <span>[<a href="#TR101" class="cite xref">TR101</a>]</span>). If multiple clients share the same client-facing port, and the device is
 not able to apply rates to the traffic of each client individually, the device <span class="bcp14">SHOULD NOT</span> apply
-the signaled rates to that port.<a href="#section-3.3-7" class="pilcrow">¶</a></p>
-<p id="section-3.3-8">Intermediate nodes that enforce the signaled rates <span class="bcp14">MAY</span> apply an implementation-specific
+the signaled rates to that port.<a href="#section-3.3-8" class="pilcrow">¶</a></p>
+<p id="section-3.3-9">Intermediate nodes that enforce the signaled rates <span class="bcp14">MAY</span> apply an implementation-specific
 correction factor, for example by enforcing a rate slightly above the signaled rate (e.g., by
-1%). This allows a client that supports these options to shape its traffic to the signaled rate
+1%). This allows a client that supports this option to shape its traffic to the signaled rate
 without triggering the enforcement at the intermediate node, while the intermediate node still
-enforces the provisioned rate for clients that do not support or ignore these options.
-Alternatively, in DHCPv6, the server can signal node-specific rates (see <a href="#dhcpv6-server" class="auto internal xref">Section 5.3</a>).<a href="#section-3.3-8" class="pilcrow">¶</a></p>
-<p id="section-3.3-9">A client can receive a rate that exceeds the maximum physical link speed of its interfaces (e.g.,
+enforces the provisioned rate for clients that do not support or ignore this option.
+Alternatively, in DHCPv6, the server can signal node-specific rates (see <a href="#dhcpv6-server" class="auto internal xref">Section 5.3</a>).<a href="#section-3.3-9" class="pilcrow">¶</a></p>
+<p id="section-3.3-10">A client can receive a rate that exceeds the maximum physical link speed of its interfaces (e.g.,
 2 Gbit/s signaled to a CPE with a 1 Gbit/s Wide Area Network (WAN) port). In such scenarios, the
 client <span class="bcp14">SHOULD</span> cap the applied traffic shaping, policing, or AQM parameters to the capacity of the
-physical link.<a href="#section-3.3-9" class="pilcrow">¶</a></p>
-<p id="section-3.3-10">In dual-stack deployments, servers <span class="bcp14">SHOULD</span> either signal identical rates via both DHCPv4 and DHCPv6,
-or signal rates via only one of the two protocols that is expected to be negotiated by every client.
-In the latter case, messages of the other protocol do not carry rate options and therefore leave the
-rates in effect unchanged. If neither approach is followed, the rate in effect for each direction
-depends on which message was received last.<a href="#section-3.3-10" class="pilcrow">¶</a></p>
+physical link.<a href="#section-3.3-10" class="pilcrow">¶</a></p>
+<p id="section-3.3-11">In dual-stack deployments, servers <span class="bcp14">MUST NOT</span> signal different rates to the same client via DHCPv4 and
+DHCPv6. Servers either signal identical rates via both protocols, or signal rates via only one of
+the two protocols that is expected to be negotiated by every client. In the latter case, messages of
+the other protocol do not carry a Rate Option and therefore leave the rates in effect unchanged.
+Where DHCPv4 and DHCPv6 are served by different servers, operators ensure that both are provisioned
+with the same rates; otherwise, the rates in effect depend on which message was received last.<a href="#section-3.3-11" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="errors">
@@ -1774,16 +1836,14 @@ depends on which message was received last.<a href="#section-3.3-10" class="pilc
         <h3 id="name-error-handling">
 <a href="#section-3.4" class="section-number selfRef">3.4. </a><a href="#name-error-handling" class="section-name selfRef">Error Handling</a>
         </h3>
-<p id="section-3.4-1">A rate option whose length is not 8 octets is malformed. A receiver <span class="bcp14">MUST</span> discard a malformed rate
-option, which is then treated as if it were not present (see <a href="#processing" class="auto internal xref">Section 3.3</a>). A malformed rate
-option for one direction does not affect the processing of the rate option for the other direction.<a href="#section-3.4-1" class="pilcrow">¶</a></p>
-<p id="section-3.4-2">A sender <span class="bcp14">MUST NOT</span> include more than one instance of each rate option in a DHCPv4 message, or at the
+<p id="section-3.4-1">A Rate Option whose length is not 16 octets is malformed. A receiver <span class="bcp14">MUST</span> discard a malformed Rate
+Option, which is then treated as if it were not present (see <a href="#processing" class="auto internal xref">Section 3.3</a>).<a href="#section-3.4-1" class="pilcrow">¶</a></p>
+<p id="section-3.4-2">A sender <span class="bcp14">MUST NOT</span> include more than one instance of the Rate Option in a DHCPv4 message, or at the
 same encapsulation level of a DHCPv6 message (i.e., within the message exchanged with the client or
-within a given Relay-reply message). If a DHCPv4 receiver nevertheless receives multiple instances
-of a rate option, it concatenates them as specified in <span>[<a href="#RFC3396" class="cite xref">RFC3396</a>]</span>; the result is malformed unless
-its length is 8 octets. If a DHCPv6 receiver receives more than one instance of a rate option at the
-same encapsulation level, it <span class="bcp14">MUST</span> discard all instances of that option.<a href="#section-3.4-2" class="pilcrow">¶</a></p>
-<p id="section-3.4-3">Rate options contained in messages other than those listed in <a href="#dhcpv4" class="auto internal xref">Section 4</a> and <a href="#dhcpv6" class="auto internal xref">Section 5</a> <span class="bcp14">MUST</span> be
+within a given Relay-reply message). A receiver that receives more than one instance <span class="bcp14">MUST</span> discard
+all instances. For DHCPv4, this is consistent with <span>[<a href="#RFC3396" class="cite xref">RFC3396</a>]</span>: the concatenation of multiple
+instances is not 16 octets long and is therefore malformed.<a href="#section-3.4-2" class="pilcrow">¶</a></p>
+<p id="section-3.4-3">A Rate Option contained in a message other than those listed in <a href="#dhcpv4" class="auto internal xref">Section 4</a> and <a href="#dhcpv6" class="auto internal xref">Section 5</a> <span class="bcp14">MUST</span> be
 ignored.<a href="#section-3.4-3" class="pilcrow">¶</a></p>
 </section>
 </div>
@@ -1794,28 +1854,34 @@ ignored.<a href="#section-3.4-3" class="pilcrow">¶</a></p>
       <h2 id="name-dhcpv4">
 <a href="#section-4" class="section-number selfRef">4. </a><a href="#name-dhcpv4" class="section-name selfRef">DHCPv4</a>
       </h2>
-<div id="dhcpv4-rate-options">
+<div id="dhcpv4-rate-option">
 <section id="section-4.1">
-        <h3 id="name-dhcpv4-rate-options">
-<a href="#section-4.1" class="section-number selfRef">4.1. </a><a href="#name-dhcpv4-rate-options" class="section-name selfRef">DHCPv4 Rate Options</a>
+        <h3 id="name-dhcpv4-rate-option">
+<a href="#section-4.1" class="section-number selfRef">4.1. </a><a href="#name-dhcpv4-rate-option" class="section-name selfRef">DHCPv4 Rate Option</a>
         </h3>
-<p id="section-4.1-1">The DHCPv4 Upstream Rate option (OPTION_V4_UPSTREAM_RATE) uses option code TBD1, and the DHCPv4
-Downstream Rate option (OPTION_V4_DOWNSTREAM_RATE) uses option code TBD2. Both options have the
-following format:<a href="#section-4.1-1" class="pilcrow">¶</a></p>
+<p id="section-4.1-1">The DHCPv4 Rate Option (OPTION_V4_RATE) has the following format:<a href="#section-4.1-1" class="pilcrow">¶</a></p>
 <span id="name-dhcpv4-rate-option-format"></span><div id="fig-v4-format">
 <figure id="figure-2">
           <div id="section-4.1-2.1">
             <div class="alignLeft art-svg artwork" id="section-4.1-2.1.1">
-<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="176" width="528" viewBox="0 0 528 176" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
-                <path d="M 8,64 L 8,160" fill="none" stroke="black"></path>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="240" width="528" viewBox="0 0 528 240" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
+                <path d="M 8,64 L 8,224" fill="none" stroke="black"></path>
+                <path d="M 72,64 L 72,72" fill="none" stroke="black"></path>
+                <path d="M 72,88 L 72,96" fill="none" stroke="black"></path>
                 <path d="M 136,64 L 136,96" fill="none" stroke="black"></path>
                 <path d="M 264,64 L 264,96" fill="none" stroke="black"></path>
                 <path d="M 264,128 L 264,160" fill="none" stroke="black"></path>
-                <path d="M 520,64 L 520,128" fill="none" stroke="black"></path>
+                <path d="M 264,192 L 264,224" fill="none" stroke="black"></path>
+                <path d="M 296,120 L 296,128" fill="none" stroke="black"></path>
+                <path d="M 360,120 L 360,128" fill="none" stroke="black"></path>
+                <path d="M 520,64 L 520,192" fill="none" stroke="black"></path>
                 <path d="M 8,64 L 520,64" fill="none" stroke="black"></path>
                 <path d="M 8,96 L 264,96" fill="none" stroke="black"></path>
-                <path d="M 272,128 L 520,128" fill="none" stroke="black"></path>
+                <path d="M 264,128 L 520,128" fill="none" stroke="black"></path>
                 <path d="M 8,160 L 264,160" fill="none" stroke="black"></path>
+                <path d="M 264,192 L 520,192" fill="none" stroke="black"></path>
+                <path d="M 8,224 L 264,224" fill="none" stroke="black"></path>
+                <path class="jump" d="M 72,88 C 66,88 66,72 72,72" fill="none" stroke="black"></path>
                 <g class="text">
                   <text x="16" y="36">0</text>
                   <text x="176" y="36">1</text>
@@ -1853,11 +1919,17 @@ following format:<a href="#section-4.1-1" class="pilcrow">¶</a></p>
                   <text x="480" y="52">9</text>
                   <text x="496" y="52">0</text>
                   <text x="512" y="52">1</text>
-                  <text x="68" y="84">Code</text>
-                  <text x="196" y="84">Length=8</text>
-                  <text x="228" y="116">Rate</text>
-                  <text x="264" y="116">(64</text>
-                  <text x="304" y="116">bits)</text>
+                  <text x="44" y="84">Code</text>
+                  <text x="96" y="84">TBD1)</text>
+                  <text x="200" y="84">Length=16</text>
+                  <text x="212" y="116">Upstream</text>
+                  <text x="268" y="116">Rate</text>
+                  <text x="304" y="116">(64</text>
+                  <text x="344" y="116">bits)</text>
+                  <text x="212" y="180">Downstream</text>
+                  <text x="276" y="180">Rate</text>
+                  <text x="312" y="180">(64</text>
+                  <text x="352" y="180">bits)</text>
                 </g>
               </svg><a href="#section-4.1-2.1.1" class="pilcrow">¶</a>
 </div>
@@ -1869,27 +1941,27 @@ following format:<a href="#section-4.1-1" class="pilcrow">¶</a></p>
 <span class="break"></span><dl class="dlParallel" id="section-4.1-3">
           <dt id="section-4.1-3.1">Code:</dt>
           <dd style="margin-left: 1.5em" id="section-4.1-3.2">
-            <p id="section-4.1-3.2.1">TBD1 for OPTION_V4_UPSTREAM_RATE, TBD2 for OPTION_V4_DOWNSTREAM_RATE.<a href="#section-4.1-3.2.1" class="pilcrow">¶</a></p>
+            <p id="section-4.1-3.2.1">TBD1.<a href="#section-4.1-3.2.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
 <dt id="section-4.1-3.3">Length:</dt>
           <dd style="margin-left: 1.5em" id="section-4.1-3.4">
-            <p id="section-4.1-3.4.1">8.<a href="#section-4.1-3.4.1" class="pilcrow">¶</a></p>
+            <p id="section-4.1-3.4.1">16.<a href="#section-4.1-3.4.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
-<dt id="section-4.1-3.5">Rate:</dt>
+<dt id="section-4.1-3.5">Upstream Rate, Downstream Rate:</dt>
           <dd style="margin-left: 1.5em" id="section-4.1-3.6">
-            <p id="section-4.1-3.6.1">The Layer 3 rate in bits per second, as a 64-bit unsigned integer in network byte order (see
-<a href="#rate-options" class="auto internal xref">Section 3</a>).<a href="#section-4.1-3.6.1" class="pilcrow">¶</a></p>
+            <p id="section-4.1-3.6.1">The Layer 3 rates in bits per second, each as a 64-bit unsigned integer in network byte order
+(see <a href="#rate-options" class="auto internal xref">Section 3</a>).<a href="#section-4.1-3.6.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
 </dl>
-<p id="section-4.1-4">The DHCPv4 rate options can appear in the following messages:<a href="#section-4.1-4" class="pilcrow">¶</a></p>
-<span id="name-appearance-of-dhcpv4-rate-o"></span><div id="tab-appearance-v4">
+<p id="section-4.1-4">The DHCPv4 Rate Option can appear in the following messages:<a href="#section-4.1-4" class="pilcrow">¶</a></p>
+<span id="name-appearance-of-the-dhcpv4-ra"></span><div id="tab-appearance-v4">
 <table class="center" id="table-1">
           <caption>
 <a href="#table-1" class="selfRef">Table 1</a>:
-<a href="#name-appearance-of-dhcpv4-rate-o" class="selfRef">Appearance of DHCPv4 Rate Options</a>
+<a href="#name-appearance-of-the-dhcpv4-ra" class="selfRef">Appearance of the DHCPv4 Rate Option</a>
           </caption>
 <thead>
             <tr>
@@ -1916,9 +1988,9 @@ following format:<a href="#section-4.1-1" class="pilcrow">¶</a></p>
         <h3 id="name-dhcpv4-client-behavior">
 <a href="#section-4.2" class="section-number selfRef">4.2. </a><a href="#name-dhcpv4-client-behavior" class="section-name selfRef">DHCPv4 Client Behavior</a>
         </h3>
-<p id="section-4.2-1">DHCPv4 clients that support the rate options <span class="bcp14">SHOULD</span> include the codes of the rate options they
-support in the Parameter Request List (PRL). This signals client support, enabling the DHCPv4 server
-to determine whether to include the rate options in its response. Furthermore, it provides network
+<p id="section-4.2-1">DHCPv4 clients that support the Rate Option <span class="bcp14">SHOULD</span> include its code in the Parameter Request List
+(PRL). This signals client support, enabling the DHCPv4 server to determine whether to include the
+Rate Option in its response. Furthermore, it provides network
 operators with visibility into client capabilities, which aids in troubleshooting and resolving
 customer service quality complaints.<a href="#section-4.2-1" class="pilcrow">¶</a></p>
 <p id="section-4.2-2">A client <span class="bcp14">MUST NOT</span> apply rates received in any DHCPv4 message other than DHCPACK. A client <span class="bcp14">MAY</span> use
@@ -1931,15 +2003,16 @@ Rates received in a DHCPACK message are processed as specified in <a href="#proc
         <h3 id="name-dhcpv4-server-behavior">
 <a href="#section-4.3" class="section-number selfRef">4.3. </a><a href="#name-dhcpv4-server-behavior" class="section-name selfRef">DHCPv4 Server Behavior</a>
         </h3>
-<p id="section-4.3-1">When a DHCPv4 server that supports the rate options receives a client message whose PRL includes a
-rate option code, and a rate is configured for the client for the corresponding direction, the
-server <span class="bcp14">MUST</span> include that rate option in the resulting DHCPOFFER and DHCPACK messages. Because a
-missing rate option leaves the rate in effect unchanged, a server that needs to remove a previously
-signaled rate <span class="bcp14">MUST</span> include the corresponding rate option with a value of 0.<a href="#section-4.3-1" class="pilcrow">¶</a></p>
+<p id="section-4.3-1">When a DHCPv4 server that supports the Rate Option receives a client message whose PRL includes the
+code of the Rate Option, and a rate is configured for the client for at least one direction, the
+server <span class="bcp14">MUST</span> include the Rate Option in the resulting DHCPOFFER and DHCPACK messages, with a value
+of 0 for a direction for which no rate is configured. Because a missing Rate Option leaves the rates
+in effect unchanged, a server that needs to remove previously signaled rates <span class="bcp14">MUST</span> include the Rate
+Option with a value of 0 for the respective directions.<a href="#section-4.3-1" class="pilcrow">¶</a></p>
 <p id="section-4.3-2">The server <span class="bcp14">MAY</span> derive the rates from local configuration profiles, centralized AAA systems such as
 RADIUS, or external policy servers.<a href="#section-4.3-2" class="pilcrow">¶</a></p>
-<p id="section-4.3-3">A server <span class="bcp14">MAY</span> include the rate options in its responses even if the client did not request them via
-the PRL, provided the operator has explicitly configured the server to do so, for example to
+<p id="section-4.3-3">A server <span class="bcp14">MAY</span> include the Rate Option in its responses even if the client did not request it via the
+PRL, provided the operator has explicitly configured the server to do so, for example to
 provision Layer 2 DHCPv4 Relay Agents or snooping devices.<a href="#section-4.3-3" class="pilcrow">¶</a></p>
 <p id="section-4.3-4">To update the rates of a client before its next scheduled renewal, a server <span class="bcp14">MAY</span> send a
 DHCPFORCERENEW message <span>[<a href="#RFC3203" class="cite xref">RFC3203</a>]</span>, causing the client to initiate a renewal transaction.
@@ -1954,13 +2027,13 @@ controlled by the renewal (T1) time value.<a href="#section-4.3-4" class="pilcro
         <h3 id="name-dhcpv4-relay-agent-behavior">
 <a href="#section-4.4" class="section-number selfRef">4.4. </a><a href="#name-dhcpv4-relay-agent-behavior" class="section-name selfRef">DHCPv4 Relay Agent Behavior</a>
         </h3>
-<p id="section-4.4-1">DHCPv4 relay agents, including Layer 2 DHCPv4 Relay Agents <span>[<a href="#TR101" class="cite xref">TR101</a>]</span>, <span class="bcp14">MAY</span> extract the rate options
+<p id="section-4.4-1">DHCPv4 relay agents, including Layer 2 DHCPv4 Relay Agents <span>[<a href="#TR101" class="cite xref">TR101</a>]</span>, <span class="bcp14">MAY</span> extract the Rate Option
 from DHCPACK messages traversing the network and use them to instantiate shapers and policers on
 their client-facing interfaces. Relay agents <span class="bcp14">SHOULD</span> remove rates applied for a client when the
-corresponding binding is removed. Layer 2 DHCPv4 Relay Agents <span class="bcp14">MUST</span> only process rate options
+corresponding binding is removed. Layer 2 DHCPv4 Relay Agents <span class="bcp14">MUST</span> only process a Rate Option
 contained in DHCPACK messages received on trusted, network-facing ports.<a href="#section-4.4-1" class="pilcrow">¶</a></p>
 <p id="section-4.4-2">Modifying the message destined for the client is outside the relay agent behavior specified in
-<span>[<a href="#RFC2131" class="cite xref">RFC2131</a>]</span> and <span>[<a href="#RFC3046" class="cite xref">RFC3046</a>]</span>. A device that populates, modifies, or removes the rate options
+<span>[<a href="#RFC2131" class="cite xref">RFC2131</a>]</span> and <span>[<a href="#RFC3046" class="cite xref">RFC3046</a>]</span>. A device that populates, modifies, or removes the Rate Option
 destined for the client based on subscriber attributes (e.g., retrieved from an AAA server such as
 RADIUS) therefore acts as a DHCPv4 server or DHCPv4 proxy towards the client, and the server
 behavior specified in this document applies to it.<a href="#section-4.4-2" class="pilcrow">¶</a></p>
@@ -1973,25 +2046,27 @@ behavior specified in this document applies to it.<a href="#section-4.4-2" class
       <h2 id="name-dhcpv6">
 <a href="#section-5" class="section-number selfRef">5. </a><a href="#name-dhcpv6" class="section-name selfRef">DHCPv6</a>
       </h2>
-<div id="dhcpv6-rate-options">
+<div id="dhcpv6-rate-option">
 <section id="section-5.1">
-        <h3 id="name-dhcpv6-rate-options">
-<a href="#section-5.1" class="section-number selfRef">5.1. </a><a href="#name-dhcpv6-rate-options" class="section-name selfRef">DHCPv6 Rate Options</a>
+        <h3 id="name-dhcpv6-rate-option">
+<a href="#section-5.1" class="section-number selfRef">5.1. </a><a href="#name-dhcpv6-rate-option" class="section-name selfRef">DHCPv6 Rate Option</a>
         </h3>
-<p id="section-5.1-1">The DHCPv6 Upstream Rate option (OPTION_V6_UPSTREAM_RATE) uses option code TBD3, and the DHCPv6
-Downstream Rate option (OPTION_V6_DOWNSTREAM_RATE) uses option code TBD4. Both options have the
-following format:<a href="#section-5.1-1" class="pilcrow">¶</a></p>
+<p id="section-5.1-1">The DHCPv6 Rate Option (OPTION_V6_RATE) has the following format:<a href="#section-5.1-1" class="pilcrow">¶</a></p>
 <span id="name-dhcpv6-rate-option-format"></span><div id="fig-v6-format">
 <figure id="figure-3">
           <div id="section-5.1-2.1">
             <div class="alignLeft art-svg artwork" id="section-5.1-2.1.1">
-<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="176" width="528" viewBox="0 0 528 176" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
-                <path d="M 8,64 L 8,160" fill="none" stroke="black"></path>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="240" width="528" viewBox="0 0 528 240" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
+                <path d="M 8,64 L 8,224" fill="none" stroke="black"></path>
+                <path d="M 200,64 L 200,72" fill="none" stroke="black"></path>
+                <path d="M 200,88 L 200,96" fill="none" stroke="black"></path>
                 <path d="M 264,64 L 264,96" fill="none" stroke="black"></path>
-                <path d="M 520,64 L 520,160" fill="none" stroke="black"></path>
+                <path d="M 520,64 L 520,224" fill="none" stroke="black"></path>
                 <path d="M 8,64 L 520,64" fill="none" stroke="black"></path>
                 <path d="M 8,96 L 520,96" fill="none" stroke="black"></path>
                 <path d="M 8,160 L 520,160" fill="none" stroke="black"></path>
+                <path d="M 8,224 L 520,224" fill="none" stroke="black"></path>
+                <path class="jump" d="M 200,88 C 206,88 206,72 200,72" fill="none" stroke="black"></path>
                 <g class="text">
                   <text x="16" y="36">0</text>
                   <text x="176" y="36">1</text>
@@ -2029,11 +2104,17 @@ following format:<a href="#section-5.1-1" class="pilcrow">¶</a></p>
                   <text x="480" y="52">9</text>
                   <text x="496" y="52">0</text>
                   <text x="512" y="52">1</text>
-                  <text x="136" y="84">option-code</text>
-                  <text x="388" y="84">option-len=8</text>
-                  <text x="228" y="132">Rate</text>
-                  <text x="264" y="132">(64</text>
-                  <text x="304" y="132">bits)</text>
+                  <text x="104" y="84">option-code</text>
+                  <text x="176" y="84">(TBD2</text>
+                  <text x="392" y="84">option-len=16</text>
+                  <text x="204" y="132">Upstream</text>
+                  <text x="260" y="132">Rate</text>
+                  <text x="296" y="132">(64</text>
+                  <text x="336" y="132">bits)</text>
+                  <text x="204" y="196">Downstream</text>
+                  <text x="268" y="196">Rate</text>
+                  <text x="304" y="196">(64</text>
+                  <text x="344" y="196">bits)</text>
                 </g>
               </svg><a href="#section-5.1-2.1.1" class="pilcrow">¶</a>
 </div>
@@ -2045,27 +2126,27 @@ following format:<a href="#section-5.1-1" class="pilcrow">¶</a></p>
 <span class="break"></span><dl class="dlParallel" id="section-5.1-3">
           <dt id="section-5.1-3.1">option-code:</dt>
           <dd style="margin-left: 1.5em" id="section-5.1-3.2">
-            <p id="section-5.1-3.2.1">TBD3 for OPTION_V6_UPSTREAM_RATE, TBD4 for OPTION_V6_DOWNSTREAM_RATE.<a href="#section-5.1-3.2.1" class="pilcrow">¶</a></p>
+            <p id="section-5.1-3.2.1">TBD2.<a href="#section-5.1-3.2.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
 <dt id="section-5.1-3.3">option-len:</dt>
           <dd style="margin-left: 1.5em" id="section-5.1-3.4">
-            <p id="section-5.1-3.4.1">8.<a href="#section-5.1-3.4.1" class="pilcrow">¶</a></p>
+            <p id="section-5.1-3.4.1">16.<a href="#section-5.1-3.4.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
-<dt id="section-5.1-3.5">Rate:</dt>
+<dt id="section-5.1-3.5">Upstream Rate, Downstream Rate:</dt>
           <dd style="margin-left: 1.5em" id="section-5.1-3.6">
-            <p id="section-5.1-3.6.1">The Layer 3 rate in bits per second, as a 64-bit unsigned integer in network byte order (see
-<a href="#rate-options" class="auto internal xref">Section 3</a>).<a href="#section-5.1-3.6.1" class="pilcrow">¶</a></p>
+            <p id="section-5.1-3.6.1">The Layer 3 rates in bits per second, each as a 64-bit unsigned integer in network byte order
+(see <a href="#rate-options" class="auto internal xref">Section 3</a>).<a href="#section-5.1-3.6.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
 </dl>
-<p id="section-5.1-4">The DHCPv6 rate options can appear in the following messages:<a href="#section-5.1-4" class="pilcrow">¶</a></p>
-<span id="name-appearance-of-dhcpv6-rate-o"></span><div id="tab-appearance-v6">
+<p id="section-5.1-4">The DHCPv6 Rate Option can appear in the following messages:<a href="#section-5.1-4" class="pilcrow">¶</a></p>
+<span id="name-appearance-of-the-dhcpv6-ra"></span><div id="tab-appearance-v6">
 <table class="center" id="table-2">
           <caption>
 <a href="#table-2" class="selfRef">Table 2</a>:
-<a href="#name-appearance-of-dhcpv6-rate-o" class="selfRef">Appearance of DHCPv6 Rate Options</a>
+<a href="#name-appearance-of-the-dhcpv6-ra" class="selfRef">Appearance of the DHCPv6 Rate Option</a>
           </caption>
 <thead>
             <tr>
@@ -2089,7 +2170,7 @@ following format:<a href="#section-5.1-1" class="pilcrow">¶</a></p>
           </tbody>
         </table>
 </div>
-<p id="section-5.1-6">The rate options are not included in Reconfigure messages, as specified in
+<p id="section-5.1-6">The Rate Option is not included in Reconfigure messages, as specified in
 <span><a href="https://rfc-editor.org/rfc/rfc9915#section-18.3.11" class="relref">Section 18.3.11</a> of [<a href="#RFC9915" class="cite xref">RFC9915</a>]</span>.<a href="#section-5.1-6" class="pilcrow">¶</a></p>
 </section>
 </div>
@@ -2098,8 +2179,8 @@ following format:<a href="#section-5.1-1" class="pilcrow">¶</a></p>
         <h3 id="name-dhcpv6-client-behavior">
 <a href="#section-5.2" class="section-number selfRef">5.2. </a><a href="#name-dhcpv6-client-behavior" class="section-name selfRef">DHCPv6 Client Behavior</a>
         </h3>
-<p id="section-5.2-1">DHCPv6 clients that support the rate options <span class="bcp14">SHOULD</span> include the codes of the rate options they
-support in the Option Request option (ORO) <span>[<a href="#RFC9915" class="cite xref">RFC9915</a>]</span>, for the same reasons as specified for
+<p id="section-5.2-1">DHCPv6 clients that support the Rate Option <span class="bcp14">SHOULD</span> include its code in the Option Request option
+(ORO) <span>[<a href="#RFC9915" class="cite xref">RFC9915</a>]</span>, for the same reasons as specified for
 DHCPv4 in <a href="#dhcpv4-client" class="auto internal xref">Section 4.2</a>.<a href="#section-5.2-1" class="pilcrow">¶</a></p>
 <p id="section-5.2-2">A client <span class="bcp14">MUST NOT</span> apply rates received in any DHCPv6 message other than Reply. A client <span class="bcp14">MAY</span> use
 the rates contained in an Advertise message as a criterion for selecting among multiple Advertise
@@ -2111,37 +2192,43 @@ messages. Rates received in a Reply message are processed as specified in <a hre
         <h3 id="name-dhcpv6-server-behavior">
 <a href="#section-5.3" class="section-number selfRef">5.3. </a><a href="#name-dhcpv6-server-behavior" class="section-name selfRef">DHCPv6 Server Behavior</a>
         </h3>
-<p id="section-5.3-1">When a DHCPv6 server that supports the rate options receives a Solicit, Request, Renew, Rebind, or
-Information-request message whose ORO includes a rate option code, and a rate is configured for the
-client for the corresponding direction, the server <span class="bcp14">MUST</span> include that rate option in the resulting
-Advertise and Reply messages. A server that needs to remove a previously signaled rate <span class="bcp14">MUST</span> include
-the corresponding rate option with a value of 0.<a href="#section-5.3-1" class="pilcrow">¶</a></p>
-<p id="section-5.3-2">A server <span class="bcp14">MAY</span> include the rate options in its responses even if the client did not request them via
-the ORO, provided the operator has explicitly configured the server to do so.<a href="#section-5.3-2" class="pilcrow">¶</a></p>
-<p id="section-5.3-3">In relayed exchanges, the rate options for the client are included in the Reply message, which is
-encapsulated in one or more Relay-reply messages. The server <span class="bcp14">MAY</span> additionally include the rate
-options in a Relay-reply message to provision the corresponding relay agent. The nested Relay-reply
+<p id="section-5.3-1">When a DHCPv6 server that supports the Rate Option receives a Solicit, Request, Renew, Rebind, or
+Information-request message whose ORO includes the code of the Rate Option, and a rate is configured
+for the client for at least one direction, the server <span class="bcp14">MUST</span> include the Rate Option in the resulting
+Advertise and Reply messages, with a value of 0 for a direction for which no rate is configured. A
+server that needs to remove previously signaled rates <span class="bcp14">MUST</span> include the Rate Option with a value of 0
+for the respective directions.<a href="#section-5.3-1" class="pilcrow">¶</a></p>
+<p id="section-5.3-2">A server <span class="bcp14">MAY</span> include the Rate Option in its responses even if the client did not request it via the
+ORO, provided the operator has explicitly configured the server to do so.<a href="#section-5.3-2" class="pilcrow">¶</a></p>
+<p id="section-5.3-3">In relayed exchanges, the Rate Option for the client is included in the Reply message, which is
+encapsulated in one or more Relay-reply messages. The server <span class="bcp14">MAY</span> additionally include the Rate
+Option in a Relay-reply message to provision the corresponding relay agent. The nested Relay-reply
 structure of DHCPv6 allows the server to address each relay agent in the path individually, in
 addition to the client. As DHCPv6 does not define a mechanism for relay agents to request options
-from the server, the server includes the rate options in a Relay-reply message based on local
+from the server, the server includes the Rate Option in a Relay-reply message based on local
 configuration, for example by identifying the relay agent by the link-address or peer-address field
 of the Relay-forward message, or by relay agent options such as Interface-Id <span>[<a href="#RFC9915" class="cite xref">RFC9915</a>]</span> or
 Remote-Id <span>[<a href="#RFC4649" class="cite xref">RFC4649</a>]</span>.<a href="#section-5.3-3" class="pilcrow">¶</a></p>
-<p id="section-5.3-4">When provisioning multiple encapsulation levels, the server <span class="bcp14">MAY</span> supply different rates to each
+<p id="section-5.3-4">Including the Rate Option in a Relay-reply message is <span class="bcp14">OPTIONAL</span> for servers, and processing it is
+<span class="bcp14">OPTIONAL</span> for relay agents. Relay agents that do not support this document are expected to ignore the
+option, as they do not recognize it. Relay agents that do not receive rates in this way can instead
+obtain them by inspecting the Rate Option destined for the client, as specified for snooping devices
+in <a href="#snooping" class="auto internal xref">Section 6</a>, or through other means, such as AAA.<a href="#section-5.3-4" class="pilcrow">¶</a></p>
+<p id="section-5.3-5">When provisioning multiple encapsulation levels, the server <span class="bcp14">MAY</span> supply different rates to each
 node. For example, an operator might configure the upstream policer of a relay agent with a
 slightly higher rate than the upstream shaper of the CPE, to accommodate minor burstiness of the
 CPE traffic. DHCPv4 does not provide a comparable mechanism for addressing multiple relay agents
-individually.<a href="#section-5.3-4" class="pilcrow">¶</a></p>
-<p id="section-5.3-5">To update the rates of a client before its next scheduled renewal, a server <span class="bcp14">MAY</span> send a
+individually.<a href="#section-5.3-5" class="pilcrow">¶</a></p>
+<p id="section-5.3-6">To update the rates of a client before its next scheduled renewal, a server <span class="bcp14">MAY</span> send a
 Reconfigure message as specified in <span><a href="https://rfc-editor.org/rfc/rfc9915#section-18.3.11" class="relref">Section 18.3.11</a> of [<a href="#RFC9915" class="cite xref">RFC9915</a>]</span>, causing the client to
 initiate a Renew, Rebind, or Information-request transaction. As specified in <span>[<a href="#RFC9915" class="cite xref">RFC9915</a>]</span>,
 a server can only send Reconfigure messages to clients that have included the Reconfigure Accept
 option in their messages, and Reconfigure messages are authenticated using the Reconfiguration
-Key Authentication Protocol (RKAP; see <span><a href="https://rfc-editor.org/rfc/rfc9915#section-20.4" class="relref">Section 20.4</a> of [<a href="#RFC9915" class="cite xref">RFC9915</a>]</span>).<a href="#section-5.3-5" class="pilcrow">¶</a></p>
-<p id="section-5.3-6">For clients that do not support Reconfigure, updated rates take effect with the next Renew or
+Key Authentication Protocol (RKAP; see <span><a href="https://rfc-editor.org/rfc/rfc9915#section-20.4" class="relref">Section 20.4</a> of [<a href="#RFC9915" class="cite xref">RFC9915</a>]</span>).<a href="#section-5.3-6" class="pilcrow">¶</a></p>
+<p id="section-5.3-7">For clients that do not support Reconfigure, updated rates take effect with the next Renew or
 Rebind transaction or, for stateless clients, with the next Information-request transaction.
 Operators can control the timing of such updates through the T1 value and the Information
-Refresh Time option (<span><a href="https://rfc-editor.org/rfc/rfc9915#section-21.23" class="relref">Section 21.23</a> of [<a href="#RFC9915" class="cite xref">RFC9915</a>]</span>).<a href="#section-5.3-6" class="pilcrow">¶</a></p>
+Refresh Time option (<span><a href="https://rfc-editor.org/rfc/rfc9915#section-21.23" class="relref">Section 21.23</a> of [<a href="#RFC9915" class="cite xref">RFC9915</a>]</span>).<a href="#section-5.3-7" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="dhcpv6-relay">
@@ -2149,19 +2236,19 @@ Refresh Time option (<span><a href="https://rfc-editor.org/rfc/rfc9915#section-2
         <h3 id="name-dhcpv6-relay-agent-behavior">
 <a href="#section-5.4" class="section-number selfRef">5.4. </a><a href="#name-dhcpv6-relay-agent-behavior" class="section-name selfRef">DHCPv6 Relay Agent Behavior</a>
         </h3>
-<p id="section-5.4-1">DHCPv6 relay agents that support the rate options, including Lightweight DHCPv6 Relay Agents (LDRA)
-<span>[<a href="#RFC6221" class="cite xref">RFC6221</a>]</span>, process rate options contained in a Relay-reply message addressed to them as specified
-in <a href="#processing" class="auto internal xref">Section 3.3</a>. Such relay agents <span class="bcp14">MAY</span> use the signaled rates to instantiate shapers, policers, or
-AQM disciplines on their client-facing interfaces. Relay agents <span class="bcp14">SHOULD</span> remove rates applied for a
-client when the corresponding binding is removed. Relay agents <span class="bcp14">MUST</span> only process Relay-reply
-messages received from the network side; in particular, an LDRA discards Relay-reply messages
-received on client-facing interfaces as specified in <span><a href="https://rfc-editor.org/rfc/rfc6221#section-6.1.1" class="relref">Section 6.1.1</a> of [<a href="#RFC6221" class="cite xref">RFC6221</a>]</span>.<a href="#section-5.4-1" class="pilcrow">¶</a></p>
-<p id="section-5.4-2">Rate options contained in the encapsulated message destined for the client target the client only.
-Relay agents <span class="bcp14">MUST NOT</span> use such options to configure their own traffic management, since the DHCPv6
+<p id="section-5.4-1">DHCPv6 relay agents that support the Rate Option, including Lightweight DHCPv6 Relay Agents (LDRA)
+<span>[<a href="#RFC6221" class="cite xref">RFC6221</a>]</span>, process a Rate Option contained in a Relay-reply message addressed to them as
+specified in <a href="#processing" class="auto internal xref">Section 3.3</a>. Such relay agents <span class="bcp14">MAY</span> use the signaled rates to instantiate shapers,
+policers, or AQM disciplines on their client-facing interfaces. Relay agents <span class="bcp14">SHOULD</span> remove rates
+applied for a client when the corresponding binding is removed. Relay agents <span class="bcp14">MUST</span> only process
+Relay-reply messages received from the network side; in particular, an LDRA discards Relay-reply
+messages received on client-facing interfaces as specified in <span><a href="https://rfc-editor.org/rfc/rfc6221#section-6.1.1" class="relref">Section 6.1.1</a> of [<a href="#RFC6221" class="cite xref">RFC6221</a>]</span>.<a href="#section-5.4-1" class="pilcrow">¶</a></p>
+<p id="section-5.4-2">A Rate Option contained in the encapsulated message destined for the client targets the client only.
+Relay agents <span class="bcp14">MUST NOT</span> use such an option to configure their own traffic management, since the DHCPv6
 relay architecture provides the Relay-reply message as a dedicated channel for signaling rates to
 relay agents.<a href="#section-5.4-2" class="pilcrow">¶</a></p>
 <p id="section-5.4-3">Modifying the message destined for the client is outside the relay agent behavior specified in
-<span>[<a href="#RFC9915" class="cite xref">RFC9915</a>]</span>. A device that populates, modifies, or removes the rate options destined for the client
+<span>[<a href="#RFC9915" class="cite xref">RFC9915</a>]</span>. A device that populates, modifies, or removes the Rate Option destined for the client
 based on subscriber attributes (e.g., retrieved from an AAA server such as RADIUS) therefore acts as
 a DHCPv6 server or DHCPv6 proxy towards the client, and the server behavior specified in this
 document applies to it.<a href="#section-5.4-3" class="pilcrow">¶</a></p>
@@ -2176,13 +2263,13 @@ document applies to it.<a href="#section-5.4-3" class="pilcrow">¶</a></p>
       </h2>
 <p id="section-6-1">DHCP snooping devices are typically deployed as intermediate Layer 2 devices that passively monitor
 DHCP message exchanges to enforce security policies and build binding databases, without modifying
-the DHCP payloads. These devices <span class="bcp14">MAY</span> inspect the rate options in messages destined for clients and
+the DHCP payloads. These devices <span class="bcp14">MAY</span> inspect the Rate Option in messages destined for clients and
 use them to provision traffic shapers, policers, or hardware queues on the corresponding
 client-facing ports. Snooping devices <span class="bcp14">SHOULD</span> remove rates applied for a client when the
 corresponding binding is removed.<a href="#section-6-1" class="pilcrow">¶</a></p>
-<p id="section-6-2">Snooping devices <span class="bcp14">MUST</span> only process rate options contained in DHCPACK (DHCPv4) and Reply (DHCPv6)
-messages received on trusted, network-facing ports. Rate options contained in messages received on
-client-facing ports <span class="bcp14">MUST NOT</span> be used to configure traffic management.<a href="#section-6-2" class="pilcrow">¶</a></p>
+<p id="section-6-2">Snooping devices <span class="bcp14">MUST</span> only process a Rate Option contained in DHCPACK (DHCPv4) and Reply (DHCPv6)
+messages received on trusted, network-facing ports. A Rate Option contained in a message received on
+a client-facing port <span class="bcp14">MUST NOT</span> be used to configure traffic management.<a href="#section-6-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="deployment-scenarios">
@@ -2197,17 +2284,17 @@ client-facing ports <span class="bcp14">MUST NOT</span> be used to configure tra
         </h3>
 <p id="section-7.1-1">In PPPoE <span>[<a href="#RFC2516" class="cite xref">RFC2516</a>]</span> architectures, the CPE typically employs DHCPv6 over the PPP <span>[<a href="#RFC1661" class="cite xref">RFC1661</a>]</span> link
 to obtain an IPv6 prefix via Prefix Delegation (IA_PD) <span>[<a href="#RFC9915" class="cite xref">RFC9915</a>]</span>. This DHCPv6 exchange conveys
-the rate options in the same way as in IPoE deployments. DHCPv4 transactions within a PPPoE session
-can similarly convey the DHCPv4 rate options.<a href="#section-7.1-1" class="pilcrow">¶</a></p>
-<p id="section-7.1-2">The processing rules for rate options received over PPPoE are identical to those defined for IPoE,
+the Rate Option in the same way as in IPoE deployments. DHCPv4 transactions within a PPPoE session
+can similarly convey the DHCPv4 Rate Option.<a href="#section-7.1-1" class="pilcrow">¶</a></p>
+<p id="section-7.1-2">The processing rules for a Rate Option received over PPPoE are identical to those defined for IPoE,
 as specified in <a href="#processing" class="auto internal xref">Section 3.3</a>. In particular, the rates in effect revert to the default
 configuration of the device when the PPPoE session is terminated.<a href="#section-7.1-2" class="pilcrow">¶</a></p>
 <p id="section-7.1-3">As the signaled rates are Layer 3 rates, a CPE that attaches its shaper to the PPP interface applies
 them directly, without accounting for the PPPoE, PPP, Ethernet, or VLAN headers.<a href="#section-7.1-3" class="pilcrow">¶</a></p>
-<p id="section-7.1-4">If a client receives rate information embedded within a PPP authentication message and also receives
-rate options, the client <span class="bcp14">SHOULD</span> give precedence to the rate options. This ensures that the
-standardized, dynamic DHCP signaling supersedes proprietary rate information conveyed during the PPP
-authentication phase.<a href="#section-7.1-4" class="pilcrow">¶</a></p>
+<p id="section-7.1-4">If a client receives rate information from other sources, for example within PPP authentication
+messages, and also receives a Rate Option, the client <span class="bcp14">SHOULD</span> give precedence to the Rate Option.
+This ensures that rate information that is refreshed with every DHCP renewal supersedes rate
+information that is conveyed only once per session.<a href="#section-7.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="lan">
@@ -2215,7 +2302,7 @@ authentication phase.<a href="#section-7.1-4" class="pilcrow">¶</a></p>
         <h3 id="name-local-area-networks">
 <a href="#section-7.2" class="section-number selfRef">7.2. </a><a href="#name-local-area-networks" class="section-name selfRef">Local Area Networks</a>
         </h3>
-<p id="section-7.2-1">The rate options can also be used by DHCP servers in local area networks, for example a DHCP server
+<p id="section-7.2-1">The Rate Option can also be used by DHCP servers in local area networks, for example a DHCP server
 co-located with a CPE or another gateway, to inform clients about the rates available to them. In
 this case, the signaled rates indicate the maximum rate a client can expect through the network it
 is attached to. Examples include:<a href="#section-7.2-1" class="pilcrow">¶</a></p>
@@ -2240,7 +2327,8 @@ network-facing interface, from local configuration, or both. In this case, it <s
 lower of the learned rate and any locally configured limit for the client. When the learned rates
 change, the device <span class="bcp14">SHOULD</span> signal the updated rates to its LAN clients with their next renewal and
 <span class="bcp14">MAY</span> trigger an earlier update as specified in <a href="#dhcpv4-server" class="auto internal xref">Section 4.3</a> and <a href="#dhcpv6-server" class="auto internal xref">Section 5.3</a>. As Layer 3
-rates are independent of the encapsulation, the learned rates can be passed on unchanged.<a href="#section-7.2-3" class="pilcrow">¶</a></p>
+rates are independent of the link-layer encapsulation, the learned rates can typically be passed on
+unchanged.<a href="#section-7.2-3" class="pilcrow">¶</a></p>
 <p id="section-7.2-4">Unless the signaled rates are enforced for each client individually, they describe a capacity shared
 by all clients of the LAN. A client that shapes its traffic to such a rate does not exceed the
 shared capacity on its own, but it does not obtain a guaranteed share of it either.<a href="#section-7.2-4" class="pilcrow">¶</a></p>
@@ -2251,8 +2339,8 @@ signaled rate and the current link capacity.<a href="#section-7.2-5" class="pilc
 <span class="bcp14">MUST NOT</span> use the signaled rates as a replacement for congestion control or other adaptive rate
 mechanisms, and <span class="bcp14">MUST NOT</span> use them to increase the sending rate of a congestion control algorithm,
 such as its initial sending rate, beyond the rate that the algorithm would otherwise use. Where rate
-limits need to be enforced, enforcement remains the responsibility of the network; the rate options
-only inform clients about such limits.<a href="#section-7.2-6" class="pilcrow">¶</a></p>
+limits need to be enforced, enforcement remains the responsibility of the network; the Rate Option
+only informs clients about such limits.<a href="#section-7.2-6" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -2273,8 +2361,8 @@ regardless of VLAN tags or PPPoE encapsulation added or removed along the path.<
 <p id="section-8-3">On the CPE, the signaled rate can be fed directly into the shaper. A shaper attached to a PPP or IP
 interface accounts IP packets and applies the rate as is. Shapers that account Ethernet frames can
 typically be configured to account the network-layer packet size instead, or to subtract the locally
-known link-layer headers; for example, CAKE with an explicitly configured overhead of 0 accounts the
-network-layer packet size and thereby enforces exactly the signaled Layer 3 rate. Where no such
+known link-layer headers, and thereby enforce exactly the signaled Layer 3 rate (see
+<a href="#impl-status" class="auto internal xref">Section 9</a> for an example). Where no such
 configuration is possible, applying the rate to the frame size results in a slightly lower effective
 Layer 3 rate and is therefore safe (see <a href="#application" class="auto internal xref">Section 3.2</a>).<a href="#section-8-3" class="pilcrow">¶</a></p>
 <p id="section-8-4">Enforcement points frequently account traffic at Layer 2, and physical bottlenecks additionally
@@ -2304,10 +2392,9 @@ precise modeling remains a matter of local configuration of the CPE.<a href="#se
 with the next renewal of the client. Operators should consider this delay when choosing lease
 and renewal times, for example when rates are changed due to service upgrades or fair-use
 policies.<a href="#section-8-6" class="pilcrow">¶</a></p>
-<p id="section-8-7">The inclusion of the rate option codes in the Parameter Request List or Option Request option allows
-operators to determine the share of clients supporting these options, for example to plan the
-introduction of correction factors or to identify clients that require enforcement at the
-network.<a href="#section-8-7" class="pilcrow">¶</a></p>
+<p id="section-8-7">The inclusion of the code of the Rate Option in the Parameter Request List or Option Request option
+allows operators to determine the share of clients supporting these options, for example to plan the
+introduction of correction factors or to identify clients that require enforcement at the network.<a href="#section-8-7" class="pilcrow">¶</a></p>
 <p id="section-8-8">Implementations are encouraged to expose the signaled rates within CPE management interfaces, such
 as the local Web User Interface (UI) or remote management protocols. As the signaled rates are
 Layer 3 rates, the displayed values are directly comparable with the results of speed tests, which
@@ -2351,10 +2438,10 @@ to use this information as they see fit".<a href="#section-9-3" class="pilcrow">
         </h3>
 <p id="section-9.1-1">The authors analyzed the feasibility of implementing the client behavior on OpenWrt without
 modifying the DHCP client software. The DHCPv4 client (BusyBox udhcpc) and DHCPv6 client (odhcp6c)
-used by OpenWrt can request the rate options and expose received options of unknown type as
+used by OpenWrt can request the Rate Option and expose received options of unknown type as
 hexadecimal environment variables to user-defined hook scripts. All client behavior specified in
-this document can therefore be implemented in such scripts, which convert the 8-octet value to an
-integer, apply the processing rules of <a href="#processing" class="auto internal xref">Section 3.3</a>, and configure local traffic management, for
+this document can therefore be implemented in such scripts, which split the 16-octet value into two
+integers, apply the processing rules of <a href="#processing" class="auto internal xref">Section 3.3</a>, and configure local traffic management, for
 example via Smart Queue Management (SQM) or the CAKE queue discipline. As the signaled rates are
 Layer 3 rates, they can be passed to CAKE directly as its bandwidth parameter, together with an
 overhead of 0, without any encapsulation-specific calculation. The rates learned on the WAN
@@ -2369,13 +2456,13 @@ DHCPv4 server (dnsmasq) and DHCPv6 server (odhcpd).<a href="#section-9.1-1" clas
       <h2 id="name-security-considerations">
 <a href="#section-10" class="section-number selfRef">10. </a><a href="#name-security-considerations" class="section-name selfRef">Security Considerations</a>
       </h2>
-<p id="section-10-1">DHCP messages are typically transmitted as plaintext and are unauthenticated. Consequently, the rate
-options defined in this document are vulnerable to interception, modification, or spoofing by
-on-path attackers. This applies to any path the options traverse, including the path between
-servers and clients as well as the path between servers and relay agents, where rate options carried
-in a Relay-reply message configure the relay agent itself (see <a href="#dhcpv6-relay" class="auto internal xref">Section 5.4</a>). A malicious actor
-or a rogue DHCP server could inject artificially low rates to throttle a client's connection,
-resulting in a localized Denial of Service (DoS).<a href="#section-10-1" class="pilcrow">¶</a></p>
+<p id="section-10-1">DHCP messages are typically transmitted as plaintext and are unauthenticated. Consequently, the Rate
+Option defined in this document is vulnerable to interception, modification, or spoofing by on-path
+attackers. This applies to any path the options traverse, including the path between servers and
+clients as well as the path between servers and relay agents, where a Rate Option carried in a
+Relay-reply message configures the relay agent itself (see <a href="#dhcpv6-relay" class="auto internal xref">Section 5.4</a>). A malicious actor or a
+rogue DHCP server could inject artificially low rates to throttle a client's connection, resulting
+in a localized Denial of Service (DoS).<a href="#section-10-1" class="pilcrow">¶</a></p>
 <p id="section-10-2">The severity of this risk is generally no greater than that of standard DHCP threat vectors, such
 as rogue default gateway assignment, DNS hijacking, or IP pool exhaustion, which typically yield a
 much more critical and immediate loss of service.<a href="#section-10-2" class="pilcrow">¶</a></p>
@@ -2385,7 +2472,7 @@ ports. These mechanisms protect both the clients and the intermediate nodes that
 rates.<a href="#section-10-3" class="pilcrow">¶</a></p>
 <p id="section-10-4">To mitigate the impact of malicious or malformed options, client implementations <span class="bcp14">MAY</span> apply sanity
 checks before applying signaled rates. In particular, a client implementation <span class="bcp14">MAY</span> assume a minimum
-rate below which basic connectivity is no longer ensured, and treat a rate option signaling a
+rate below which basic connectivity is no longer ensured, and treat a Rate Option signaling a
 non-zero rate below this minimum as if it were not present (see <a href="#processing" class="auto internal xref">Section 3.3</a>). The appropriate
 minimum depends on the deployment and the use case of the device and is therefore left to the client
 implementation. For example, a broadband CPE might reject rates below 1 Mbit/s.<a href="#section-10-4" class="pilcrow">¶</a></p>
@@ -2393,8 +2480,8 @@ implementation. For example, a broadband CPE might reject rates below 1 Mbit/s.<
 effective rate limit. Because clients are expected to cap the effective rate to the capacity of the
 physical link (see <a href="#processing" class="auto internal xref">Section 3.3</a>), the impact is limited to the loss of the benefits of rate
 signaling, such as increased queuing delay at the bottleneck, which corresponds to the behavior of a
-device without support for these options. Where an intermediate node derives the enforcement of the
-provisioned rate from the rate options (see <a href="#solution-overview" class="auto internal xref">Section 1.2</a>), however, an attacker on the path
+device without support for this option. Where an intermediate node derives the enforcement of the
+provisioned rate from the Rate Option (see <a href="#solution-overview" class="auto internal xref">Section 1.2</a>), however, an attacker on the path
 between the server and that node that raises or removes the signaled rates also raises or removes
 the enforcement, allowing a client to exceed its provisioned rate. Mechanisms for securing the
 messages exchanged between servers and relay agents are described in <span>[<a href="#RFC8213" class="cite xref">RFC8213</a>]</span>.<a href="#section-10-5" class="pilcrow">¶</a></p>
@@ -2403,14 +2490,18 @@ likely. A rogue server signaling artificially low rates could cause applications
 to reduce their quality or to prefer another network interface, which can incur additional cost
 (e.g., cellular data). Clients <span class="bcp14">SHOULD NOT</span> use the signaled rates as the sole criterion for
 selecting a network interface, and the sanity checks described above apply.<a href="#section-10-6" class="pilcrow">¶</a></p>
-<p id="section-10-7">Relay agents and snooping devices that instantiate traffic management functions based on the rate
-options consume finite resources, such as hardware queues and shapers. Because only server messages
+<p id="section-10-7">A rogue server can also advertise excessively high rates in DHCPOFFER or Advertise messages to be
+selected by clients that use rates as a criterion for selecting among servers (see <a href="#dhcpv4-client" class="auto internal xref">Section 4.2</a>
+and <a href="#dhcpv6-client" class="auto internal xref">Section 5.2</a>). Clients <span class="bcp14">SHOULD NOT</span> use the rates as the sole criterion for server selection,
+and the mitigations against rogue DHCP servers described above apply.<a href="#section-10-7" class="pilcrow">¶</a></p>
+<p id="section-10-8">Relay agents and snooping devices that instantiate traffic management functions based on the Rate
+Option consume finite resources, such as hardware queues and shapers. Because only server messages
 received on trusted ports are processed and rates are applied per client-facing port (see
 <a href="#processing" class="auto internal xref">Section 3.3</a>), the amount of such resources is bounded by the number of client-facing ports.
 However, a client can trigger frequent DHCP exchanges, potentially causing repeated reconfiguration
 of these functions. In addition to not reconfiguring unchanged rates (see <a href="#processing" class="auto internal xref">Section 3.3</a>),
 implementations <span class="bcp14">MAY</span> rate-limit DHCP messages received on client-facing ports or the reconfiguration
-of traffic management functions.<a href="#section-10-7" class="pilcrow">¶</a></p>
+of traffic management functions.<a href="#section-10-8" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="privacy">
@@ -2419,15 +2510,15 @@ of traffic management functions.<a href="#section-10-7" class="pilcrow">¶</a></
 <a href="#section-11" class="section-number selfRef">11. </a><a href="#name-privacy-considerations" class="section-name selfRef">Privacy Considerations</a>
       </h2>
 <p id="section-11-1">The general privacy considerations for DHCP specified in <span>[<a href="#RFC7844" class="cite xref">RFC7844</a>]</span> apply to this document.<a href="#section-11-1" class="pilcrow">¶</a></p>
-<p id="section-11-2">The rate options convey the rates provisioned for a client, which typically reflect the service tier
+<p id="section-11-2">The Rate Option conveys the rates provisioned for a client, which typically reflect the service tier
 of a subscriber. Because DHCP messages are typically transmitted as plaintext, this information is
 exposed to on-path observers, as well as to relay agents and snooping devices that process the
 options. The rate information itself does not identify a subscriber, but in combination with other
 information it can reveal commercial details of the service contract.<a href="#section-11-2" class="pilcrow">¶</a></p>
-<p id="section-11-3">Clients that include the rate option codes in the Parameter Request List or Option Request option
-disclose additional information that can contribute to fingerprinting the device. Clients that
-implement the anonymity profiles specified in <span>[<a href="#RFC7844" class="cite xref">RFC7844</a>]</span> <span class="bcp14">MAY</span> omit the rate option codes from the
-Parameter Request List or Option Request option.<a href="#section-11-3" class="pilcrow">¶</a></p>
+<p id="section-11-3">Clients that include the code of the Rate Option in the Parameter Request List or Option Request
+option disclose additional information that can contribute to fingerprinting the device. Clients
+that implement the anonymity profiles specified in <span>[<a href="#RFC7844" class="cite xref">RFC7844</a>]</span> <span class="bcp14">MAY</span> omit the code of the Rate Option
+from the Parameter Request List or Option Request option.<a href="#section-11-3" class="pilcrow">¶</a></p>
 <p id="section-11-4">The operational practice of exposing and logging signaled and effective rates (see <a href="#operations" class="auto internal xref">Section 8</a>)
 can provide operators with information about the equipment installed by a subscriber. Such data
 is subject to the operator's applicable privacy policies.<a href="#section-11-4" class="pilcrow">¶</a></p>
@@ -2438,21 +2529,21 @@ is subject to the operator's applicable privacy policies.<a href="#section-11-4"
       <h2 id="name-iana-considerations">
 <a href="#section-12" class="section-number selfRef">12. </a><a href="#name-iana-considerations" class="section-name selfRef">IANA Considerations</a>
       </h2>
-<p id="section-12-1">IANA is requested to replace TBD1, TBD2, TBD3, and TBD4 throughout this document with the values
-assigned as specified below. RFC Editor: please replace "RFC XXXX" throughout this document with the
-RFC number assigned to this document, and remove this note.<a href="#section-12-1" class="pilcrow">¶</a></p>
-<div id="dhcpv4-options">
+<p id="section-12-1">IANA is requested to replace TBD1 and TBD2 throughout this document with the values assigned as
+specified below. RFC Editor: please replace "RFC XXXX" throughout this document with the RFC number
+assigned to this document, and remove this note.<a href="#section-12-1" class="pilcrow">¶</a></p>
+<div id="dhcpv4-option">
 <section id="section-12.1">
-        <h3 id="name-dhcpv4-options">
-<a href="#section-12.1" class="section-number selfRef">12.1. </a><a href="#name-dhcpv4-options" class="section-name selfRef">DHCPv4 Options</a>
+        <h3 id="name-dhcpv4-option">
+<a href="#section-12.1" class="section-number selfRef">12.1. </a><a href="#name-dhcpv4-option" class="section-name selfRef">DHCPv4 Option</a>
         </h3>
-<p id="section-12.1-1">IANA is requested to assign two new DHCP Option Codes in the "BOOTP Vendor Extensions and DHCP
-Options" registry as follows:<a href="#section-12.1-1" class="pilcrow">¶</a></p>
-<span id="name-dhcpv4-option-codes"></span><div id="tab-iana-v4">
+<p id="section-12.1-1">IANA is requested to assign a new DHCP Option Code in the "BOOTP Vendor Extensions and DHCP Options"
+registry as follows:<a href="#section-12.1-1" class="pilcrow">¶</a></p>
+<span id="name-dhcpv4-option-code"></span><div id="tab-iana-v4">
 <table class="center" id="table-3">
           <caption>
 <a href="#table-3" class="selfRef">Table 3</a>:
-<a href="#name-dhcpv4-option-codes" class="selfRef">DHCPv4 Option Codes</a>
+<a href="#name-dhcpv4-option-code" class="selfRef">DHCPv4 Option Code</a>
           </caption>
 <thead>
             <tr>
@@ -2466,16 +2557,9 @@ Options" registry as follows:<a href="#section-12.1-1" class="pilcrow">¶</a></p
           <tbody>
             <tr>
               <td class="text-left" rowspan="1" colspan="1">TBD1</td>
-              <td class="text-left" rowspan="1" colspan="1">OPTION_V4_UPSTREAM_RATE</td>
-              <td class="text-right" rowspan="1" colspan="1">8</td>
-              <td class="text-left" rowspan="1" colspan="1">DHCPv4 Upstream Rate</td>
-              <td class="text-left" rowspan="1" colspan="1">RFC XXXX</td>
-            </tr>
-            <tr>
-              <td class="text-left" rowspan="1" colspan="1">TBD2</td>
-              <td class="text-left" rowspan="1" colspan="1">OPTION_V4_DOWNSTREAM_RATE</td>
-              <td class="text-right" rowspan="1" colspan="1">8</td>
-              <td class="text-left" rowspan="1" colspan="1">DHCPv4 Downstream Rate</td>
+              <td class="text-left" rowspan="1" colspan="1">OPTION_V4_RATE</td>
+              <td class="text-right" rowspan="1" colspan="1">16</td>
+              <td class="text-left" rowspan="1" colspan="1">DHCPv4 Rate</td>
               <td class="text-left" rowspan="1" colspan="1">RFC XXXX</td>
             </tr>
           </tbody>
@@ -2483,17 +2567,17 @@ Options" registry as follows:<a href="#section-12.1-1" class="pilcrow">¶</a></p
 </div>
 </section>
 </div>
-<div id="dhcpv6-options">
+<div id="dhcpv6-option">
 <section id="section-12.2">
-        <h3 id="name-dhcpv6-options">
-<a href="#section-12.2" class="section-number selfRef">12.2. </a><a href="#name-dhcpv6-options" class="section-name selfRef">DHCPv6 Options</a>
+        <h3 id="name-dhcpv6-option">
+<a href="#section-12.2" class="section-number selfRef">12.2. </a><a href="#name-dhcpv6-option" class="section-name selfRef">DHCPv6 Option</a>
         </h3>
-<p id="section-12.2-1">IANA is requested to assign two new DHCPv6 Option Codes in the "Option Codes" registry as follows:<a href="#section-12.2-1" class="pilcrow">¶</a></p>
-<span id="name-dhcpv6-option-codes"></span><div id="tab-iana-v6">
+<p id="section-12.2-1">IANA is requested to assign a new DHCPv6 Option Code in the "Option Codes" registry as follows:<a href="#section-12.2-1" class="pilcrow">¶</a></p>
+<span id="name-dhcpv6-option-code"></span><div id="tab-iana-v6">
 <table class="center" id="table-4">
           <caption>
 <a href="#table-4" class="selfRef">Table 4</a>:
-<a href="#name-dhcpv6-option-codes" class="selfRef">DHCPv6 Option Codes</a>
+<a href="#name-dhcpv6-option-code" class="selfRef">DHCPv6 Option Code</a>
           </caption>
 <thead>
             <tr>
@@ -2506,15 +2590,8 @@ Options" registry as follows:<a href="#section-12.1-1" class="pilcrow">¶</a></p
           </thead>
           <tbody>
             <tr>
-              <td class="text-left" rowspan="1" colspan="1">TBD3</td>
-              <td class="text-left" rowspan="1" colspan="1">OPTION_V6_UPSTREAM_RATE</td>
-              <td class="text-left" rowspan="1" colspan="1">Yes</td>
-              <td class="text-left" rowspan="1" colspan="1">Yes</td>
-              <td class="text-left" rowspan="1" colspan="1">RFC XXXX</td>
-            </tr>
-            <tr>
-              <td class="text-left" rowspan="1" colspan="1">TBD4</td>
-              <td class="text-left" rowspan="1" colspan="1">OPTION_V6_DOWNSTREAM_RATE</td>
+              <td class="text-left" rowspan="1" colspan="1">TBD2</td>
+              <td class="text-left" rowspan="1" colspan="1">OPTION_V6_RATE</td>
               <td class="text-left" rowspan="1" colspan="1">Yes</td>
               <td class="text-left" rowspan="1" colspan="1">Yes</td>
               <td class="text-left" rowspan="1" colspan="1">RFC XXXX</td>
@@ -2546,21 +2623,17 @@ Options" registry as follows:<a href="#section-12.1-1" class="pilcrow">¶</a></p
         <dd>
 <span class="refAuthor">Droms, R.</span>, <span class="refTitle">"Dynamic Host Configuration Protocol"</span>, <span class="seriesInfo">RFC 2131</span>, <span class="seriesInfo">DOI 10.17487/RFC2131</span>, <time datetime="1997-03" class="refDate">March 1997</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc2131">https://www.rfc-editor.org/rfc/rfc2131</a>&gt;</span>. </dd>
 <dd class="break"></dd>
-<dt id="RFC3396">[RFC3396]</dt>
+<dt id="RFC6221">[RFC6221]</dt>
         <dd>
-<span class="refAuthor">Lemon, T.</span> and <span class="refAuthor">S. Cheshire</span>, <span class="refTitle">"Encoding Long Options in the Dynamic Host Configuration Protocol (DHCPv4)"</span>, <span class="seriesInfo">RFC 3396</span>, <span class="seriesInfo">DOI 10.17487/RFC3396</span>, <time datetime="2002-11" class="refDate">November 2002</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc3396">https://www.rfc-editor.org/rfc/rfc3396</a>&gt;</span>. </dd>
+<span class="refAuthor">Miles, D., Ed.</span>, <span class="refAuthor">Ooghe, S.</span>, <span class="refAuthor">Dec, W.</span>, <span class="refAuthor">Krishnan, S.</span>, and <span class="refAuthor">A. Kavanagh</span>, <span class="refTitle">"Lightweight DHCPv6 Relay Agent"</span>, <span class="seriesInfo">RFC 6221</span>, <span class="seriesInfo">DOI 10.17487/RFC6221</span>, <time datetime="2011-05" class="refDate">May 2011</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc6221">https://www.rfc-editor.org/rfc/rfc6221</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC8174">[RFC8174]</dt>
         <dd>
 <span class="refAuthor">Leiba, B.</span>, <span class="refTitle">"Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 8174</span>, <span class="seriesInfo">DOI 10.17487/RFC8174</span>, <time datetime="2017-05" class="refDate">May 2017</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8174">https://www.rfc-editor.org/rfc/rfc8174</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC9915">[RFC9915]</dt>
-        <dd>
-<span class="refAuthor">Mrugalski, T.</span>, <span class="refAuthor">Volz, B.</span>, <span class="refAuthor">Richardson, M.</span>, <span class="refAuthor">Jiang, S.</span>, and <span class="refAuthor">T. Winters</span>, <span class="refTitle">"Dynamic Host Configuration Protocol for IPv6 (DHCPv6)"</span>, <span class="seriesInfo">STD 102</span>, <span class="seriesInfo">RFC 9915</span>, <span class="seriesInfo">DOI 10.17487/RFC9915</span>, <time datetime="2026-01" class="refDate">January 2026</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9915">https://www.rfc-editor.org/rfc/rfc9915</a>&gt;</span>. </dd>
-<dd class="break"></dd>
-<dt id="TR101">[TR101]</dt>
       <dd>
-<span class="refAuthor">Broadband Forum</span>, <span class="refTitle">"Migration to Ethernet-Based Broadband Aggregation"</span>, <span class="seriesInfo">TR 101 Issue 2</span>, <time datetime="2011-07" class="refDate">July 2011</time>, <span>&lt;<a href="https://www.broadband-forum.org/pdfs/tr-101-2-0-0.pdf">https://www.broadband-forum.org/pdfs/tr-101-2-0-0.pdf</a>&gt;</span>. </dd>
+<span class="refAuthor">Mrugalski, T.</span>, <span class="refAuthor">Volz, B.</span>, <span class="refAuthor">Richardson, M.</span>, <span class="refAuthor">Jiang, S.</span>, and <span class="refAuthor">T. Winters</span>, <span class="refTitle">"Dynamic Host Configuration Protocol for IPv6 (DHCPv6)"</span>, <span class="seriesInfo">STD 102</span>, <span class="seriesInfo">RFC 9915</span>, <span class="seriesInfo">DOI 10.17487/RFC9915</span>, <time datetime="2026-01" class="refDate">January 2026</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9915">https://www.rfc-editor.org/rfc/rfc9915</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 </dl>
 </section>
@@ -2595,6 +2668,14 @@ Options" registry as follows:<a href="#section-12.1-1" class="pilcrow">¶</a></p
         <dd>
 <span class="refAuthor">T'Joens, Y.</span>, <span class="refAuthor">Hublet, C.</span>, and <span class="refAuthor">P. De Schrijver</span>, <span class="refTitle">"DHCP reconfigure extension"</span>, <span class="seriesInfo">RFC 3203</span>, <span class="seriesInfo">DOI 10.17487/RFC3203</span>, <time datetime="2001-12" class="refDate">December 2001</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc3203">https://www.rfc-editor.org/rfc/rfc3203</a>&gt;</span>. </dd>
 <dd class="break"></dd>
+<dt id="RFC3396">[RFC3396]</dt>
+        <dd>
+<span class="refAuthor">Lemon, T.</span> and <span class="refAuthor">S. Cheshire</span>, <span class="refTitle">"Encoding Long Options in the Dynamic Host Configuration Protocol (DHCPv4)"</span>, <span class="seriesInfo">RFC 3396</span>, <span class="seriesInfo">DOI 10.17487/RFC3396</span>, <time datetime="2002-11" class="refDate">November 2002</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc3396">https://www.rfc-editor.org/rfc/rfc3396</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC3931">[RFC3931]</dt>
+        <dd>
+<span class="refAuthor">Lau, J., Ed.</span>, <span class="refAuthor">Townsley, M., Ed.</span>, and <span class="refAuthor">I. Goyret, Ed.</span>, <span class="refTitle">"Layer Two Tunneling Protocol - Version 3 (L2TPv3)"</span>, <span class="seriesInfo">RFC 3931</span>, <span class="seriesInfo">DOI 10.17487/RFC3931</span>, <time datetime="2005-03" class="refDate">March 2005</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc3931">https://www.rfc-editor.org/rfc/rfc3931</a>&gt;</span>. </dd>
+<dd class="break"></dd>
 <dt id="RFC4649">[RFC4649]</dt>
         <dd>
 <span class="refAuthor">Volz, B.</span>, <span class="refTitle">"Dynamic Host Configuration Protocol for IPv6 (DHCPv6) Relay Agent Remote-ID Option"</span>, <span class="seriesInfo">RFC 4649</span>, <span class="seriesInfo">DOI 10.17487/RFC4649</span>, <time datetime="2006-08" class="refDate">August 2006</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc4649">https://www.rfc-editor.org/rfc/rfc4649</a>&gt;</span>. </dd>
@@ -2603,25 +2684,33 @@ Options" registry as follows:<a href="#section-12.1-1" class="pilcrow">¶</a></p
         <dd>
 <span class="refAuthor">Mammoliti, V.</span>, <span class="refAuthor">Zorn, G.</span>, <span class="refAuthor">Arberg, P.</span>, and <span class="refAuthor">R. Rennison</span>, <span class="refTitle">"DSL Forum Vendor-Specific RADIUS Attributes"</span>, <span class="seriesInfo">RFC 4679</span>, <span class="seriesInfo">DOI 10.17487/RFC4679</span>, <time datetime="2006-09" class="refDate">September 2006</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc4679">https://www.rfc-editor.org/rfc/rfc4679</a>&gt;</span>. </dd>
 <dd class="break"></dd>
-<dt id="RFC6221">[RFC6221]</dt>
-        <dd>
-<span class="refAuthor">Miles, D., Ed.</span>, <span class="refAuthor">Ooghe, S.</span>, <span class="refAuthor">Dec, W.</span>, <span class="refAuthor">Krishnan, S.</span>, and <span class="refAuthor">A. Kavanagh</span>, <span class="refTitle">"Lightweight DHCPv6 Relay Agent"</span>, <span class="seriesInfo">RFC 6221</span>, <span class="seriesInfo">DOI 10.17487/RFC6221</span>, <time datetime="2011-05" class="refDate">May 2011</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc6221">https://www.rfc-editor.org/rfc/rfc6221</a>&gt;</span>. </dd>
-<dd class="break"></dd>
 <dt id="RFC6320">[RFC6320]</dt>
         <dd>
 <span class="refAuthor">Wadhwa, S.</span>, <span class="refAuthor">Moisand, J.</span>, <span class="refAuthor">Haag, T.</span>, <span class="refAuthor">Voigt, N.</span>, and <span class="refAuthor">T. Taylor, Ed.</span>, <span class="refTitle">"Protocol for Access Node Control Mechanism in Broadband Networks"</span>, <span class="seriesInfo">RFC 6320</span>, <span class="seriesInfo">DOI 10.17487/RFC6320</span>, <time datetime="2011-10" class="refDate">October 2011</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc6320">https://www.rfc-editor.org/rfc/rfc6320</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC6333">[RFC6333]</dt>
+        <dd>
+<span class="refAuthor">Durand, A.</span>, <span class="refAuthor">Droms, R.</span>, <span class="refAuthor">Woodyatt, J.</span>, and <span class="refAuthor">Y. Lee</span>, <span class="refTitle">"Dual-Stack Lite Broadband Deployments Following IPv4 Exhaustion"</span>, <span class="seriesInfo">RFC 6333</span>, <span class="seriesInfo">DOI 10.17487/RFC6333</span>, <time datetime="2011-08" class="refDate">August 2011</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc6333">https://www.rfc-editor.org/rfc/rfc6333</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC6704">[RFC6704]</dt>
         <dd>
 <span class="refAuthor">Miles, D.</span>, <span class="refAuthor">Dec, W.</span>, <span class="refAuthor">Bristow, J.</span>, and <span class="refAuthor">R. Maglione</span>, <span class="refTitle">"Forcerenew Nonce Authentication"</span>, <span class="seriesInfo">RFC 6704</span>, <span class="seriesInfo">DOI 10.17487/RFC6704</span>, <time datetime="2012-08" class="refDate">August 2012</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc6704">https://www.rfc-editor.org/rfc/rfc6704</a>&gt;</span>. </dd>
 <dd class="break"></dd>
-<dt id="RFC7227">[RFC7227]</dt>
+<dt id="RFC6877">[RFC6877]</dt>
         <dd>
-<span class="refAuthor">Hankins, D.</span>, <span class="refAuthor">Mrugalski, T.</span>, <span class="refAuthor">Siodelski, M.</span>, <span class="refAuthor">Jiang, S.</span>, and <span class="refAuthor">S. Krishnan</span>, <span class="refTitle">"Guidelines for Creating New DHCPv6 Options"</span>, <span class="seriesInfo">BCP 187</span>, <span class="seriesInfo">RFC 7227</span>, <span class="seriesInfo">DOI 10.17487/RFC7227</span>, <time datetime="2014-05" class="refDate">May 2014</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc7227">https://www.rfc-editor.org/rfc/rfc7227</a>&gt;</span>. </dd>
+<span class="refAuthor">Mawatari, M.</span>, <span class="refAuthor">Kawashima, M.</span>, and <span class="refAuthor">C. Byrne</span>, <span class="refTitle">"464XLAT: Combination of Stateful and Stateless Translation"</span>, <span class="seriesInfo">RFC 6877</span>, <span class="seriesInfo">DOI 10.17487/RFC6877</span>, <time datetime="2013-04" class="refDate">April 2013</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc6877">https://www.rfc-editor.org/rfc/rfc6877</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC7567">[RFC7567]</dt>
         <dd>
 <span class="refAuthor">Baker, F., Ed.</span> and <span class="refAuthor">G. Fairhurst, Ed.</span>, <span class="refTitle">"IETF Recommendations Regarding Active Queue Management"</span>, <span class="seriesInfo">BCP 197</span>, <span class="seriesInfo">RFC 7567</span>, <span class="seriesInfo">DOI 10.17487/RFC7567</span>, <time datetime="2015-07" class="refDate">July 2015</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc7567">https://www.rfc-editor.org/rfc/rfc7567</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC7597">[RFC7597]</dt>
+        <dd>
+<span class="refAuthor">Troan, O., Ed.</span>, <span class="refAuthor">Dec, W.</span>, <span class="refAuthor">Li, X.</span>, <span class="refAuthor">Bao, C.</span>, <span class="refAuthor">Matsushima, S.</span>, <span class="refAuthor">Murakami, T.</span>, and <span class="refAuthor">T. Taylor, Ed.</span>, <span class="refTitle">"Mapping of Address and Port with Encapsulation (MAP-E)"</span>, <span class="seriesInfo">RFC 7597</span>, <span class="seriesInfo">DOI 10.17487/RFC7597</span>, <time datetime="2015-07" class="refDate">July 2015</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc7597">https://www.rfc-editor.org/rfc/rfc7597</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC7599">[RFC7599]</dt>
+        <dd>
+<span class="refAuthor">Li, X.</span>, <span class="refAuthor">Bao, C.</span>, <span class="refAuthor">Dec, W., Ed.</span>, <span class="refAuthor">Troan, O.</span>, <span class="refAuthor">Matsushima, S.</span>, and <span class="refAuthor">T. Murakami</span>, <span class="refTitle">"Mapping of Address and Port using Translation (MAP-T)"</span>, <span class="seriesInfo">RFC 7599</span>, <span class="seriesInfo">DOI 10.17487/RFC7599</span>, <time datetime="2015-07" class="refDate">July 2015</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc7599">https://www.rfc-editor.org/rfc/rfc7599</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC7610">[RFC7610]</dt>
         <dd>
@@ -2648,8 +2737,12 @@ Options" registry as follows:<a href="#section-12.1-1" class="pilcrow">¶</a></p
 <span class="refAuthor">Briscoe, B., Ed.</span>, <span class="refAuthor">De Schepper, K.</span>, <span class="refAuthor">Bagnulo, M.</span>, and <span class="refAuthor">G. White</span>, <span class="refTitle">"Low Latency, Low Loss, and Scalable Throughput (L4S) Internet Service: Architecture"</span>, <span class="seriesInfo">RFC 9330</span>, <span class="seriesInfo">DOI 10.17487/RFC9330</span>, <time datetime="2023-01" class="refDate">January 2023</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9330">https://www.rfc-editor.org/rfc/rfc9330</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="TR069">[TR069]</dt>
-      <dd>
+        <dd>
 <span class="refAuthor">Broadband Forum</span>, <span class="refTitle">"CPE WAN Management Protocol v1.1"</span>, <span class="seriesInfo">TR 069 Issue 1 Amendment 1</span>, <time datetime="2006-11" class="refDate">November 2006</time>, <span>&lt;<a href="https://www.broadband-forum.org/pdfs/tr-069-1-1-0.pdf">https://www.broadband-forum.org/pdfs/tr-069-1-1-0.pdf</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="TR101">[TR101]</dt>
+      <dd>
+<span class="refAuthor">Broadband Forum</span>, <span class="refTitle">"Migration to Ethernet-Based Broadband Aggregation"</span>, <span class="seriesInfo">TR 101 Issue 2</span>, <time datetime="2011-07" class="refDate">July 2011</time>, <span>&lt;<a href="https://www.broadband-forum.org/pdfs/tr-101-2-0-0.pdf">https://www.broadband-forum.org/pdfs/tr-101-2-0-0.pdf</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 </dl>
 </section>
@@ -2681,9 +2774,9 @@ the access device typically manages the resulting queue. Shaping at the CPE is t
 practical means to control upstream latency and to make prioritization effective.<a href="#appendix-A.1-2" class="pilcrow">¶</a></p>
 <p id="appendix-A.1-3">Shaping at the CPE complements the enforcement at the BNG: the BNG continues to enforce the
 provisioned rate, for example with a small correction factor (see <a href="#processing" class="auto internal xref">Section 3.3</a>), while the CPE
-ensures that this enforcement is not triggered under normal operation. CPE that do not support
-these options continue to be subject to the enforcement at the BNG, so that the provisioned
-service tier is maintained in all cases.<a href="#appendix-A.1-3" class="pilcrow">¶</a></p>
+ensures that this enforcement is not triggered under normal operation. CPE that do not support this
+option continue to be subject to the enforcement at the BNG, so that the provisioned service tier is
+maintained in all cases.<a href="#appendix-A.1-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="why-not-shape-upstream-traffic-at-the-bng">
@@ -2773,17 +2866,18 @@ cell-based link layers remains possible through local configuration of the CPE.<
         </ul>
 </section>
 </div>
-<div id="why-separate-options-instead-of-a-container-option">
+<div id="why-a-single-fixed-format-option">
 <section id="appendix-A.6">
-        <h3 id="name-why-separate-options-instea">
-<a href="#appendix-A.6" class="section-number selfRef">A.6. </a><a href="#name-why-separate-options-instea" class="section-name selfRef">Why Separate Options Instead of a Container Option?</a>
+        <h3 id="name-why-a-single-fixed-format-o">
+<a href="#appendix-A.6" class="section-number selfRef">A.6. </a><a href="#name-why-a-single-fixed-format-o" class="section-name selfRef">Why a Single Fixed-Format Option?</a>
         </h3>
-<p id="appendix-A.6-1">Each option defined in this document carries exactly one fixed-size value. This avoids sub-option
-parsing, a dedicated sub-option registry, and the corner cases of empty or partially valid
-containers, and it allows each direction to be requested, signaled, and processed independently,
-consistent with the guidance for simple option formats in <span>[<a href="#RFC7227" class="cite xref">RFC7227</a>]</span>. A client that only applies
-the upstream rate can request and process only the upstream rate option. Should additional
-parameters be required in the future, they can be defined as separate options.<a href="#appendix-A.6-1" class="pilcrow">¶</a></p>
+<p id="appendix-A.6-1">The Rate Option carries exactly two fixed-size values. Compared with a container option with
+sub-options, this avoids sub-option parsing, a dedicated sub-option registry, and the corner cases
+of empty or partially valid containers. Compared with separate options per direction, it consumes
+only one code from the limited DHCPv4 option code space, and a single option conveys the complete
+rate information, so that receivers never need to combine rates from different options or messages.
+Receivers that only apply the upstream rate simply ignore the Downstream Rate field. Should
+additional parameters be required in the future, they can be defined as separate options.<a href="#appendix-A.6-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="relation-to-access-line-information">
@@ -2841,8 +2935,8 @@ prioritization at the CPE; added a figure.<a href="#appendix-B.1-3.1.1" class="p
 </li>
           <li class="normal" id="appendix-B.1-3.2">
             <p id="appendix-B.1-3.2.1">Added the Design Rationale appendix addressing frequently raised questions, including the
-restriction to Layer 3 rates, the use of separate options, and the relation to access line
-information and to existing proprietary solutions.<a href="#appendix-B.1-3.2.1" class="pilcrow">¶</a></p>
+restriction to Layer 3 rates, the use of a single fixed-format option, and the relation to access
+line information and to existing proprietary solutions.<a href="#appendix-B.1-3.2.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="appendix-B.1-3.3">
             <p id="appendix-B.1-3.3.1">Added applicability to local area networks.<a href="#appendix-B.1-3.3.1" class="pilcrow">¶</a></p>
@@ -2851,13 +2945,13 @@ information and to existing proprietary solutions.<a href="#appendix-B.1-3.2.1" 
 <p id="appendix-B.1-4">Protocol changes (not backward compatible with -00):<a href="#appendix-B.1-4" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="appendix-B.1-5.1">
-            <p id="appendix-B.1-5.1.1">Replaced the container option with sub-options by four top-level options:
-OPTION_V4_UPSTREAM_RATE, OPTION_V4_DOWNSTREAM_RATE, OPTION_V6_UPSTREAM_RATE, and
-OPTION_V6_DOWNSTREAM_RATE, each carrying a single 64-bit rate in bits per second.<a href="#appendix-B.1-5.1.1" class="pilcrow">¶</a></p>
+            <p id="appendix-B.1-5.1.1">Replaced the sub-option structure of OPTION_V4_RATE and OPTION_V6_RATE by a fixed 16-octet
+format carrying the upstream and downstream rates as 64-bit values in bits per second.<a href="#appendix-B.1-5.1.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="appendix-B.1-5.2">
-            <p id="appendix-B.1-5.2.1">All rates are Layer 3 rates. Removed the rate type and layer selection, the informational rates,
-and the DHCP Rate Sub-Options registry.<a href="#appendix-B.1-5.2.1" class="pilcrow">¶</a></p>
+            <p id="appendix-B.1-5.2.1">All rates are Layer 3 rates, calculated over the outermost IP header on the link of the receiver,
+including tunnels and translations performed by the receiver. Removed the rate type and layer
+selection, the informational rates, and the DHCP Rate Sub-Options registry.<a href="#appendix-B.1-5.2.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
 <p id="appendix-B.1-6">Processing and behavior:<a href="#appendix-B.1-6" class="pilcrow">¶</a></p>
@@ -2870,6 +2964,16 @@ and specified the messages in which the options can appear.<a href="#appendix-B.
             <p id="appendix-B.1-7.2.1">Clarified the requirement levels for applying rates, the precedence of administrator
 configuration, and the behavior of servers, relay agents, and snooping devices.<a href="#appendix-B.1-7.2.1" class="pilcrow">¶</a></p>
 </li>
+          <li class="normal" id="appendix-B.1-7.3">
+            <p id="appendix-B.1-7.3.1">Defined the terms Intended Rate and Binding, including the removal of rates by intermediate nodes
+without per-client state.<a href="#appendix-B.1-7.3.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="appendix-B.1-7.4">
+            <p id="appendix-B.1-7.4.1">Servers no longer signal different rates via DHCPv4 and DHCPv6 to the same client.<a href="#appendix-B.1-7.4.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="appendix-B.1-7.5">
+            <p id="appendix-B.1-7.5.1">Made the provisioning of relay agents via Relay-reply messages explicitly optional.<a href="#appendix-B.1-7.5.1" class="pilcrow">¶</a></p>
+</li>
         </ul>
 <p id="appendix-B.1-8">Other:<a href="#appendix-B.1-8" class="pilcrow">¶</a></p>
 <ul class="normal">
@@ -2877,12 +2981,15 @@ configuration, and the behavior of servers, relay agents, and snooping devices.<
             <p id="appendix-B.1-9.1.1">Changed the intended status to Standards Track; replaced RFC 8415 by RFC 9915.<a href="#appendix-B.1-9.1.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="appendix-B.1-9.2">
-            <p id="appendix-B.1-9.2.1">Extended the Security Considerations; added Privacy Considerations, Operational Considerations,
-and Implementation Status.<a href="#appendix-B.1-9.2.1" class="pilcrow">¶</a></p>
+            <p id="appendix-B.1-9.2.1">Moved TR-101 to the informative references and RFC 6221 to the normative references.<a href="#appendix-B.1-9.2.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="appendix-B.1-9.3">
-            <p id="appendix-B.1-9.3.1">Explained the use of 64-bit rates and the derivation of rates from access line information
-<span>[<a href="#RFC4679" class="cite xref">RFC4679</a>]</span> <span>[<a href="#RFC6320" class="cite xref">RFC6320</a>]</span>.<a href="#appendix-B.1-9.3.1" class="pilcrow">¶</a></p>
+            <p id="appendix-B.1-9.3.1">Extended the Security Considerations; added Privacy Considerations, Operational Considerations,
+and Implementation Status.<a href="#appendix-B.1-9.3.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="appendix-B.1-9.4">
+            <p id="appendix-B.1-9.4.1">Explained the use of 64-bit rates and the derivation of rates from access line information
+<span>[<a href="#RFC4679" class="cite xref">RFC4679</a>]</span> <span>[<a href="#RFC6320" class="cite xref">RFC6320</a>]</span>.<a href="#appendix-B.1-9.4.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
 </section>
