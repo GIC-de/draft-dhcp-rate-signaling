@@ -207,8 +207,13 @@ Unlike auto-configuration protocols such as TR-069 {{TR069}}, which are not depl
 operators and are typically not available for customer-owned CPE, DHCP is supported by virtually
 all CPE, including retail routers and devices running open-source firmware (e.g., OpenWrt), and
 it is visible to intermediate nodes along the path. Rates conveyed via DHCP are refreshed with
-every lease renewal and can be updated dynamically. The options are also applicable within LANs
-(see {{lan}}).
+every lease renewal and can be updated dynamically.
+
+The options are applicable to any access link on which DHCP is used to configure the
+network-facing interface and on which the intended rates are determined by a subscription,
+contract, or policy, for example enterprise access links (see {{enterprise}}) and public or guest
+Wi-Fi networks (see {{lan}}). They convey provisioned, slowly changing values and do not describe
+the instantaneous capacity of links whose capacity varies over time (see {{variable-capacity}}).
 
 {{rationale}} discusses the reasoning behind this mechanism and addresses frequently raised
 questions, such as why rate enforcement at the BNG alone is not sufficient, why upstream shaping is
@@ -750,17 +755,37 @@ information that is conveyed only once per session.
 ## Local Area Networks {#lan}
 
 The Rate Option can also be used by DHCP servers in local area networks, for example a DHCP server
-co-located with a CPE or another gateway, to inform clients about the rates available to them. In
-this case, the signaled rates indicate the maximum rate a client can expect through the network it
-is attached to. Examples include:
+co-located with a CPE or another gateway, to inform clients about the rates available to them
+towards the Internet or another upstream network. In this case, the signaled rates indicate the
+maximum rate a client can expect through the upstream connection of the network it is attached to.
+
+This is primarily useful in networks that are used mainly for Internet access, such as public
+Wi-Fi hotspots and guest networks, where the upstream connection is the relevant bottleneck for
+most of the traffic of a client. In networks that are also used for substantial local traffic, such
+as home or corporate networks with local servers, printers, or storage, the signaled rates do not
+apply to the local traffic. Clients in such networks SHOULD NOT apply the signaled rates to traffic
+that does not traverse the upstream connection and typically use them as information only.
+
+Examples include:
 
 - Virtual Private Network (VPN) gateways or tunnel endpoints that shape traffic towards their peers
   and whose processing capacity exceeds the capacity of the upstream connection.
 - Public Wi-Fi hotspots that enforce per-user rate limits, where clients can align their sending
   rate with the enforced limit to avoid policer drops.
-- Applications on end devices that use the signaled rates as an initial estimate, e.g., to
-  estimate transfer times, to select an initial video quality, or to choose between available
-  network interfaces.
+- End devices, such as smartphones, laptops, or other Wi-Fi clients, that display the offered
+  upstream connection rates to the user, for example in the details of the connected network, or
+  that use them as an initial estimate, e.g., to estimate transfer times, to select an initial video
+  quality, or to decide whether to keep using the network or to prefer another available
+  interface, such as a cellular connection.
+
+End devices decide whether they use the signaled rates as information only or also apply them to
+their traffic management functions (see {{application}}). Using the rates as information only is
+always permitted.
+
+As DHCP is performed after association with a wireless network, the signaled rates are only
+available once the device has connected. A device can retain the rates learned for a network and
+take them into account when selecting among known networks later. Providing information about the
+capacity of a wireless network prior to association is outside the scope of this document.
 
 A device that acts as a DHCP client on its network-facing interface and as a DHCP server on its
 LAN interfaces MAY derive the rates it signals to LAN clients from the rates learned on its
@@ -785,6 +810,30 @@ mechanisms, and MUST NOT use them to increase the sending rate of a congestion c
 such as its initial sending rate, beyond the rate that the algorithm would otherwise use. Where rate
 limits need to be enforced, enforcement remains the responsibility of the network; the Rate Option
 only informs clients about such limits.
+
+## Enterprise Access Links {#enterprise}
+
+Enterprise branch offices are often connected via access links whose contracted rate is lower than
+the speed of the physical interface, for example a 100 Mbit/s service delivered over a 1 Gbit/s
+Ethernet interface, with the contracted rate enforced by a policer in the provider network. Where
+the provider uses DHCP to configure the customer edge router, the Rate Option allows the router,
+including Software-Defined Wide Area Network (SD-WAN) edge devices, to configure its upstream shaper
+without manual provisioning.
+
+Where the service defines both a committed and an excess or peak rate, the intended rate is the
+maximum rate at which the provider intends to forward traffic (see {{definitions}}). Bandwidth
+profiles of such services commonly account Ethernet frames; the considerations for enforcement
+points that account traffic at Layer 2 apply (see {{operations}}).
+
+## Links with Variable Capacity {#variable-capacity}
+
+On wireless, cellular, and satellite access links, the available capacity varies with radio
+conditions, scheduling, and load on time scales far shorter than DHCP lease and renewal intervals.
+The Rate Option is not suitable for conveying such variations. It can, however, convey a
+provisioned upper bound, for example a rate limit defined by the subscription. Receivers on such
+links use the lower of the signaled rate and the current link capacity (see {{lan}}) and SHOULD
+combine the signaled rate with adaptive mechanisms where the bottleneck is the variable-capacity
+link itself.
 
 # Operational Considerations {#operations}
 
@@ -1123,7 +1172,8 @@ Motivation and scope:
 - Added the Design Rationale appendix addressing frequently raised questions, including the
   restriction to Layer 3 rates, the use of a single fixed-format option, and the relation to access
   line information and to existing proprietary solutions.
-- Added applicability to local area networks.
+- Added applicability to local area networks, enterprise access links, and links with variable
+  capacity.
 
 Protocol changes (not backward compatible with -00):
 
