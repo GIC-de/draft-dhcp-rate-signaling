@@ -19,9 +19,7 @@ prioritization, Active Queue Management (AQM), and the Low Latency, Low Loss, an
 Throughput (L4S) architecture. Intermediate nodes acting as DHCP relay agents or performing DHCP
 snooping can use the same information to instantiate per-subscriber shapers and policers. All rates
 are Layer 3 rates, which match the speed perceived by users and can be applied directly to common
-traffic shapers without encapsulation-specific calculations. These options are also applicable
-within local area networks, for example to inform end devices about the capacity of the upstream
-connection. 
+traffic shapers without encapsulation-specific calculations. 
     " name="description">
 <meta content="xml2rfc 3.34.1" name="generator">
 <meta content="DHCP" name="keyword">
@@ -1111,9 +1109,7 @@ prioritization, Active Queue Management (AQM), and the Low Latency, Low Loss, an
 Throughput (L4S) architecture. Intermediate nodes acting as DHCP relay agents or performing DHCP
 snooping can use the same information to instantiate per-subscriber shapers and policers. All rates
 are Layer 3 rates, which match the speed perceived by users and can be applied directly to common
-traffic shapers without encapsulation-specific calculations. These options are also applicable
-within local area networks, for example to inform end devices about the capacity of the upstream
-connection.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
+traffic shapers without encapsulation-specific calculations.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
 </section>
 <section class="note rfcEditorRemove" id="section-note.1">
       <h2 id="name-about-this-document">
@@ -1381,10 +1377,11 @@ and the achieved throughput often remains well below the provisioned rate. Users
 as poor and fluctuating results, for example in speed tests, even though no part of the network
 is congested.<a href="#section-1.1-2" class="pilcrow">¶</a></p>
 <p id="section-1.1-3">Where the upstream bottleneck is located at the access device or within the access network, the
-resulting queue is typically managed by neither AQM nor prioritization of the subscriber's
-traffic. Depending on the buffering of the access device, this results in packet loss, with
-effects similar to those of a policer, or in increased latency under load. In both cases, all
-traffic of the subscriber is affected alike, including latency-sensitive applications.<a href="#section-1.1-3" class="pilcrow">¶</a></p>
+resulting queue is typically managed by neither Active Queue Management (AQM) <span>[<a href="#RFC7567" class="cite xref">RFC7567</a>]</span> nor
+prioritization of the subscriber's traffic. Depending on the buffering of the access device, this
+results in packet loss, with effects similar to those of a policer, or in increased latency under
+load. In both cases, all traffic of the subscriber is affected alike, including latency-sensitive
+applications.<a href="#section-1.1-3" class="pilcrow">¶</a></p>
 <p id="section-1.1-4">Many CPE implementations support upstream prioritization, for example of DNS, Voice over IP
 (VoIP), online gaming, or video conferencing traffic, of TCP acknowledgments, or of selected
 clients or applications. Such prioritization is only effective if the CPE is the bottleneck of
@@ -1414,7 +1411,7 @@ a 64-bit unsigned integer in bits per second. The rates are always Layer 3 rates
 IP header and payload of each packet as transmitted on the link of the receiver (see <a href="#layer3" class="auto internal xref">Section 3.1</a>).<a href="#section-1.2-1" class="pilcrow">¶</a></p>
 <p id="section-1.2-2">If the CPE knows the upstream rate, it can shape its upstream traffic to this rate, regardless of
 where the bottleneck is located. The queue then builds at the CPE, where it can be managed using
-prioritization, Active Queue Management (AQM) <span>[<a href="#RFC7567" class="cite xref">RFC7567</a>]</span>, and flow queuing <span>[<a href="#RFC8290" class="cite xref">RFC8290</a>]</span>. Under
+prioritization, AQM, and flow queuing <span>[<a href="#RFC8290" class="cite xref">RFC8290</a>]</span>. Under
 normal operation, the policer at the BNG is not triggered, and the access device is not congested
 (see <a href="#fig-policer" class="auto internal xref">Figure 1</a>). The resulting upstream throughput is stable and close to the signaled rate,
 and latency under load remains low. When combined with the Low Latency, Low Loss, and Scalable
@@ -1504,18 +1501,20 @@ this document continue to be subject to the enforcement at the BNG, which can be
 slightly above the signaled rate for this purpose (see <a href="#processing" class="auto internal xref">Section 3.3</a>).<a href="#section-1.2-4" class="pilcrow">¶</a></p>
 <p id="section-1.2-5">Signaling Layer 3 rates keeps the mechanism simple. A Layer 3 rate corresponds to the speed
 perceived by users and measured by speed tests, and it is independent of the encapsulation used on
-any segment of the path. The same value is therefore valid at the CPE, at an access node, and at
-the BNG, irrespective of VLAN tags or PPPoE headers added or removed along the path, and it can be
-configured directly into common CPE shapers, such as the Common Applications Kept Enhanced (CAKE)
-queue discipline, without encapsulation-specific calculations (see <a href="#application" class="auto internal xref">Section 3.2</a>).<a href="#section-1.2-5" class="pilcrow">¶</a></p>
+any segment of the path. The same value is therefore valid at the CPE, at an access node, and at the
+BNG, irrespective of Virtual LAN (VLAN) tags or Point-to-Point Protocol over Ethernet (PPPoE)
+<span>[<a href="#RFC2516" class="cite xref">RFC2516</a>]</span> headers added or removed along the path, and it can be configured directly into common
+CPE shapers, such as the Common Applications Kept Enhanced (CAKE) queue discipline, without
+encapsulation-specific calculations (see <a href="#application" class="auto internal xref">Section 3.2</a>).<a href="#section-1.2-5" class="pilcrow">¶</a></p>
 <p id="section-1.2-6">The same rate information can be used by intermediate nodes. In many IP over Ethernet (IPoE)
 <span>[<a href="#TR101" class="cite xref">TR101</a>]</span> architectures, the BNG operates as a DHCP relay agent. While per-subscriber traffic
 management policies are typically provisioned via Authentication, Authorization, and Accounting
-(AAA) protocols such as RADIUS <span>[<a href="#RFC2865" class="cite xref">RFC2865</a>]</span>, deployments lacking AAA integration at the service
-edge require an in-band alternative. The BNG can use the signaled rates to instantiate downstream
-shapers and upstream policers, and access nodes performing DHCP snooping can use them to
-configure their local queues and shapers. DHCPv6 additionally allows the server to signal
-different rates to the client and to each relay agent in the path (see <a href="#dhcpv6-server" class="auto internal xref">Section 5.3</a>).<a href="#section-1.2-6" class="pilcrow">¶</a></p>
+(AAA) protocols such as Remote Authentication Dial-In User Service (RADIUS) <span>[<a href="#RFC2865" class="cite xref">RFC2865</a>]</span>,
+deployments lacking AAA integration at the service edge require an in-band alternative. The BNG can
+use the signaled rates to instantiate downstream shapers and upstream policers, and access nodes
+performing DHCP snooping can use them to configure their local queues and shapers. DHCPv6
+additionally allows the server to signal different rates to the client and to each relay agent in
+the path (see <a href="#dhcpv6-server" class="auto internal xref">Section 5.3</a>).<a href="#section-1.2-6" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="applicability">
@@ -1524,10 +1523,10 @@ different rates to the client and to each relay agent in the path (see <a href="
 <a href="#section-1.3" class="section-number selfRef">1.3. </a><a href="#name-applicability" class="section-name selfRef">Applicability</a>
         </h3>
 <p id="section-1.3-1">The mechanism defined in this document is primarily designed for broadband access networks using
-IPoE or Point-to-Point Protocol over Ethernet (PPPoE) <span>[<a href="#RFC2516" class="cite xref">RFC2516</a>]</span>. In PPPoE deployments, DHCPv6 is
-commonly used over the PPP session for IPv6 Prefix Delegation and conveys the options in the same
-way (see <a href="#pppoe" class="auto internal xref">Section 7.1</a>). The options are defined for both DHCPv4 and DHCPv6 to support IPv4-only,
-IPv6-only, and dual-stack deployments.<a href="#section-1.3-1" class="pilcrow">¶</a></p>
+IPoE or PPPoE. In PPPoE deployments, DHCPv6 is commonly used over the Point-to-Point Protocol (PPP)
+<span>[<a href="#RFC1661" class="cite xref">RFC1661</a>]</span> session for IPv6 Prefix Delegation and conveys the options in the same way (see
+<a href="#pppoe" class="auto internal xref">Section 7.1</a>). The options are defined for both DHCPv4 and DHCPv6 to support IPv4-only, IPv6-only, and
+dual-stack deployments.<a href="#section-1.3-1" class="pilcrow">¶</a></p>
 <p id="section-1.3-2">Unlike auto-configuration protocols such as TR-069 <span>[<a href="#TR069" class="cite xref">TR069</a>]</span>, which are not deployed by all
 operators and are typically not available for customer-owned CPE, DHCP is supported by virtually
 all CPE, including retail routers and devices running open-source firmware (e.g., OpenWrt), and
@@ -1553,27 +1552,27 @@ appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶<
 <p id="section-2-2">This document makes use of the terms defined in <span>[<a href="#RFC2131" class="cite xref">RFC2131</a>]</span> and <span>[<a href="#RFC9915" class="cite xref">RFC9915</a>]</span>.
 The following additional terms are used:<a href="#section-2-2" class="pilcrow">¶</a></p>
 <span class="break"></span><dl class="dlParallel" id="section-2-3">
-        <dt id="section-2-3.1">DHCP</dt>
+        <dt id="section-2-3.1">Binding</dt>
         <dd style="margin-left: 1.5em" id="section-2-3.2">
-          <p id="section-2-3.2.1">The abbreviation DHCP is used throughout this document to refer to both DHCPv4 and DHCPv6
-protocols.<a href="#section-2-3.2.1" class="pilcrow">¶</a></p>
+          <p id="section-2-3.2.1">The state that an intermediate node maintains for a client, associating the client with its
+client-facing port or session and with the addresses or prefixes leased to it, for example the
+subscriber session of a BNG or the binding table of a snooping device.<a href="#section-2-3.2.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
-<dt id="section-2-3.3">DHCPv4</dt>
+<dt id="section-2-3.3">DHCP</dt>
         <dd style="margin-left: 1.5em" id="section-2-3.4">
-          <p id="section-2-3.4.1">The Dynamic Host Configuration Protocol <span>[<a href="#RFC2131" class="cite xref">RFC2131</a>]</span>.<a href="#section-2-3.4.1" class="pilcrow">¶</a></p>
+          <p id="section-2-3.4.1">The abbreviation DHCP is used throughout this document to refer to both DHCPv4 and DHCPv6
+protocols.<a href="#section-2-3.4.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
-<dt id="section-2-3.5">DHCPv6</dt>
+<dt id="section-2-3.5">DHCPv4</dt>
         <dd style="margin-left: 1.5em" id="section-2-3.6">
-          <p id="section-2-3.6.1">The Dynamic Host Configuration Protocol for IPv6 <span>[<a href="#RFC9915" class="cite xref">RFC9915</a>]</span>.<a href="#section-2-3.6.1" class="pilcrow">¶</a></p>
+          <p id="section-2-3.6.1">The Dynamic Host Configuration Protocol <span>[<a href="#RFC2131" class="cite xref">RFC2131</a>]</span>.<a href="#section-2-3.6.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
-<dt id="section-2-3.7">Upstream</dt>
+<dt id="section-2-3.7">DHCPv6</dt>
         <dd style="margin-left: 1.5em" id="section-2-3.8">
-          <p id="section-2-3.8.1">The direction of traffic from the client towards the network. For a client, this corresponds to
-traffic sent over the link on which the Rate Option was received. For a relay agent or
-snooping device, this corresponds to traffic received on the client-facing interface or port.<a href="#section-2-3.8.1" class="pilcrow">¶</a></p>
+          <p id="section-2-3.8.1">The Dynamic Host Configuration Protocol for IPv6 <span>[<a href="#RFC9915" class="cite xref">RFC9915</a>]</span>.<a href="#section-2-3.8.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
 <dt id="section-2-3.9">Downstream</dt>
@@ -1623,25 +1622,25 @@ the provisioned rates.<a href="#section-2-3.20.1" class="pilcrow">¶</a></p>
 document. Where the distinction is not relevant, this document refers to both as the Rate Option.<a href="#section-2-3.22.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
-<dt id="section-2-3.23">Binding</dt>
+<dt id="section-2-3.23">Receiver</dt>
         <dd style="margin-left: 1.5em" id="section-2-3.24">
-          <p id="section-2-3.24.1">The state that an intermediate node maintains for a client, associating the client with its
-client-facing port or session and with the addresses or prefixes leased to it, for example the
-subscriber session of a BNG or the binding table of a snooping device.<a href="#section-2-3.24.1" class="pilcrow">¶</a></p>
-</dd>
-        <dd class="break"></dd>
-<dt id="section-2-3.25">Receiver</dt>
-        <dd style="margin-left: 1.5em" id="section-2-3.26">
-          <p id="section-2-3.26.1">Any node that processes a received Rate Option, including DHCP clients, relay agents (including
+          <p id="section-2-3.24.1">Any node that processes a received Rate Option, including DHCP clients, relay agents (including
 Lightweight DHCPv6 Relay Agents <span>[<a href="#RFC6221" class="cite xref">RFC6221</a>]</span> and Layer 2 DHCPv4 Relay Agents <span>[<a href="#TR101" class="cite xref">TR101</a>]</span>), and DHCP
-snooping devices.<a href="#section-2-3.26.1" class="pilcrow">¶</a></p>
+snooping devices.<a href="#section-2-3.24.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
-<dt id="section-2-3.27">Subscriber</dt>
-        <dd style="margin-left: 1.5em" id="section-2-3.28">
-          <p id="section-2-3.28.1">The customer of a network access service. Within the network, a subscriber is typically
+<dt id="section-2-3.25">Subscriber</dt>
+        <dd style="margin-left: 1.5em" id="section-2-3.26">
+          <p id="section-2-3.26.1">The customer of a network access service. Within the network, a subscriber is typically
 represented by a subscriber session at the BNG (e.g., an IPoE or PPPoE session), to which the
-provisioned rates and other per-subscriber policies are applied.<a href="#section-2-3.28.1" class="pilcrow">¶</a></p>
+provisioned rates and other per-subscriber policies are applied.<a href="#section-2-3.26.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-2-3.27">Upstream</dt>
+        <dd style="margin-left: 1.5em" id="section-2-3.28">
+          <p id="section-2-3.28.1">The direction of traffic from the client towards the network. For a client, this corresponds to
+traffic sent over the link on which the Rate Option was received. For a relay agent or
+snooping device, this corresponds to traffic received on the client-facing interface or port.<a href="#section-2-3.28.1" class="pilcrow">¶</a></p>
 </dd>
       <dd class="break"></dd>
 </dl>
@@ -1686,7 +1685,7 @@ outermost IP header of each packet (including any IPv6 extension headers) and it
 transmitted or received on the link of the receiver. For a client, this is the link on which the
 Rate Option was received; for a relay agent or snooping device, it is the client-facing link. The
 Layer 3 rate excludes all headers and trailers below the outermost IP header, such as Ethernet
-headers, Virtual LAN (VLAN) tags, PPPoE and PPP headers, and the Ethernet Frame Check Sequence
+headers, VLAN tags, PPPoE and PPP headers, and the Ethernet Frame Check Sequence
 (FCS), as well as all physical-layer overhead.<a href="#section-3.1-1" class="pilcrow">¶</a></p>
 <p id="section-3.1-2">Consequently, any tunnel or translation applied by the receiver itself is part of the Layer 3 rate.
 For example:<a href="#section-3.1-2" class="pilcrow">¶</a></p>
@@ -1711,7 +1710,7 @@ Layer 3 rate covers the outer IP header and all headers and payload carried with
 translation, rather than to the packets on the link, accounts for the resulting difference locally,
 as the encapsulation or translation is performed by the receiver itself. Encapsulations added or
 removed by other nodes between the receiver and the enforcement point, such as an L2TP tunnel
-between an L2TP Access Concentrator (LAC) and an L2TP Network Server (LNS) <span>[<a href="#RFC3931" class="cite xref">RFC3931</a>]</span>, are
+between an L2TP Access Concentrator (LAC) and an L2TP Network Server (LNS) <span>[<a href="#RFC2661" class="cite xref">RFC2661</a>]</span>, are
 not part of the Layer 3 rate of the receiver; they are treated like any other difference in
 accounting at the enforcement point (see <a href="#operations" class="auto internal xref">Section 8</a>).<a href="#section-3.1-4" class="pilcrow">¶</a></p>
 <p id="section-3.1-5">Layer 3 rates have the following properties:<a href="#section-3.1-5" class="pilcrow">¶</a></p>
@@ -2282,7 +2281,7 @@ a client-facing port <span class="bcp14">MUST NOT</span> be used to configure tr
         <h3 id="name-pppoe">
 <a href="#section-7.1" class="section-number selfRef">7.1. </a><a href="#name-pppoe" class="section-name selfRef">PPPoE</a>
         </h3>
-<p id="section-7.1-1">In PPPoE <span>[<a href="#RFC2516" class="cite xref">RFC2516</a>]</span> architectures, the CPE typically employs DHCPv6 over the PPP <span>[<a href="#RFC1661" class="cite xref">RFC1661</a>]</span> link
+<p id="section-7.1-1">In PPPoE <span>[<a href="#RFC2516" class="cite xref">RFC2516</a>]</span> architectures, the CPE typically employs DHCPv6 over the PPP link
 to obtain an IPv6 prefix via Prefix Delegation (IA_PD) <span>[<a href="#RFC9915" class="cite xref">RFC9915</a>]</span>. This DHCPv6 exchange conveys
 the Rate Option in the same way as in IPoE deployments. DHCPv4 transactions within a PPPoE session
 can similarly convey the DHCPv4 Rate Option.<a href="#section-7.1-1" class="pilcrow">¶</a></p>
@@ -2377,21 +2376,21 @@ exceed a Layer 2 enforcement point that is configured close to the signaled rate
 inaccuracy is accepted in exchange for the simplicity of a single, encapsulation-independent
 parameter (see <a href="#rationale" class="auto internal xref">Appendix A</a>).<a href="#section-8-4" class="pilcrow">¶</a></p>
 <p id="section-8-5">Where the actual rate of the access line is known and lower than the provisioned rate, for example
-due to the synchronization rate of a DSL line, operators should signal the lower of the two rates,
-so that the client shapes its traffic to the actual bottleneck. The actual rate is typically known
-at the BNG, for example from the Actual-Data-Rate-Upstream and Actual-Data-Rate-Downstream
-attributes <span>[<a href="#RFC4679" class="cite xref">RFC4679</a>]</span> or the corresponding Access Node Control Protocol (ANCP) TLVs <span>[<a href="#RFC6320" class="cite xref">RFC6320</a>]</span>.
-As these attributes describe the net data rate of the access line, the server converts them to a
-Layer 3 rate, for example by deducting the encapsulation overhead for typical packet sizes and, for
-lines using Packet Transfer Mode (PTM) with 64/65-octet encapsulation, the corresponding 1/65 of the
-rate. Access lines with cell-based link layers, such as Asynchronous Transfer Mode (ATM) on
-Asymmetric Digital Subscriber Line (ADSL), have a packet-size-dependent overhead that a single rate
-cannot describe precisely; operators of such lines can signal a conservatively reduced rate, and
-precise modeling remains a matter of local configuration of the CPE.<a href="#section-8-5" class="pilcrow">¶</a></p>
-<p id="section-8-6">Without the use of DHCPFORCERENEW or Reconfigure, changes of the provisioned rates take effect
-with the next renewal of the client. Operators should consider this delay when choosing lease
-and renewal times, for example when rates are changed due to service upgrades or fair-use
-policies.<a href="#section-8-6" class="pilcrow">¶</a></p>
+due to the synchronization rate of a DSL line, operators are advised to signal the lower of the two
+rates, so that the client shapes its traffic to the actual bottleneck. The actual rate is typically
+known at the BNG, for example from the Actual-Data-Rate-Upstream and Actual-Data-Rate-Downstream
+attributes <span>[<a href="#RFC4679" class="cite xref">RFC4679</a>]</span> or the corresponding Access Node Control Protocol (ANCP) Type-Length-Value
+(TLV) elements <span>[<a href="#RFC6320" class="cite xref">RFC6320</a>]</span>. As these attributes describe the net data rate of the access line, the
+server converts them to a Layer 3 rate, for example by deducting the encapsulation overhead for
+typical packet sizes and, for lines using Packet Transfer Mode (PTM) with 64/65-octet encapsulation,
+the corresponding 1/65 of the rate. Access lines with cell-based link layers, such as Asynchronous
+Transfer Mode (ATM) on Asymmetric Digital Subscriber Line (ADSL), have a packet-size-dependent
+overhead that a single rate cannot describe precisely; operators of such lines can signal a
+conservatively reduced rate, and precise modeling remains a matter of local configuration of the
+CPE.<a href="#section-8-5" class="pilcrow">¶</a></p>
+<p id="section-8-6">Without the use of DHCPFORCERENEW or Reconfigure, changes of the provisioned rates take effect with
+the next renewal of the client. Operators are advised to consider this delay when choosing lease and
+renewal times, for example when rates are changed due to service upgrades or fair-use policies.<a href="#section-8-6" class="pilcrow">¶</a></p>
 <p id="section-8-7">The inclusion of the code of the Rate Option in the Parameter Request List or Option Request option
 allows operators to determine the share of clients supporting these options, for example to plan the
 introduction of correction factors or to identify clients that require enforcement at the network.<a href="#section-8-7" class="pilcrow">¶</a></p>
@@ -2400,8 +2399,8 @@ as the local Web User Interface (UI) or remote management protocols. As the sign
 Layer 3 rates, the displayed values are directly comparable with the results of speed tests, which
 can reduce support inquiries related to perceived bandwidth issues.<a href="#section-8-8" class="pilcrow">¶</a></p>
 <p id="section-8-9">As noted in <a href="#processing" class="auto internal xref">Section 3.3</a>, a client can receive a rate that exceeds the maximum physical link speed
-of its interfaces. In such scenarios, management interfaces should expose both the signaled rate and
-the effective, capped rate applied by the device, and implementations should log this discrepancy
+of its interfaces. In such scenarios, management interfaces can expose both the signaled rate and
+the effective, capped rate applied by the device, and implementations can log this discrepancy
 if logging facilities are enabled. Such events can indicate a mismatch between the subscriber's
 provisioned service tier and the installed equipment.<a href="#section-8-9" class="pilcrow">¶</a></p>
 </section>
@@ -2529,16 +2528,16 @@ is subject to the operator's applicable privacy policies.<a href="#section-11-4"
       <h2 id="name-iana-considerations">
 <a href="#section-12" class="section-number selfRef">12. </a><a href="#name-iana-considerations" class="section-name selfRef">IANA Considerations</a>
       </h2>
-<p id="section-12-1">IANA is requested to replace TBD1 and TBD2 throughout this document with the values assigned as
-specified below. RFC Editor: please replace "RFC XXXX" throughout this document with the RFC number
-assigned to this document, and remove this note.<a href="#section-12-1" class="pilcrow">¶</a></p>
+<p id="section-12-1">RFC Editor: please replace TBD1 and TBD2 throughout this document with the values assigned by IANA,
+replace "RFC XXXX" with the RFC number assigned to this document, and remove this note.<a href="#section-12-1" class="pilcrow">¶</a></p>
 <div id="dhcpv4-option">
 <section id="section-12.1">
         <h3 id="name-dhcpv4-option">
 <a href="#section-12.1" class="section-number selfRef">12.1. </a><a href="#name-dhcpv4-option" class="section-name selfRef">DHCPv4 Option</a>
         </h3>
-<p id="section-12.1-1">IANA is requested to assign a new DHCP Option Code in the "BOOTP Vendor Extensions and DHCP Options"
-registry as follows:<a href="#section-12.1-1" class="pilcrow">¶</a></p>
+<p id="section-12.1-1">IANA is requested to assign a new option code in the "BOOTP Vendor Extensions and DHCP Options"
+registry within the "Dynamic Host Configuration Protocol (DHCP) and Bootstrap Protocol (BOOTP)
+Parameters" registry group (<a href="https://www.iana.org/assignments/bootp-dhcp-parameters">https://www.iana.org/assignments/bootp-dhcp-parameters</a>) as follows:<a href="#section-12.1-1" class="pilcrow">¶</a></p>
 <span id="name-dhcpv4-option-code"></span><div id="tab-iana-v4">
 <table class="center" id="table-3">
           <caption>
@@ -2559,7 +2558,7 @@ registry as follows:<a href="#section-12.1-1" class="pilcrow">¶</a></p>
               <td class="text-left" rowspan="1" colspan="1">TBD1</td>
               <td class="text-left" rowspan="1" colspan="1">OPTION_V4_RATE</td>
               <td class="text-right" rowspan="1" colspan="1">16</td>
-              <td class="text-left" rowspan="1" colspan="1">DHCPv4 Rate</td>
+              <td class="text-left" rowspan="1" colspan="1">Intended upstream and downstream rates</td>
               <td class="text-left" rowspan="1" colspan="1">RFC XXXX</td>
             </tr>
           </tbody>
@@ -2572,7 +2571,9 @@ registry as follows:<a href="#section-12.1-1" class="pilcrow">¶</a></p>
         <h3 id="name-dhcpv6-option">
 <a href="#section-12.2" class="section-number selfRef">12.2. </a><a href="#name-dhcpv6-option" class="section-name selfRef">DHCPv6 Option</a>
         </h3>
-<p id="section-12.2-1">IANA is requested to assign a new DHCPv6 Option Code in the "Option Codes" registry as follows:<a href="#section-12.2-1" class="pilcrow">¶</a></p>
+<p id="section-12.2-1">IANA is requested to assign a new option code in the "Option Codes" registry within the
+"Dynamic Host Configuration Protocol for IPv6 (DHCPv6)" registry group
+(<a href="https://www.iana.org/assignments/dhcpv6-parameters">https://www.iana.org/assignments/dhcpv6-parameters</a>) as follows:<a href="#section-12.2-1" class="pilcrow">¶</a></p>
 <span id="name-dhcpv6-option-code"></span><div id="tab-iana-v6">
 <table class="center" id="table-4">
           <caption>
@@ -2656,6 +2657,10 @@ registry as follows:<a href="#section-12.1-1" class="pilcrow">¶</a></p>
         <dd>
 <span class="refAuthor">Mamakos, L.</span>, <span class="refAuthor">Lidl, K.</span>, <span class="refAuthor">Evarts, J.</span>, <span class="refAuthor">Carrel, D.</span>, <span class="refAuthor">Simone, D.</span>, and <span class="refAuthor">R. Wheeler</span>, <span class="refTitle">"A Method for Transmitting PPP Over Ethernet (PPPoE)"</span>, <span class="seriesInfo">RFC 2516</span>, <span class="seriesInfo">DOI 10.17487/RFC2516</span>, <time datetime="1999-02" class="refDate">February 1999</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc2516">https://www.rfc-editor.org/rfc/rfc2516</a>&gt;</span>. </dd>
 <dd class="break"></dd>
+<dt id="RFC2661">[RFC2661]</dt>
+        <dd>
+<span class="refAuthor">Townsley, W.</span>, <span class="refAuthor">Valencia, A.</span>, <span class="refAuthor">Rubens, A.</span>, <span class="refAuthor">Pall, G.</span>, <span class="refAuthor">Zorn, G.</span>, and <span class="refAuthor">B. Palter</span>, <span class="refTitle">"Layer Two Tunneling Protocol "L2TP""</span>, <span class="seriesInfo">RFC 2661</span>, <span class="seriesInfo">DOI 10.17487/RFC2661</span>, <time datetime="1999-08" class="refDate">August 1999</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc2661">https://www.rfc-editor.org/rfc/rfc2661</a>&gt;</span>. </dd>
+<dd class="break"></dd>
 <dt id="RFC2865">[RFC2865]</dt>
         <dd>
 <span class="refAuthor">Rigney, C.</span>, <span class="refAuthor">Willens, S.</span>, <span class="refAuthor">Rubens, A.</span>, and <span class="refAuthor">W. Simpson</span>, <span class="refTitle">"Remote Authentication Dial In User Service (RADIUS)"</span>, <span class="seriesInfo">RFC 2865</span>, <span class="seriesInfo">DOI 10.17487/RFC2865</span>, <time datetime="2000-06" class="refDate">June 2000</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc2865">https://www.rfc-editor.org/rfc/rfc2865</a>&gt;</span>. </dd>
@@ -2671,10 +2676,6 @@ registry as follows:<a href="#section-12.1-1" class="pilcrow">¶</a></p>
 <dt id="RFC3396">[RFC3396]</dt>
         <dd>
 <span class="refAuthor">Lemon, T.</span> and <span class="refAuthor">S. Cheshire</span>, <span class="refTitle">"Encoding Long Options in the Dynamic Host Configuration Protocol (DHCPv4)"</span>, <span class="seriesInfo">RFC 3396</span>, <span class="seriesInfo">DOI 10.17487/RFC3396</span>, <time datetime="2002-11" class="refDate">November 2002</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc3396">https://www.rfc-editor.org/rfc/rfc3396</a>&gt;</span>. </dd>
-<dd class="break"></dd>
-<dt id="RFC3931">[RFC3931]</dt>
-        <dd>
-<span class="refAuthor">Lau, J., Ed.</span>, <span class="refAuthor">Townsley, M., Ed.</span>, and <span class="refAuthor">I. Goyret, Ed.</span>, <span class="refTitle">"Layer Two Tunneling Protocol - Version 3 (L2TPv3)"</span>, <span class="seriesInfo">RFC 3931</span>, <span class="seriesInfo">DOI 10.17487/RFC3931</span>, <time datetime="2005-03" class="refDate">March 2005</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc3931">https://www.rfc-editor.org/rfc/rfc3931</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC4649">[RFC4649]</dt>
         <dd>
@@ -2984,12 +2985,16 @@ without per-client state.<a href="#appendix-B.1-7.3.1" class="pilcrow">¶</a></p
             <p id="appendix-B.1-9.2.1">Moved TR-101 to the informative references and RFC 6221 to the normative references.<a href="#appendix-B.1-9.2.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="appendix-B.1-9.3">
-            <p id="appendix-B.1-9.3.1">Extended the Security Considerations; added Privacy Considerations, Operational Considerations,
-and Implementation Status.<a href="#appendix-B.1-9.3.1" class="pilcrow">¶</a></p>
+            <p id="appendix-B.1-9.3.1">Editorial updates following IANA and RFC Editor style review, including the IANA registry
+group names and the expansion of abbreviations on first use.<a href="#appendix-B.1-9.3.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="appendix-B.1-9.4">
-            <p id="appendix-B.1-9.4.1">Explained the use of 64-bit rates and the derivation of rates from access line information
-<span>[<a href="#RFC4679" class="cite xref">RFC4679</a>]</span> <span>[<a href="#RFC6320" class="cite xref">RFC6320</a>]</span>.<a href="#appendix-B.1-9.4.1" class="pilcrow">¶</a></p>
+            <p id="appendix-B.1-9.4.1">Extended the Security Considerations; added Privacy Considerations, Operational Considerations,
+and Implementation Status.<a href="#appendix-B.1-9.4.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="appendix-B.1-9.5">
+            <p id="appendix-B.1-9.5.1">Explained the use of 64-bit rates and the derivation of rates from access line information
+<span>[<a href="#RFC4679" class="cite xref">RFC4679</a>]</span> <span>[<a href="#RFC6320" class="cite xref">RFC6320</a>]</span>.<a href="#appendix-B.1-9.5.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
 </section>
