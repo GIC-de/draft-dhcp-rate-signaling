@@ -79,9 +79,7 @@ prioritization, Active Queue Management (AQM), and the Low Latency, Low Loss, an
 Throughput (L4S) architecture. Intermediate nodes acting as DHCP relay agents or performing DHCP
 snooping can use the same information to instantiate per-subscriber shapers and policers. All rates
 are Layer 3 rates, which match the speed perceived by users and can be applied directly to common
-traffic shapers without encapsulation-specific calculations. These options are also applicable
-within local area networks, for example to inform end devices about the capacity of the upstream
-connection.
+traffic shapers without encapsulation-specific calculations.
 
 --- middle
 
@@ -114,10 +112,11 @@ as poor and fluctuating results, for example in speed tests, even though no part
 is congested.
 
 Where the upstream bottleneck is located at the access device or within the access network, the
-resulting queue is typically managed by neither AQM nor prioritization of the subscriber's
-traffic. Depending on the buffering of the access device, this results in packet loss, with
-effects similar to those of a policer, or in increased latency under load. In both cases, all
-traffic of the subscriber is affected alike, including latency-sensitive applications.
+resulting queue is typically managed by neither Active Queue Management (AQM) {{?RFC7567}} nor
+prioritization of the subscriber's traffic. Depending on the buffering of the access device, this
+results in packet loss, with effects similar to those of a policer, or in increased latency under
+load. In both cases, all traffic of the subscriber is affected alike, including latency-sensitive
+applications.
 
 Many CPE implementations support upstream prioritization, for example of DNS, Voice over IP
 (VoIP), online gaming, or video conferencing traffic, of TCP acknowledgments, or of selected
@@ -147,7 +146,7 @@ IP header and payload of each packet as transmitted on the link of the receiver 
 
 If the CPE knows the upstream rate, it can shape its upstream traffic to this rate, regardless of
 where the bottleneck is located. The queue then builds at the CPE, where it can be managed using
-prioritization, Active Queue Management (AQM) {{?RFC7567}}, and flow queuing {{?RFC8290}}. Under
+prioritization, AQM, and flow queuing {{?RFC8290}}. Under
 normal operation, the policer at the BNG is not triggered, and the access device is not congested
 (see {{fig-policer}}). The resulting upstream throughput is stable and close to the signaled rate,
 and latency under load remains low. When combined with the Low Latency, Low Loss, and Scalable
@@ -180,27 +179,29 @@ slightly above the signaled rate for this purpose (see {{processing}}).
 
 Signaling Layer 3 rates keeps the mechanism simple. A Layer 3 rate corresponds to the speed
 perceived by users and measured by speed tests, and it is independent of the encapsulation used on
-any segment of the path. The same value is therefore valid at the CPE, at an access node, and at
-the BNG, irrespective of VLAN tags or PPPoE headers added or removed along the path, and it can be
-configured directly into common CPE shapers, such as the Common Applications Kept Enhanced (CAKE)
-queue discipline, without encapsulation-specific calculations (see {{application}}).
+any segment of the path. The same value is therefore valid at the CPE, at an access node, and at the
+BNG, irrespective of Virtual LAN (VLAN) tags or Point-to-Point Protocol over Ethernet (PPPoE)
+{{?RFC2516}} headers added or removed along the path, and it can be configured directly into common
+CPE shapers, such as the Common Applications Kept Enhanced (CAKE) queue discipline, without
+encapsulation-specific calculations (see {{application}}).
 
 The same rate information can be used by intermediate nodes. In many IP over Ethernet (IPoE)
 {{TR101}} architectures, the BNG operates as a DHCP relay agent. While per-subscriber traffic
 management policies are typically provisioned via Authentication, Authorization, and Accounting
-(AAA) protocols such as RADIUS {{?RFC2865}}, deployments lacking AAA integration at the service
-edge require an in-band alternative. The BNG can use the signaled rates to instantiate downstream
-shapers and upstream policers, and access nodes performing DHCP snooping can use them to
-configure their local queues and shapers. DHCPv6 additionally allows the server to signal
-different rates to the client and to each relay agent in the path (see {{dhcpv6-server}}).
+(AAA) protocols such as Remote Authentication Dial-In User Service (RADIUS) {{?RFC2865}},
+deployments lacking AAA integration at the service edge require an in-band alternative. The BNG can
+use the signaled rates to instantiate downstream shapers and upstream policers, and access nodes
+performing DHCP snooping can use them to configure their local queues and shapers. DHCPv6
+additionally allows the server to signal different rates to the client and to each relay agent in
+the path (see {{dhcpv6-server}}).
 
 ## Applicability
 
 The mechanism defined in this document is primarily designed for broadband access networks using
-IPoE or Point-to-Point Protocol over Ethernet (PPPoE) {{?RFC2516}}. In PPPoE deployments, DHCPv6 is
-commonly used over the PPP session for IPv6 Prefix Delegation and conveys the options in the same
-way (see {{pppoe}}). The options are defined for both DHCPv4 and DHCPv6 to support IPv4-only,
-IPv6-only, and dual-stack deployments.
+IPoE or PPPoE. In PPPoE deployments, DHCPv6 is commonly used over the Point-to-Point Protocol (PPP)
+{{?RFC1661}} session for IPv6 Prefix Delegation and conveys the options in the same way (see
+{{pppoe}}). The options are defined for both DHCPv4 and DHCPv6 to support IPv4-only, IPv6-only, and
+dual-stack deployments.
 
 Unlike auto-configuration protocols such as TR-069 {{TR069}}, which are not deployed by all
 operators and are typically not available for customer-owned CPE, DHCP is supported by virtually
@@ -220,6 +221,11 @@ not performed at the BNG, and why only Layer 3 rates are signaled.
 This document makes use of the terms defined in {{!RFC2131}} and {{!RFC9915}}.
 The following additional terms are used:
 
+Binding
+: The state that an intermediate node maintains for a client, associating the client with its
+  client-facing port or session and with the addresses or prefixes leased to it, for example the
+  subscriber session of a BNG or the binding table of a snooping device.
+
 DHCP
 : The abbreviation DHCP is used throughout this document to refer to both DHCPv4 and DHCPv6
   protocols.
@@ -229,11 +235,6 @@ DHCPv4
 
 DHCPv6
 : The Dynamic Host Configuration Protocol for IPv6 {{!RFC9915}}.
-
-Upstream
-: The direction of traffic from the client towards the network. For a client, this corresponds to
-  traffic sent over the link on which the Rate Option was received. For a relay agent or
-  snooping device, this corresponds to traffic received on the client-facing interface or port.
 
 Downstream
 : The direction of traffic from the network towards the client. For a client, this corresponds to
@@ -268,11 +269,6 @@ Rate Option
 : The DHCPv4 Rate Option (OPTION_V4_RATE) or the DHCPv6 Rate Option (OPTION_V6_RATE) defined in this
   document. Where the distinction is not relevant, this document refers to both as the Rate Option.
 
-Binding
-: The state that an intermediate node maintains for a client, associating the client with its
-  client-facing port or session and with the addresses or prefixes leased to it, for example the
-  subscriber session of a BNG or the binding table of a snooping device.
-
 Receiver
 : Any node that processes a received Rate Option, including DHCP clients, relay agents (including
   Lightweight DHCPv6 Relay Agents {{!RFC6221}} and Layer 2 DHCPv4 Relay Agents {{TR101}}), and DHCP
@@ -282,6 +278,11 @@ Subscriber
 : The customer of a network access service. Within the network, a subscriber is typically
   represented by a subscriber session at the BNG (e.g., an IPoE or PPPoE session), to which the
   provisioned rates and other per-subscriber policies are applied.
+
+Upstream
+: The direction of traffic from the client towards the network. For a client, this corresponds to
+  traffic sent over the link on which the Rate Option was received. For a relay agent or
+  snooping device, this corresponds to traffic received on the client-facing interface or port.
 
 # Rate Option {#rate-options}
 
@@ -314,7 +315,7 @@ outermost IP header of each packet (including any IPv6 extension headers) and it
 transmitted or received on the link of the receiver. For a client, this is the link on which the
 Rate Option was received; for a relay agent or snooping device, it is the client-facing link. The
 Layer 3 rate excludes all headers and trailers below the outermost IP header, such as Ethernet
-headers, Virtual LAN (VLAN) tags, PPPoE and PPP headers, and the Ethernet Frame Check Sequence
+headers, VLAN tags, PPPoE and PPP headers, and the Ethernet Frame Check Sequence
 (FCS), as well as all physical-layer overhead.
 
 Consequently, any tunnel or translation applied by the receiver itself is part of the Layer 3 rate.
@@ -334,7 +335,7 @@ A receiver that applies its traffic management functions to the inner traffic of
 translation, rather than to the packets on the link, accounts for the resulting difference locally,
 as the encapsulation or translation is performed by the receiver itself. Encapsulations added or
 removed by other nodes between the receiver and the enforcement point, such as an L2TP tunnel
-between an L2TP Access Concentrator (LAC) and an L2TP Network Server (LNS) {{?RFC3931}}, are
+between an L2TP Access Concentrator (LAC) and an L2TP Network Server (LNS) {{?RFC2661}}, are
 not part of the Layer 3 rate of the receiver; they are treated like any other difference in
 accounting at the enforcement point (see {{operations}}).
 
@@ -691,7 +692,7 @@ a client-facing port MUST NOT be used to configure traffic management.
 
 ## PPPoE {#pppoe}
 
-In PPPoE {{?RFC2516}} architectures, the CPE typically employs DHCPv6 over the PPP {{?RFC1661}} link
+In PPPoE {{?RFC2516}} architectures, the CPE typically employs DHCPv6 over the PPP link
 to obtain an IPv6 prefix via Prefix Delegation (IA_PD) {{!RFC9915}}. This DHCPv6 exchange conveys
 the Rate Option in the same way as in IPoE deployments. DHCPv4 transactions within a PPPoE session
 can similarly convey the DHCPv4 Rate Option.
@@ -780,22 +781,22 @@ inaccuracy is accepted in exchange for the simplicity of a single, encapsulation
 parameter (see {{rationale}}).
 
 Where the actual rate of the access line is known and lower than the provisioned rate, for example
-due to the synchronization rate of a DSL line, operators should signal the lower of the two rates,
-so that the client shapes its traffic to the actual bottleneck. The actual rate is typically known
-at the BNG, for example from the Actual-Data-Rate-Upstream and Actual-Data-Rate-Downstream
-attributes {{?RFC4679}} or the corresponding Access Node Control Protocol (ANCP) TLVs {{?RFC6320}}.
-As these attributes describe the net data rate of the access line, the server converts them to a
-Layer 3 rate, for example by deducting the encapsulation overhead for typical packet sizes and, for
-lines using Packet Transfer Mode (PTM) with 64/65-octet encapsulation, the corresponding 1/65 of the
-rate. Access lines with cell-based link layers, such as Asynchronous Transfer Mode (ATM) on
-Asymmetric Digital Subscriber Line (ADSL), have a packet-size-dependent overhead that a single rate
-cannot describe precisely; operators of such lines can signal a conservatively reduced rate, and
-precise modeling remains a matter of local configuration of the CPE.
+due to the synchronization rate of a DSL line, operators are advised to signal the lower of the two
+rates, so that the client shapes its traffic to the actual bottleneck. The actual rate is typically
+known at the BNG, for example from the Actual-Data-Rate-Upstream and Actual-Data-Rate-Downstream
+attributes {{?RFC4679}} or the corresponding Access Node Control Protocol (ANCP) Type-Length-Value
+(TLV) elements {{?RFC6320}}. As these attributes describe the net data rate of the access line, the
+server converts them to a Layer 3 rate, for example by deducting the encapsulation overhead for
+typical packet sizes and, for lines using Packet Transfer Mode (PTM) with 64/65-octet encapsulation,
+the corresponding 1/65 of the rate. Access lines with cell-based link layers, such as Asynchronous
+Transfer Mode (ATM) on Asymmetric Digital Subscriber Line (ADSL), have a packet-size-dependent
+overhead that a single rate cannot describe precisely; operators of such lines can signal a
+conservatively reduced rate, and precise modeling remains a matter of local configuration of the
+CPE.
 
-Without the use of DHCPFORCERENEW or Reconfigure, changes of the provisioned rates take effect
-with the next renewal of the client. Operators should consider this delay when choosing lease
-and renewal times, for example when rates are changed due to service upgrades or fair-use
-policies.
+Without the use of DHCPFORCERENEW or Reconfigure, changes of the provisioned rates take effect with
+the next renewal of the client. Operators are advised to consider this delay when choosing lease and
+renewal times, for example when rates are changed due to service upgrades or fair-use policies.
 
 The inclusion of the code of the Rate Option in the Parameter Request List or Option Request option
 allows operators to determine the share of clients supporting these options, for example to plan the
@@ -807,8 +808,8 @@ Layer 3 rates, the displayed values are directly comparable with the results of 
 can reduce support inquiries related to perceived bandwidth issues.
 
 As noted in {{processing}}, a client can receive a rate that exceeds the maximum physical link speed
-of its interfaces. In such scenarios, management interfaces should expose both the signaled rate and
-the effective, capped rate applied by the device, and implementations should log this discrepancy
+of its interfaces. In such scenarios, management interfaces can expose both the signaled rate and
+the effective, capped rate applied by the device, and implementations can log this discrepancy
 if logging facilities are enabled. Such events can indicate a mismatch between the subscriber's
 provisioned service tier and the installed equipment.
 
@@ -910,23 +911,25 @@ is subject to the operator's applicable privacy policies.
 
 # IANA Considerations {#iana}
 
-IANA is requested to replace TBD1 and TBD2 throughout this document with the values assigned as
-specified below. RFC Editor: please replace "RFC XXXX" throughout this document with the RFC number
-assigned to this document, and remove this note.
+RFC Editor: please replace TBD1 and TBD2 throughout this document with the values assigned by IANA,
+replace "RFC XXXX" with the RFC number assigned to this document, and remove this note.
 
 ## DHCPv4 Option
 
-IANA is requested to assign a new DHCP Option Code in the "BOOTP Vendor Extensions and DHCP Options"
-registry as follows:
+IANA is requested to assign a new option code in the "BOOTP Vendor Extensions and DHCP Options"
+registry within the "Dynamic Host Configuration Protocol (DHCP) and Bootstrap Protocol (BOOTP)
+Parameters" registry group (<https://www.iana.org/assignments/bootp-dhcp-parameters>) as follows:
 
-| Tag  | Name           | Data Length | Meaning          | Reference |
-| :--- | :------------- | ----------: | :--------------- | :-------- |
-| TBD1 | OPTION_V4_RATE |          16 | DHCPv4 Rate      | RFC XXXX  |
+| Tag  | Name           | Data Length | Meaning                                   | Reference |
+| :--- | :------------- | ----------: | :---------------------------------------- | :-------- |
+| TBD1 | OPTION_V4_RATE |          16 | Intended upstream and downstream rates    | RFC XXXX  |
 {: #tab-iana-v4 title="DHCPv4 Option Code"}
 
 ## DHCPv6 Option
 
-IANA is requested to assign a new DHCPv6 Option Code in the "Option Codes" registry as follows:
+IANA is requested to assign a new option code in the "Option Codes" registry within the
+"Dynamic Host Configuration Protocol for IPv6 (DHCPv6)" registry group
+(<https://www.iana.org/assignments/dhcpv6-parameters>) as follows:
 
 | Value | Description    | Client ORO | Singleton Option | Reference |
 | :---- | :------------- | :--------- | :--------------- | :-------- |
@@ -1102,6 +1105,8 @@ Other:
 
 - Changed the intended status to Standards Track; replaced RFC 8415 by RFC 9915.
 - Moved TR-101 to the informative references and RFC 6221 to the normative references.
+- Editorial updates following IANA and RFC Editor style review, including the IANA registry
+  group names and the expansion of abbreviations on first use.
 - Extended the Security Considerations; added Privacy Considerations, Operational Considerations,
   and Implementation Status.
 - Explained the use of 64-bit rates and the derivation of rates from access line information
