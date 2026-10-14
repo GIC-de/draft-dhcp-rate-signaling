@@ -1256,6 +1256,12 @@ traffic shapers without encapsulation-specific calculations.<a href="#section-ab
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.2">
                 <p id="section-toc.1-1.7.2.2.1"><a href="#section-7.2" class="auto internal xref">7.2</a>.  <a href="#name-local-area-networks" class="internal xref">Local Area Networks</a></p>
 </li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.3">
+                <p id="section-toc.1-1.7.2.3.1"><a href="#section-7.3" class="auto internal xref">7.3</a>.  <a href="#name-enterprise-access-links" class="internal xref">Enterprise Access Links</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.4">
+                <p id="section-toc.1-1.7.2.4.1"><a href="#section-7.4" class="auto internal xref">7.4</a>.  <a href="#name-links-with-variable-capacit" class="internal xref">Links with Variable Capacity</a></p>
+</li>
             </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8">
@@ -1531,11 +1537,15 @@ dual-stack deployments.<a href="#section-1.3-1" class="pilcrow">¶</a></p>
 operators and are typically not available for customer-owned CPE, DHCP is supported by virtually
 all CPE, including retail routers and devices running open-source firmware (e.g., OpenWrt), and
 it is visible to intermediate nodes along the path. Rates conveyed via DHCP are refreshed with
-every lease renewal and can be updated dynamically. The options are also applicable within LANs
-(see <a href="#lan" class="auto internal xref">Section 7.2</a>).<a href="#section-1.3-2" class="pilcrow">¶</a></p>
-<p id="section-1.3-3"><a href="#rationale" class="auto internal xref">Appendix A</a> discusses the reasoning behind this mechanism and addresses frequently raised
+every lease renewal and can be updated dynamically.<a href="#section-1.3-2" class="pilcrow">¶</a></p>
+<p id="section-1.3-3">The options are applicable to any access link on which DHCP is used to configure the
+network-facing interface and on which the intended rates are determined by a subscription,
+contract, or policy, for example enterprise access links (see <a href="#enterprise" class="auto internal xref">Section 7.3</a>) and public or guest
+Wi-Fi networks (see <a href="#lan" class="auto internal xref">Section 7.2</a>). They convey provisioned, slowly changing values and do not describe
+the instantaneous capacity of links whose capacity varies over time (see <a href="#variable-capacity" class="auto internal xref">Section 7.4</a>).<a href="#section-1.3-3" class="pilcrow">¶</a></p>
+<p id="section-1.3-4"><a href="#rationale" class="auto internal xref">Appendix A</a> discusses the reasoning behind this mechanism and addresses frequently raised
 questions, such as why rate enforcement at the BNG alone is not sufficient, why upstream shaping is
-not performed at the BNG, and why only Layer 3 rates are signaled.<a href="#section-1.3-3" class="pilcrow">¶</a></p>
+not performed at the BNG, and why only Layer 3 rates are signaled.<a href="#section-1.3-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -1575,72 +1585,82 @@ protocols.<a href="#section-2-3.4.1" class="pilcrow">¶</a></p>
           <p id="section-2-3.8.1">The Dynamic Host Configuration Protocol for IPv6 <span>[<a href="#RFC9915" class="cite xref">RFC9915</a>]</span>.<a href="#section-2-3.8.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
-<dt id="section-2-3.9">Downstream</dt>
+<dt id="section-2-3.9">Default Configuration</dt>
         <dd style="margin-left: 1.5em" id="section-2-3.10">
-          <p id="section-2-3.10.1">The direction of traffic from the network towards the client. For a client, this corresponds to
-traffic received over the link on which the Rate Option was received. For a relay agent or
-snooping device, this corresponds to traffic sent on the client-facing interface or port.<a href="#section-2-3.10.1" class="pilcrow">¶</a></p>
+          <p id="section-2-3.10.1">The configuration of the traffic management functions of a receiver for a given direction that
+applies when no signaled rate is in effect for that direction. It consists of any rate or traffic
+management policy statically configured by the administrator of the receiver for that direction
+or, if no such configuration exists, of no rate limitation by the receiver, i.e., traffic is
+forwarded up to the capacity of the physical link. The default configuration does not depend on
+rates previously learned from a Rate Option.<a href="#section-2-3.10.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
-<dt id="section-2-3.11">Enforcement Point</dt>
+<dt id="section-2-3.11">Downstream</dt>
         <dd style="margin-left: 1.5em" id="section-2-3.12">
-          <p id="section-2-3.12.1">The node or link at which the provisioned rates are enforced or which constitutes the bottleneck
-of the path, for example a policer at the BNG or an access link.<a href="#section-2-3.12.1" class="pilcrow">¶</a></p>
+          <p id="section-2-3.12.1">The direction of traffic from the network towards the client. For a client, this corresponds to
+traffic received over the link on which the Rate Option was received. For a relay agent or
+snooping device, this corresponds to traffic sent on the client-facing interface or port.<a href="#section-2-3.12.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
-<dt id="section-2-3.13">Intended Rate</dt>
+<dt id="section-2-3.13">Enforcement Point</dt>
         <dd style="margin-left: 1.5em" id="section-2-3.14">
-          <p id="section-2-3.14.1">The maximum rate, in a given direction, at which the network intends to forward the traffic of a
+          <p id="section-2-3.14.1">The node or link at which the provisioned rates are enforced or which constitutes the bottleneck
+of the path, for example a policer at the BNG or an access link.<a href="#section-2-3.14.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-2-3.15">Intended Rate</dt>
+        <dd style="margin-left: 1.5em" id="section-2-3.16">
+          <p id="section-2-3.16.1">The maximum rate, in a given direction, at which the network intends to forward the traffic of a
 client. Traffic exceeding the intended rate is subject to being dropped or delayed at the
 enforcement point. The intended rate is not a guarantee: the achievable rate can be lower, for
 example due to congestion elsewhere in the network. The Rate Option signals the intended rates;
-this document also refers to them as the signaled rates.<a href="#section-2-3.14.1" class="pilcrow">¶</a></p>
+this document also refers to them as the signaled rates.<a href="#section-2-3.16.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
-<dt id="section-2-3.15">Intermediate Node</dt>
-        <dd style="margin-left: 1.5em" id="section-2-3.16">
-          <p id="section-2-3.16.1">A relay agent or snooping device on the path between a client and a server that processes the Rate
-Option, for example a BNG acting as a DHCP relay agent or an access node performing DHCP snooping.<a href="#section-2-3.16.1" class="pilcrow">¶</a></p>
-</dd>
-        <dd class="break"></dd>
-<dt id="section-2-3.17">Layer 3 Rate</dt>
+<dt id="section-2-3.17">Intermediate Node</dt>
         <dd style="margin-left: 1.5em" id="section-2-3.18">
-          <p id="section-2-3.18.1">A rate calculated over the outermost IP header of each packet and its payload, as transmitted on
-the link of the receiver (see <a href="#layer3" class="auto internal xref">Section 3.1</a>).<a href="#section-2-3.18.1" class="pilcrow">¶</a></p>
+          <p id="section-2-3.18.1">A relay agent or snooping device on the path between a client and a server that processes the Rate
+Option, for example a BNG acting as a DHCP relay agent or an access node performing DHCP snooping.<a href="#section-2-3.18.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
-<dt id="section-2-3.19">Provisioned Rate</dt>
+<dt id="section-2-3.19">Layer 3 Rate</dt>
         <dd style="margin-left: 1.5em" id="section-2-3.20">
-          <p id="section-2-3.20.1">The rate configured in the network for a subscriber according to the subscribed service, typically
-enforced at the enforcement point (e.g., the BNG). The intended rates are typically derived from
-the provisioned rates.<a href="#section-2-3.20.1" class="pilcrow">¶</a></p>
+          <p id="section-2-3.20.1">A rate calculated over the outermost IP header of each packet and its payload, as transmitted on
+the link of the receiver (see <a href="#layer3" class="auto internal xref">Section 3.1</a>).<a href="#section-2-3.20.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
-<dt id="section-2-3.21">Rate Option</dt>
+<dt id="section-2-3.21">Provisioned Rate</dt>
         <dd style="margin-left: 1.5em" id="section-2-3.22">
-          <p id="section-2-3.22.1">The DHCPv4 Rate Option (OPTION_V4_RATE) or the DHCPv6 Rate Option (OPTION_V6_RATE) defined in this
-document. Where the distinction is not relevant, this document refers to both as the Rate Option.<a href="#section-2-3.22.1" class="pilcrow">¶</a></p>
+          <p id="section-2-3.22.1">The rate configured in the network for a subscriber according to the subscribed service, typically
+enforced at the enforcement point (e.g., the BNG). The intended rates are typically derived from
+the provisioned rates.<a href="#section-2-3.22.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
-<dt id="section-2-3.23">Receiver</dt>
+<dt id="section-2-3.23">Rate Option</dt>
         <dd style="margin-left: 1.5em" id="section-2-3.24">
-          <p id="section-2-3.24.1">Any node that processes a received Rate Option, including DHCP clients, relay agents (including
-Lightweight DHCPv6 Relay Agents <span>[<a href="#RFC6221" class="cite xref">RFC6221</a>]</span> and Layer 2 DHCPv4 Relay Agents <span>[<a href="#TR101" class="cite xref">TR101</a>]</span>), and DHCP
-snooping devices.<a href="#section-2-3.24.1" class="pilcrow">¶</a></p>
+          <p id="section-2-3.24.1">The DHCPv4 Rate Option (OPTION_V4_RATE) or the DHCPv6 Rate Option (OPTION_V6_RATE) defined in this
+document. Where the distinction is not relevant, this document refers to both as the Rate Option.<a href="#section-2-3.24.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
-<dt id="section-2-3.25">Subscriber</dt>
+<dt id="section-2-3.25">Receiver</dt>
         <dd style="margin-left: 1.5em" id="section-2-3.26">
-          <p id="section-2-3.26.1">The customer of a network access service. Within the network, a subscriber is typically
-represented by a subscriber session at the BNG (e.g., an IPoE or PPPoE session), to which the
-provisioned rates and other per-subscriber policies are applied.<a href="#section-2-3.26.1" class="pilcrow">¶</a></p>
+          <p id="section-2-3.26.1">Any node that processes a received Rate Option, including DHCP clients, relay agents (including
+Lightweight DHCPv6 Relay Agents <span>[<a href="#RFC6221" class="cite xref">RFC6221</a>]</span> and Layer 2 DHCPv4 Relay Agents <span>[<a href="#TR101" class="cite xref">TR101</a>]</span>), and DHCP
+snooping devices.<a href="#section-2-3.26.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
-<dt id="section-2-3.27">Upstream</dt>
+<dt id="section-2-3.27">Subscriber</dt>
         <dd style="margin-left: 1.5em" id="section-2-3.28">
-          <p id="section-2-3.28.1">The direction of traffic from the client towards the network. For a client, this corresponds to
+          <p id="section-2-3.28.1">The customer of a network access service. Within the network, a subscriber is typically
+represented by a subscriber session at the BNG (e.g., an IPoE or PPPoE session), to which the
+provisioned rates and other per-subscriber policies are applied.<a href="#section-2-3.28.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-2-3.29">Upstream</dt>
+        <dd style="margin-left: 1.5em" id="section-2-3.30">
+          <p id="section-2-3.30.1">The direction of traffic from the client towards the network. For a client, this corresponds to
 traffic sent over the link on which the Rate Option was received. For a relay agent or
-snooping device, this corresponds to traffic received on the client-facing interface or port.<a href="#section-2-3.28.1" class="pilcrow">¶</a></p>
+snooping device, this corresponds to traffic received on the client-facing interface or port.<a href="#section-2-3.30.1" class="pilcrow">¶</a></p>
 </dd>
       <dd class="break"></dd>
 </dl>
@@ -1791,13 +1811,18 @@ direction:<a href="#section-3.3-3" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-3.3-4.2">
             <p id="section-3.3-4.2.1">If the value is 0, the receiver <span class="bcp14">MUST</span> remove any rate previously applied for that direction and
-revert to its default configuration for that direction.<a href="#section-3.3-4.2.1" class="pilcrow">¶</a></p>
+revert to its default configuration for that direction (see <a href="#definitions" class="auto internal xref">Section 2</a>), i.e., to any
+statically configured local policy or, if none exists, to no rate limitation by the receiver.<a href="#section-3.3-4.2.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
 <p id="section-3.3-5">If a DHCPACK or Reply message does not contain a Rate Option, the receiver <span class="bcp14">MUST</span> retain the rates in
 effect unchanged.<a href="#section-3.3-5" class="pilcrow">¶</a></p>
-<p id="section-3.3-6">If a signaled rate is identical to the rate currently in effect, the receiver <span class="bcp14">SHOULD NOT</span> reconfigure
-its traffic management functions.<a href="#section-3.3-6" class="pilcrow">¶</a></p>
+<p id="section-3.3-6">In some deployments, DHCP renewals occur frequently, and most of them carry unchanged rates. A
+receiver therefore compares the signaled rates with the rates currently in effect and treats the
+processing as idempotent: if a signaled rate is identical to the rate currently in effect, the
+receiver <span class="bcp14">SHOULD NOT</span> reconfigure its traffic management functions for that direction. A stateless
+implementation can achieve this by storing the rates currently in effect and comparing them before
+any reconfiguration.<a href="#section-3.3-6" class="pilcrow">¶</a></p>
 <p id="section-3.3-7">For clients, the rates in effect are not bound to the lifetime of the DHCP lease from which they
 were learned. Relay agents and snooping devices remove the rates applied for a client together with
 the corresponding binding (see <a href="#dhcpv4" class="auto internal xref">Section 4</a>, <a href="#dhcpv6-relay" class="auto internal xref">Section 5.4</a>, and <a href="#snooping" class="auto internal xref">Section 6</a>). An intermediate node
@@ -1822,12 +1847,41 @@ Alternatively, in DHCPv6, the server can signal node-specific rates (see <a href
 2 Gbit/s signaled to a CPE with a 1 Gbit/s Wide Area Network (WAN) port). In such scenarios, the
 client <span class="bcp14">SHOULD</span> cap the applied traffic shaping, policing, or AQM parameters to the capacity of the
 physical link.<a href="#section-3.3-10" class="pilcrow">¶</a></p>
-<p id="section-3.3-11">In dual-stack deployments, servers <span class="bcp14">MUST NOT</span> signal different rates to the same client via DHCPv4 and
-DHCPv6. Servers either signal identical rates via both protocols, or signal rates via only one of
-the two protocols that is expected to be negotiated by every client. In the latter case, messages of
-the other protocol do not carry a Rate Option and therefore leave the rates in effect unchanged.
-Where DHCPv4 and DHCPv6 are served by different servers, operators ensure that both are provisioned
-with the same rates; otherwise, the rates in effect depend on which message was received last.<a href="#section-3.3-11" class="pilcrow">¶</a></p>
+<p id="section-3.3-11">In dual-stack deployments, DHCPv4 and DHCPv6 are frequently served by independent servers, for
+example a centralized DHCPv4 server and a DHCPv6 server co-located with the BNG, which cannot
+inspect each other's state. Network operators <span class="bcp14">MUST</span> ensure that the DHCPv4 and DHCPv6 services for
+the same client are configured with identical intended rates, or that only one of the two protocols,
+which is expected to be negotiated by every client, conveys the Rate Option. In the latter case,
+messages of the other protocol do not carry a Rate Option and therefore leave the rates in effect
+unchanged.<a href="#section-3.3-11" class="pilcrow">¶</a></p>
+<p id="section-3.3-12">Even with identical configuration, the two protocols can transiently convey different rates, for
+example while a rate change is being provisioned on both servers, or because the renewal times of
+DHCPv4 and DHCPv6 are not aligned. As the most recently received valid Rate Option takes precedence,
+a receiver can then alternate between the old and the new rates until both protocols convey the new
+rates. Operators can minimize this period by updating the rates on both servers together and, where
+supported, by triggering an immediate update via DHCPFORCERENEW or Reconfigure (see
+<a href="#dhcpv4-server" class="auto internal xref">Section 4.3</a> and <a href="#dhcpv6-server" class="auto internal xref">Section 5.3</a>).<a href="#section-3.3-12" class="pilcrow">¶</a></p>
+<p id="section-3.3-13">The processing specified in this section is stateless by design, so that it can be implemented by
+simple scripts. Implementations <span class="bcp14">MAY</span> maintain additional state to improve robustness, provided that
+the rates eventually applied correspond to the most recently received valid Rate Option. For
+example, an implementation can:<a href="#section-3.3-13" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-3.3-14.1">
+            <p id="section-3.3-14.1.1">apply a hold-down or hysteresis timer, delaying the reconfiguration of its traffic management
+functions after a change until the signaled rates have been stable for a short period, to avoid
+repeated reconfiguration when DHCPv4 and DHCPv6 transiently convey different rates;<a href="#section-3.3-14.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-3.3-14.2">
+            <p id="section-3.3-14.2.1">track the protocol from which the rates in effect were learned, in order to detect and log
+conflicting rates conveyed via DHCPv4 and DHCPv6; or<a href="#section-3.3-14.2.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-3.3-14.3">
+            <p id="section-3.3-14.3.1">revert to its default configuration on reconnect events, for example when a new DHCP exchange is
+initiated after the lease has expired or when the DHCP server changes, until a Rate Option is
+received again.<a href="#section-3.3-14.3.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+<p id="section-3.3-15">Such behavior is desirable but not required for interoperability.<a href="#section-3.3-15" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="errors">
@@ -2302,44 +2356,91 @@ information that is conveyed only once per session.<a href="#section-7.1-4" clas
 <a href="#section-7.2" class="section-number selfRef">7.2. </a><a href="#name-local-area-networks" class="section-name selfRef">Local Area Networks</a>
         </h3>
 <p id="section-7.2-1">The Rate Option can also be used by DHCP servers in local area networks, for example a DHCP server
-co-located with a CPE or another gateway, to inform clients about the rates available to them. In
-this case, the signaled rates indicate the maximum rate a client can expect through the network it
-is attached to. Examples include:<a href="#section-7.2-1" class="pilcrow">¶</a></p>
+co-located with a CPE or another gateway, to inform clients about the rates available to them
+towards the Internet or another upstream network. In this case, the signaled rates indicate the
+maximum rate a client can expect through the upstream connection of the network it is attached to.<a href="#section-7.2-1" class="pilcrow">¶</a></p>
+<p id="section-7.2-2">This is primarily useful in networks that are used mainly for Internet access, such as public
+Wi-Fi hotspots and guest networks, where the upstream connection is the relevant bottleneck for
+most of the traffic of a client. In networks that are also used for substantial local traffic, such
+as home or corporate networks with local servers, printers, or storage, the signaled rates do not
+apply to the local traffic. Clients in such networks <span class="bcp14">SHOULD NOT</span> apply the signaled rates to traffic
+that does not traverse the upstream connection and typically use them as information only.<a href="#section-7.2-2" class="pilcrow">¶</a></p>
+<p id="section-7.2-3">Examples include:<a href="#section-7.2-3" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-7.2-2.1">
-            <p id="section-7.2-2.1.1">Virtual Private Network (VPN) gateways or tunnel endpoints that shape traffic towards their peers
-and whose processing capacity exceeds the capacity of the upstream connection.<a href="#section-7.2-2.1.1" class="pilcrow">¶</a></p>
+<li class="normal" id="section-7.2-4.1">
+            <p id="section-7.2-4.1.1">Virtual Private Network (VPN) gateways or tunnel endpoints that shape traffic towards their peers
+and whose processing capacity exceeds the capacity of the upstream connection.<a href="#section-7.2-4.1.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="section-7.2-2.2">
-            <p id="section-7.2-2.2.1">Public Wi-Fi hotspots that enforce per-user rate limits, where clients can align their sending
-rate with the enforced limit to avoid policer drops.<a href="#section-7.2-2.2.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="section-7.2-4.2">
+            <p id="section-7.2-4.2.1">Public Wi-Fi hotspots that enforce per-user rate limits, where clients can align their sending
+rate with the enforced limit to avoid policer drops.<a href="#section-7.2-4.2.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="section-7.2-2.3">
-            <p id="section-7.2-2.3.1">Applications on end devices that use the signaled rates as an initial estimate, e.g., to
-estimate transfer times, to select an initial video quality, or to choose between available
-network interfaces.<a href="#section-7.2-2.3.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="section-7.2-4.3">
+            <p id="section-7.2-4.3.1">End devices, such as smartphones, laptops, or other Wi-Fi clients, that display the offered
+upstream connection rates to the user, for example in the details of the connected network, or
+that use them as an initial estimate, e.g., to estimate transfer times, to select an initial video
+quality, or to decide whether to keep using the network or to prefer another available
+interface, such as a cellular connection.<a href="#section-7.2-4.3.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
-<p id="section-7.2-3">A device that acts as a DHCP client on its network-facing interface and as a DHCP server on its
+<p id="section-7.2-5">End devices decide whether they use the signaled rates as information only or also apply them to
+their traffic management functions (see <a href="#application" class="auto internal xref">Section 3.2</a>). Using the rates as information only is
+always permitted.<a href="#section-7.2-5" class="pilcrow">¶</a></p>
+<p id="section-7.2-6">As DHCP is performed after association with a wireless network, the signaled rates are only
+available once the device has connected. A device can retain the rates learned for a network and
+take them into account when selecting among known networks later. Providing information about the
+capacity of a wireless network prior to association is outside the scope of this document.<a href="#section-7.2-6" class="pilcrow">¶</a></p>
+<p id="section-7.2-7">A device that acts as a DHCP client on its network-facing interface and as a DHCP server on its
 LAN interfaces <span class="bcp14">MAY</span> derive the rates it signals to LAN clients from the rates learned on its
 network-facing interface, from local configuration, or both. In this case, it <span class="bcp14">SHOULD</span> signal the
 lower of the learned rate and any locally configured limit for the client. When the learned rates
 change, the device <span class="bcp14">SHOULD</span> signal the updated rates to its LAN clients with their next renewal and
 <span class="bcp14">MAY</span> trigger an earlier update as specified in <a href="#dhcpv4-server" class="auto internal xref">Section 4.3</a> and <a href="#dhcpv6-server" class="auto internal xref">Section 5.3</a>. As Layer 3
 rates are independent of the link-layer encapsulation, the learned rates can typically be passed on
-unchanged.<a href="#section-7.2-3" class="pilcrow">¶</a></p>
-<p id="section-7.2-4">Unless the signaled rates are enforced for each client individually, they describe a capacity shared
+unchanged.<a href="#section-7.2-7" class="pilcrow">¶</a></p>
+<p id="section-7.2-8">Unless the signaled rates are enforced for each client individually, they describe a capacity shared
 by all clients of the LAN. A client that shapes its traffic to such a rate does not exceed the
-shared capacity on its own, but it does not obtain a guaranteed share of it either.<a href="#section-7.2-4" class="pilcrow">¶</a></p>
-<p id="section-7.2-5">Clients cap the effective rates to the capacity of their physical link (see <a href="#processing" class="auto internal xref">Section 3.3</a>). For
+shared capacity on its own, but it does not obtain a guaranteed share of it either.<a href="#section-7.2-8" class="pilcrow">¶</a></p>
+<p id="section-7.2-9">Clients cap the effective rates to the capacity of their physical link (see <a href="#processing" class="auto internal xref">Section 3.3</a>). For
 links with variable capacity, such as wireless links, the effective rate is the lower of the
-signaled rate and the current link capacity.<a href="#section-7.2-5" class="pilcrow">¶</a></p>
-<p id="section-7.2-6">The signaled rates do not account for other bottlenecks along the path to a remote peer. Clients
+signaled rate and the current link capacity.<a href="#section-7.2-9" class="pilcrow">¶</a></p>
+<p id="section-7.2-10">The signaled rates do not account for other bottlenecks along the path to a remote peer. Clients
 <span class="bcp14">MUST NOT</span> use the signaled rates as a replacement for congestion control or other adaptive rate
 mechanisms, and <span class="bcp14">MUST NOT</span> use them to increase the sending rate of a congestion control algorithm,
 such as its initial sending rate, beyond the rate that the algorithm would otherwise use. Where rate
 limits need to be enforced, enforcement remains the responsibility of the network; the Rate Option
-only informs clients about such limits.<a href="#section-7.2-6" class="pilcrow">¶</a></p>
+only informs clients about such limits.<a href="#section-7.2-10" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="enterprise">
+<section id="section-7.3">
+        <h3 id="name-enterprise-access-links">
+<a href="#section-7.3" class="section-number selfRef">7.3. </a><a href="#name-enterprise-access-links" class="section-name selfRef">Enterprise Access Links</a>
+        </h3>
+<p id="section-7.3-1">Enterprise branch offices are often connected via access links whose contracted rate is lower than
+the speed of the physical interface, for example a 100 Mbit/s service delivered over a 1 Gbit/s
+Ethernet interface, with the contracted rate enforced by a policer in the provider network. Where
+the provider uses DHCP to configure the customer edge router, the Rate Option allows the router,
+including Software-Defined Wide Area Network (SD-WAN) edge devices, to configure its upstream shaper
+without manual provisioning.<a href="#section-7.3-1" class="pilcrow">¶</a></p>
+<p id="section-7.3-2">Where the service defines both a committed and an excess or peak rate, the intended rate is the
+maximum rate at which the provider intends to forward traffic (see <a href="#definitions" class="auto internal xref">Section 2</a>). Bandwidth
+profiles of such services commonly account Ethernet frames; the considerations for enforcement
+points that account traffic at Layer 2 apply (see <a href="#operations" class="auto internal xref">Section 8</a>).<a href="#section-7.3-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="variable-capacity">
+<section id="section-7.4">
+        <h3 id="name-links-with-variable-capacit">
+<a href="#section-7.4" class="section-number selfRef">7.4. </a><a href="#name-links-with-variable-capacit" class="section-name selfRef">Links with Variable Capacity</a>
+        </h3>
+<p id="section-7.4-1">On wireless, cellular, and satellite access links, the available capacity varies with radio
+conditions, scheduling, and load on time scales far shorter than DHCP lease and renewal intervals.
+The Rate Option is not suitable for conveying such variations. It can, however, convey a
+provisioned upper bound, for example a rate limit defined by the subscription. Receivers on such
+links use the lower of the signaled rate and the current link capacity (see <a href="#lan" class="auto internal xref">Section 7.2</a>) and <span class="bcp14">SHOULD</span>
+combine the signaled rate with adaptive mechanisms where the bottleneck is the variable-capacity
+link itself.<a href="#section-7.4-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -2469,13 +2570,23 @@ much more critical and immediate loss of service.<a href="#section-10-2" class="
 <span>[<a href="#RFC7610" class="cite xref">RFC7610</a>]</span> for DHCPv6 on access nodes, which discard server messages received on client-facing
 ports. These mechanisms protect both the clients and the intermediate nodes that apply signaled
 rates.<a href="#section-10-3" class="pilcrow">¶</a></p>
-<p id="section-10-4">To mitigate the impact of malicious or malformed options, client implementations <span class="bcp14">MAY</span> apply sanity
-checks before applying signaled rates. In particular, a client implementation <span class="bcp14">MAY</span> assume a minimum
-rate below which basic connectivity is no longer ensured, and treat a Rate Option signaling a
-non-zero rate below this minimum as if it were not present (see <a href="#processing" class="auto internal xref">Section 3.3</a>). The appropriate
-minimum depends on the deployment and the use case of the device and is therefore left to the client
-implementation. For example, a broadband CPE might reject rates below 1 Mbit/s.<a href="#section-10-4" class="pilcrow">¶</a></p>
-<p id="section-10-5">Conversely, an attacker could inject an excessively high rate or a rate of 0, thereby removing any
+<p id="section-10-4">To mitigate the impact of malicious, spoofed, or malformed options, clients <span class="bcp14">SHOULD</span> apply sanity
+checks before applying signaled rates:<a href="#section-10-4" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-10-5.1">
+          <p id="section-10-5.1.1">Clients <span class="bcp14">SHOULD</span> ignore a non-zero rate below a minimum below which basic connectivity is no longer
+ensured, and retain the rate currently in effect for that direction. The appropriate minimum
+depends on the deployment and the use case of the device and is therefore left to the
+implementation, which can allow the administrator or operator to configure it. For example, a
+broadband CPE might ignore rates below 1 Mbit/s.<a href="#section-10-5.1.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="section-10-5.2">
+          <p id="section-10-5.2.1">Clients <span class="bcp14">SHOULD NOT</span> apply a rate above the capacity of the physical link of the respective
+interface, but cap the applied rate to that capacity (see <a href="#processing" class="auto internal xref">Section 3.3</a>). An excessively high
+rate therefore has the same effect as the absence of a signaled rate.<a href="#section-10-5.2.1" class="pilcrow">¶</a></p>
+</li>
+      </ul>
+<p id="section-10-6">Conversely, an attacker could inject an excessively high rate or a rate of 0, thereby removing any
 effective rate limit. Because clients are expected to cap the effective rate to the capacity of the
 physical link (see <a href="#processing" class="auto internal xref">Section 3.3</a>), the impact is limited to the loss of the benefits of rate
 signaling, such as increased queuing delay at the bottleneck, which corresponds to the behavior of a
@@ -2483,24 +2594,24 @@ device without support for this option. Where an intermediate node derives the e
 provisioned rate from the Rate Option (see <a href="#solution-overview" class="auto internal xref">Section 1.2</a>), however, an attacker on the path
 between the server and that node that raises or removes the signaled rates also raises or removes
 the enforcement, allowing a client to exceed its provisioned rate. Mechanisms for securing the
-messages exchanged between servers and relay agents are described in <span>[<a href="#RFC8213" class="cite xref">RFC8213</a>]</span>.<a href="#section-10-5" class="pilcrow">¶</a></p>
-<p id="section-10-6">In local area networks, DHCP snooping is often not deployed, making rogue DHCP servers more
+messages exchanged between servers and relay agents are described in <span>[<a href="#RFC8213" class="cite xref">RFC8213</a>]</span>.<a href="#section-10-6" class="pilcrow">¶</a></p>
+<p id="section-10-7">In local area networks, DHCP snooping is often not deployed, making rogue DHCP servers more
 likely. A rogue server signaling artificially low rates could cause applications on end devices
 to reduce their quality or to prefer another network interface, which can incur additional cost
 (e.g., cellular data). Clients <span class="bcp14">SHOULD NOT</span> use the signaled rates as the sole criterion for
-selecting a network interface, and the sanity checks described above apply.<a href="#section-10-6" class="pilcrow">¶</a></p>
-<p id="section-10-7">A rogue server can also advertise excessively high rates in DHCPOFFER or Advertise messages to be
+selecting a network interface, and the sanity checks described above apply.<a href="#section-10-7" class="pilcrow">¶</a></p>
+<p id="section-10-8">A rogue server can also advertise excessively high rates in DHCPOFFER or Advertise messages to be
 selected by clients that use rates as a criterion for selecting among servers (see <a href="#dhcpv4-client" class="auto internal xref">Section 4.2</a>
 and <a href="#dhcpv6-client" class="auto internal xref">Section 5.2</a>). Clients <span class="bcp14">SHOULD NOT</span> use the rates as the sole criterion for server selection,
-and the mitigations against rogue DHCP servers described above apply.<a href="#section-10-7" class="pilcrow">¶</a></p>
-<p id="section-10-8">Relay agents and snooping devices that instantiate traffic management functions based on the Rate
+and the mitigations against rogue DHCP servers described above apply.<a href="#section-10-8" class="pilcrow">¶</a></p>
+<p id="section-10-9">Relay agents and snooping devices that instantiate traffic management functions based on the Rate
 Option consume finite resources, such as hardware queues and shapers. Because only server messages
 received on trusted ports are processed and rates are applied per client-facing port (see
 <a href="#processing" class="auto internal xref">Section 3.3</a>), the amount of such resources is bounded by the number of client-facing ports.
 However, a client can trigger frequent DHCP exchanges, potentially causing repeated reconfiguration
 of these functions. In addition to not reconfiguring unchanged rates (see <a href="#processing" class="auto internal xref">Section 3.3</a>),
 implementations <span class="bcp14">MAY</span> rate-limit DHCP messages received on client-facing ports or the reconfiguration
-of traffic management functions.<a href="#section-10-8" class="pilcrow">¶</a></p>
+of traffic management functions.<a href="#section-10-9" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="privacy">
@@ -2940,7 +3051,8 @@ restriction to Layer 3 rates, the use of a single fixed-format option, and the r
 line information and to existing proprietary solutions.<a href="#appendix-B.1-3.2.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="appendix-B.1-3.3">
-            <p id="appendix-B.1-3.3.1">Added applicability to local area networks.<a href="#appendix-B.1-3.3.1" class="pilcrow">¶</a></p>
+            <p id="appendix-B.1-3.3.1">Added applicability to local area networks, enterprise access links, and links with variable
+capacity.<a href="#appendix-B.1-3.3.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
 <p id="appendix-B.1-4">Protocol changes (not backward compatible with -00):<a href="#appendix-B.1-4" class="pilcrow">¶</a></p>
@@ -2970,10 +3082,18 @@ configuration, and the behavior of servers, relay agents, and snooping devices.<
 without per-client state.<a href="#appendix-B.1-7.3.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="appendix-B.1-7.4">
-            <p id="appendix-B.1-7.4.1">Servers no longer signal different rates via DHCPv4 and DHCPv6 to the same client.<a href="#appendix-B.1-7.4.1" class="pilcrow">¶</a></p>
+            <p id="appendix-B.1-7.4.1">Operators ensure that DHCPv4 and DHCPv6 convey identical rates for the same client; added
+guidance on transient conflicts between DHCPv4 and DHCPv6, optional hold-down timers, and
+idempotent processing of unchanged rates.<a href="#appendix-B.1-7.4.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="appendix-B.1-7.5">
-            <p id="appendix-B.1-7.5.1">Made the provisioning of relay agents via Relay-reply messages explicitly optional.<a href="#appendix-B.1-7.5.1" class="pilcrow">¶</a></p>
+            <p id="appendix-B.1-7.5.1">Defined the term Default Configuration.<a href="#appendix-B.1-7.5.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="appendix-B.1-7.6">
+            <p id="appendix-B.1-7.6.1">Changed the client sanity checks against implausibly low or high rates from <span class="bcp14">MAY</span> to <span class="bcp14">SHOULD</span>.<a href="#appendix-B.1-7.6.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="appendix-B.1-7.7">
+            <p id="appendix-B.1-7.7.1">Made the provisioning of relay agents via Relay-reply messages explicitly optional.<a href="#appendix-B.1-7.7.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
 <p id="appendix-B.1-8">Other:<a href="#appendix-B.1-8" class="pilcrow">¶</a></p>

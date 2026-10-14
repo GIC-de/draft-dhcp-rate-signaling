@@ -115,6 +115,8 @@ Table of Contents
    7.  Deployment Scenarios
      7.1.  PPPoE
      7.2.  Local Area Networks
+     7.3.  Enterprise Access Links
+     7.4.  Links with Variable Capacity
    8.  Operational Considerations
    9.  Implementation Status
      9.1.  Implementation Feasibility on Open-Source CPE
@@ -296,8 +298,15 @@ Table of Contents
    retail routers and devices running open-source firmware (e.g.,
    OpenWrt), and it is visible to intermediate nodes along the path.
    Rates conveyed via DHCP are refreshed with every lease renewal and
-   can be updated dynamically.  The options are also applicable within
-   LANs (see Section 7.2).
+   can be updated dynamically.
+
+   The options are applicable to any access link on which DHCP is used
+   to configure the network-facing interface and on which the intended
+   rates are determined by a subscription, contract, or policy, for
+   example enterprise access links (see Section 7.3) and public or guest
+   Wi-Fi networks (see Section 7.2).  They convey provisioned, slowly
+   changing values and do not describe the instantaneous capacity of
+   links whose capacity varies over time (see Section 7.4).
 
    Appendix A discusses the reasoning behind this mechanism and
    addresses frequently raised questions, such as why rate enforcement
@@ -327,6 +336,16 @@ Table of Contents
    DHCPv4  The Dynamic Host Configuration Protocol [RFC2131].
 
    DHCPv6  The Dynamic Host Configuration Protocol for IPv6 [RFC9915].
+
+   Default Configuration  The configuration of the traffic management
+      functions of a receiver for a given direction that applies when no
+      signaled rate is in effect for that direction.  It consists of any
+      rate or traffic management policy statically configured by the
+      administrator of the receiver for that direction or, if no such
+      configuration exists, of no rate limitation by the receiver, i.e.,
+      traffic is forwarded up to the capacity of the physical link.  The
+      default configuration does not depend on rates previously learned
+      from a Rate Option.
 
    Downstream  The direction of traffic from the network towards the
       client.  For a client, this corresponds to traffic received over
@@ -546,13 +565,21 @@ Table of Contents
 
    *  If the value is 0, the receiver MUST remove any rate previously
       applied for that direction and revert to its default configuration
-      for that direction.
+      for that direction (see Section 2), i.e., to any statically
+      configured local policy or, if none exists, to no rate limitation
+      by the receiver.
 
    If a DHCPACK or Reply message does not contain a Rate Option, the
    receiver MUST retain the rates in effect unchanged.
 
-   If a signaled rate is identical to the rate currently in effect, the
-   receiver SHOULD NOT reconfigure its traffic management functions.
+   In some deployments, DHCP renewals occur frequently, and most of them
+   carry unchanged rates.  A receiver therefore compares the signaled
+   rates with the rates currently in effect and treats the processing as
+   idempotent: if a signaled rate is identical to the rate currently in
+   effect, the receiver SHOULD NOT reconfigure its traffic management
+   functions for that direction.  A stateless implementation can achieve
+   this by storing the rates currently in effect and comparing them
+   before any reconfiguration.
 
    For clients, the rates in effect are not bound to the lifetime of the
    DHCP lease from which they were learned.  Relay agents and snooping
@@ -590,15 +617,49 @@ Table of Contents
    SHOULD cap the applied traffic shaping, policing, or AQM parameters
    to the capacity of the physical link.
 
-   In dual-stack deployments, servers MUST NOT signal different rates to
-   the same client via DHCPv4 and DHCPv6.  Servers either signal
-   identical rates via both protocols, or signal rates via only one of
-   the two protocols that is expected to be negotiated by every client.
+   In dual-stack deployments, DHCPv4 and DHCPv6 are frequently served by
+   independent servers, for example a centralized DHCPv4 server and a
+   DHCPv6 server co-located with the BNG, which cannot inspect each
+   other's state.  Network operators MUST ensure that the DHCPv4 and
+   DHCPv6 services for the same client are configured with identical
+   intended rates, or that only one of the two protocols, which is
+   expected to be negotiated by every client, conveys the Rate Option.
    In the latter case, messages of the other protocol do not carry a
-   Rate Option and therefore leave the rates in effect unchanged.  Where
-   DHCPv4 and DHCPv6 are served by different servers, operators ensure
-   that both are provisioned with the same rates; otherwise, the rates
-   in effect depend on which message was received last.
+   Rate Option and therefore leave the rates in effect unchanged.
+
+   Even with identical configuration, the two protocols can transiently
+   convey different rates, for example while a rate change is being
+   provisioned on both servers, or because the renewal times of DHCPv4
+   and DHCPv6 are not aligned.  As the most recently received valid Rate
+   Option takes precedence, a receiver can then alternate between the
+   old and the new rates until both protocols convey the new rates.
+   Operators can minimize this period by updating the rates on both
+   servers together and, where supported, by triggering an immediate
+   update via DHCPFORCERENEW or Reconfigure (see Section 4.3 and
+   Section 5.3).
+
+   The processing specified in this section is stateless by design, so
+   that it can be implemented by simple scripts.  Implementations MAY
+   maintain additional state to improve robustness, provided that the
+   rates eventually applied correspond to the most recently received
+   valid Rate Option.  For example, an implementation can:
+
+   *  apply a hold-down or hysteresis timer, delaying the
+      reconfiguration of its traffic management functions after a change
+      until the signaled rates have been stable for a short period, to
+      avoid repeated reconfiguration when DHCPv4 and DHCPv6 transiently
+      convey different rates;
+
+   *  track the protocol from which the rates in effect were learned, in
+      order to detect and log conflicting rates conveyed via DHCPv4 and
+      DHCPv6; or
+
+   *  revert to its default configuration on reconnect events, for
+      example when a new DHCP exchange is initiated after the lease has
+      expired or when the DHCP server changes, until a Rate Option is
+      received again.
+
+   Such behavior is desirable but not required for interoperability.
 
 3.4.  Error Handling
 
@@ -915,9 +976,22 @@ Table of Contents
 
    The Rate Option can also be used by DHCP servers in local area
    networks, for example a DHCP server co-located with a CPE or another
-   gateway, to inform clients about the rates available to them.  In
-   this case, the signaled rates indicate the maximum rate a client can
-   expect through the network it is attached to.  Examples include:
+   gateway, to inform clients about the rates available to them towards
+   the Internet or another upstream network.  In this case, the signaled
+   rates indicate the maximum rate a client can expect through the
+   upstream connection of the network it is attached to.
+
+   This is primarily useful in networks that are used mainly for
+   Internet access, such as public Wi-Fi hotspots and guest networks,
+   where the upstream connection is the relevant bottleneck for most of
+   the traffic of a client.  In networks that are also used for
+   substantial local traffic, such as home or corporate networks with
+   local servers, printers, or storage, the signaled rates do not apply
+   to the local traffic.  Clients in such networks SHOULD NOT apply the
+   signaled rates to traffic that does not traverse the upstream
+   connection and typically use them as information only.
+
+   Examples include:
 
    *  Virtual Private Network (VPN) gateways or tunnel endpoints that
       shape traffic towards their peers and whose processing capacity
@@ -927,10 +1001,25 @@ Table of Contents
       clients can align their sending rate with the enforced limit to
       avoid policer drops.
 
-   *  Applications on end devices that use the signaled rates as an
-      initial estimate, e.g., to estimate transfer times, to select an
-      initial video quality, or to choose between available network
-      interfaces.
+   *  End devices, such as smartphones, laptops, or other Wi-Fi clients,
+      that display the offered upstream connection rates to the user,
+      for example in the details of the connected network, or that use
+      them as an initial estimate, e.g., to estimate transfer times, to
+      select an initial video quality, or to decide whether to keep
+      using the network or to prefer another available interface, such
+      as a cellular connection.
+
+   End devices decide whether they use the signaled rates as information
+   only or also apply them to their traffic management functions (see
+   Section 3.2).  Using the rates as information only is always
+   permitted.
+
+   As DHCP is performed after association with a wireless network, the
+   signaled rates are only available once the device has connected.  A
+   device can retain the rates learned for a network and take them into
+   account when selecting among known networks later.  Providing
+   information about the capacity of a wireless network prior to
+   association is outside the scope of this document.
 
    A device that acts as a DHCP client on its network-facing interface
    and as a DHCP server on its LAN interfaces MAY derive the rates it
@@ -963,6 +1052,36 @@ Table of Contents
    that the algorithm would otherwise use.  Where rate limits need to be
    enforced, enforcement remains the responsibility of the network; the
    Rate Option only informs clients about such limits.
+
+7.3.  Enterprise Access Links
+
+   Enterprise branch offices are often connected via access links whose
+   contracted rate is lower than the speed of the physical interface,
+   for example a 100 Mbit/s service delivered over a 1 Gbit/s Ethernet
+   interface, with the contracted rate enforced by a policer in the
+   provider network.  Where the provider uses DHCP to configure the
+   customer edge router, the Rate Option allows the router, including
+   Software-Defined Wide Area Network (SD-WAN) edge devices, to
+   configure its upstream shaper without manual provisioning.
+
+   Where the service defines both a committed and an excess or peak
+   rate, the intended rate is the maximum rate at which the provider
+   intends to forward traffic (see Section 2).  Bandwidth profiles of
+   such services commonly account Ethernet frames; the considerations
+   for enforcement points that account traffic at Layer 2 apply (see
+   Section 8).
+
+7.4.  Links with Variable Capacity
+
+   On wireless, cellular, and satellite access links, the available
+   capacity varies with radio conditions, scheduling, and load on time
+   scales far shorter than DHCP lease and renewal intervals.  The Rate
+   Option is not suitable for conveying such variations.  It can,
+   however, convey a provisioned upper bound, for example a rate limit
+   defined by the subscription.  Receivers on such links use the lower
+   of the signaled rate and the current link capacity (see Section 7.2)
+   and SHOULD combine the signaled rate with adaptive mechanisms where
+   the bottleneck is the variable-capacity link itself.
 
 8.  Operational Considerations
 
@@ -1123,15 +1242,21 @@ Table of Contents
    mechanisms protect both the clients and the intermediate nodes that
    apply signaled rates.
 
-   To mitigate the impact of malicious or malformed options, client
-   implementations MAY apply sanity checks before applying signaled
-   rates.  In particular, a client implementation MAY assume a minimum
-   rate below which basic connectivity is no longer ensured, and treat a
-   Rate Option signaling a non-zero rate below this minimum as if it
-   were not present (see Section 3.3).  The appropriate minimum depends
-   on the deployment and the use case of the device and is therefore
-   left to the client implementation.  For example, a broadband CPE
-   might reject rates below 1 Mbit/s.
+   To mitigate the impact of malicious, spoofed, or malformed options,
+   clients SHOULD apply sanity checks before applying signaled rates:
+
+   *  Clients SHOULD ignore a non-zero rate below a minimum below which
+      basic connectivity is no longer ensured, and retain the rate
+      currently in effect for that direction.  The appropriate minimum
+      depends on the deployment and the use case of the device and is
+      therefore left to the implementation, which can allow the
+      administrator or operator to configure it.  For example, a
+      broadband CPE might ignore rates below 1 Mbit/s.
+
+   *  Clients SHOULD NOT apply a rate above the capacity of the physical
+      link of the respective interface, but cap the applied rate to that
+      capacity (see Section 3.3).  An excessively high rate therefore
+      has the same effect as the absence of a signaled rate.
 
    Conversely, an attacker could inject an excessively high rate or a
    rate of 0, thereby removing any effective rate limit.  Because
@@ -1578,7 +1703,8 @@ B.1.  Since draft-ietf-intarea-dhcp-rate-signaling-00
       a single fixed-format option, and the relation to access line
       information and to existing proprietary solutions.
 
-   *  Added applicability to local area networks.
+   *  Added applicability to local area networks, enterprise access
+      links, and links with variable capacity.
 
    Protocol changes (not backward compatible with -00):
 
@@ -1605,8 +1731,15 @@ B.1.  Since draft-ietf-intarea-dhcp-rate-signaling-00
    *  Defined the terms Intended Rate and Binding, including the removal
       of rates by intermediate nodes without per-client state.
 
-   *  Servers no longer signal different rates via DHCPv4 and DHCPv6 to
-      the same client.
+   *  Operators ensure that DHCPv4 and DHCPv6 convey identical rates for
+      the same client; added guidance on transient conflicts between
+      DHCPv4 and DHCPv6, optional hold-down timers, and idempotent
+      processing of unchanged rates.
+
+   *  Defined the term Default Configuration.
+
+   *  Changed the client sanity checks against implausibly low or high
+      rates from MAY to SHOULD.
 
    *  Made the provisioning of relay agents via Relay-reply messages
       explicitly optional.
