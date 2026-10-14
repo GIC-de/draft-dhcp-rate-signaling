@@ -236,6 +236,14 @@ DHCPv4
 DHCPv6
 : The Dynamic Host Configuration Protocol for IPv6 {{!RFC9915}}.
 
+Default Configuration
+: The configuration of the traffic management functions of a receiver for a given direction that
+  applies when no signaled rate is in effect for that direction. It consists of any rate or traffic
+  management policy statically configured by the administrator of the receiver for that direction
+  or, if no such configuration exists, of no rate limitation by the receiver, i.e., traffic is
+  forwarded up to the capacity of the physical link. The default configuration does not depend on
+  rates previously learned from a Rate Option.
+
 Downstream
 : The direction of traffic from the network towards the client. For a client, this corresponds to
   traffic received over the link on which the Rate Option was received. For a relay agent or
@@ -406,13 +414,18 @@ direction:
 
 - If the value is non-zero, the receiver applies the signaled rate as specified in {{application}}.
 - If the value is 0, the receiver MUST remove any rate previously applied for that direction and
-  revert to its default configuration for that direction.
+  revert to its default configuration for that direction (see {{definitions}}), i.e., to any
+  statically configured local policy or, if none exists, to no rate limitation by the receiver.
 
 If a DHCPACK or Reply message does not contain a Rate Option, the receiver MUST retain the rates in
 effect unchanged.
 
-If a signaled rate is identical to the rate currently in effect, the receiver SHOULD NOT reconfigure
-its traffic management functions.
+In some deployments, DHCP renewals occur frequently, and most of them carry unchanged rates. A
+receiver therefore compares the signaled rates with the rates currently in effect and treats the
+processing as idempotent: if a signaled rate is identical to the rate currently in effect, the
+receiver SHOULD NOT reconfigure its traffic management functions for that direction. A stateless
+implementation can achieve this by storing the rates currently in effect and comparing them before
+any reconfiguration.
 
 For clients, the rates in effect are not bound to the lifetime of the DHCP lease from which they
 were learned. Relay agents and snooping devices remove the rates applied for a client together with
@@ -442,12 +455,37 @@ A client can receive a rate that exceeds the maximum physical link speed of its 
 client SHOULD cap the applied traffic shaping, policing, or AQM parameters to the capacity of the
 physical link.
 
-In dual-stack deployments, servers MUST NOT signal different rates to the same client via DHCPv4 and
-DHCPv6. Servers either signal identical rates via both protocols, or signal rates via only one of
-the two protocols that is expected to be negotiated by every client. In the latter case, messages of
-the other protocol do not carry a Rate Option and therefore leave the rates in effect unchanged.
-Where DHCPv4 and DHCPv6 are served by different servers, operators ensure that both are provisioned
-with the same rates; otherwise, the rates in effect depend on which message was received last.
+In dual-stack deployments, DHCPv4 and DHCPv6 are frequently served by independent servers, for
+example a centralized DHCPv4 server and a DHCPv6 server co-located with the BNG, which cannot
+inspect each other's state. Network operators MUST ensure that the DHCPv4 and DHCPv6 services for
+the same client are configured with identical intended rates, or that only one of the two protocols,
+which is expected to be negotiated by every client, conveys the Rate Option. In the latter case,
+messages of the other protocol do not carry a Rate Option and therefore leave the rates in effect
+unchanged.
+
+Even with identical configuration, the two protocols can transiently convey different rates, for
+example while a rate change is being provisioned on both servers, or because the renewal times of
+DHCPv4 and DHCPv6 are not aligned. As the most recently received valid Rate Option takes precedence,
+a receiver can then alternate between the old and the new rates until both protocols convey the new
+rates. Operators can minimize this period by updating the rates on both servers together and, where
+supported, by triggering an immediate update via DHCPFORCERENEW or Reconfigure (see
+{{dhcpv4-server}} and {{dhcpv6-server}}).
+
+The processing specified in this section is stateless by design, so that it can be implemented by
+simple scripts. Implementations MAY maintain additional state to improve robustness, provided that
+the rates eventually applied correspond to the most recently received valid Rate Option. For
+example, an implementation can:
+
+- apply a hold-down or hysteresis timer, delaying the reconfiguration of its traffic management
+  functions after a change until the signaled rates have been stable for a short period, to avoid
+  repeated reconfiguration when DHCPv4 and DHCPv6 transiently convey different rates;
+- track the protocol from which the rates in effect were learned, in order to detect and log
+  conflicting rates conveyed via DHCPv4 and DHCPv6; or
+- revert to its default configuration on reconnect events, for example when a new DHCP exchange is
+  initiated after the lease has expired or when the DHCP server changes, until a Rate Option is
+  received again.
+
+Such behavior is desirable but not required for interoperability.
 
 ## Error Handling {#errors}
 
@@ -853,12 +891,17 @@ Operators can mitigate rogue DHCP servers by deploying DHCP snooping for DHCPv4 
 ports. These mechanisms protect both the clients and the intermediate nodes that apply signaled
 rates.
 
-To mitigate the impact of malicious or malformed options, client implementations MAY apply sanity
-checks before applying signaled rates. In particular, a client implementation MAY assume a minimum
-rate below which basic connectivity is no longer ensured, and treat a Rate Option signaling a
-non-zero rate below this minimum as if it were not present (see {{processing}}). The appropriate
-minimum depends on the deployment and the use case of the device and is therefore left to the client
-implementation. For example, a broadband CPE might reject rates below 1 Mbit/s.
+To mitigate the impact of malicious, spoofed, or malformed options, clients SHOULD apply sanity
+checks before applying signaled rates:
+
+- Clients SHOULD ignore a non-zero rate below a minimum below which basic connectivity is no longer
+  ensured, and retain the rate currently in effect for that direction. The appropriate minimum
+  depends on the deployment and the use case of the device and is therefore left to the
+  implementation, which can allow the administrator or operator to configure it. For example, a
+  broadband CPE might ignore rates below 1 Mbit/s.
+- Clients SHOULD NOT apply a rate above the capacity of the physical link of the respective
+  interface, but cap the applied rate to that capacity (see {{processing}}). An excessively high
+  rate therefore has the same effect as the absence of a signaled rate.
 
 Conversely, an attacker could inject an excessively high rate or a rate of 0, thereby removing any
 effective rate limit. Because clients are expected to cap the effective rate to the capacity of the
@@ -1098,7 +1141,11 @@ Processing and behavior:
   configuration, and the behavior of servers, relay agents, and snooping devices.
 - Defined the terms Intended Rate and Binding, including the removal of rates by intermediate nodes
   without per-client state.
-- Servers no longer signal different rates via DHCPv4 and DHCPv6 to the same client.
+- Operators ensure that DHCPv4 and DHCPv6 convey identical rates for the same client; added
+  guidance on transient conflicts between DHCPv4 and DHCPv6, optional hold-down timers, and
+  idempotent processing of unchanged rates.
+- Defined the term Default Configuration.
+- Changed the client sanity checks against implausibly low or high rates from MAY to SHOULD.
 - Made the provisioning of relay agents via Relay-reply messages explicitly optional.
 
 Other:
