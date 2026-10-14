@@ -40,7 +40,7 @@ author:
   country: "United Kingdom"
   email: "Richard.Patterson@sky.uk"
 
-normative:
+informative:
    TR101:
       title: "Migration to Ethernet-Based Broadband Aggregation"
       target: https://www.broadband-forum.org/pdfs/tr-101-2-0-0.pdf
@@ -49,8 +49,6 @@ normative:
       date: 2011-07
       seriesinfo:
          TR: 101 Issue 2
-
-informative:
    TR069:
       title: "CPE WAN Management Protocol v1.1"
       target: https://www.broadband-forum.org/pdfs/tr-069-1-1-0.pdf
@@ -75,13 +73,15 @@ signal the intended upstream and downstream rates of a network connection to cli
 intermediate nodes. In many broadband access networks, the provisioned upstream rate is enforced at
 the service edge by ingress policers, while the Customer Premises Equipment (CPE) sends at the speed
 of its physical link. The resulting policer drops cause unstable and reduced throughput and render
-upstream prioritization at the CPE ineffective. By learning the available rate via DHCP, the CPE can
-shape its upstream traffic, moving the queue to the CPE, where it can be managed by prioritization,
-Active Queue Management (AQM), and the Low Latency, Low Loss, and Scalable Throughput (L4S)
-architecture. Intermediate nodes acting as DHCP relay agents or performing DHCP snooping can use the
-same information to instantiate per-subscriber shapers and policers. These options are also
-applicable within local area networks, for example to inform end devices about the capacity of the
-upstream connection.
+upstream prioritization at the CPE ineffective. By learning the intended upstream rate via DHCP, the
+CPE can shape its upstream traffic, moving the queue to the CPE, where it can be managed by
+prioritization, Active Queue Management (AQM), and the Low Latency, Low Loss, and Scalable
+Throughput (L4S) architecture. Intermediate nodes acting as DHCP relay agents or performing DHCP
+snooping can use the same information to instantiate per-subscriber shapers and policers. All rates
+are Layer 3 rates, which match the speed perceived by users and can be applied directly to common
+traffic shapers without encapsulation-specific calculations. These options are also applicable
+within local area networks, for example to inform end devices about the capacity of the upstream
+connection.
 
 --- middle
 
@@ -140,11 +140,10 @@ exceed the capacity of the upstream connection (see {{lan}}).
 
 ## Solution Overview {#solution-overview}
 
-This document defines four DHCP options: an upstream rate option and a downstream rate option for
-each of DHCPv4 and DHCPv6. Each option carries exactly one value, the intended rate for one
-direction as a 64-bit unsigned integer in bits per second. The rate is always a Layer 3 rate: it
-refers to the IP header and payload of each packet (see {{layer3}}). No other parameters are
-defined.
+This document defines a Rate Option for each of DHCPv4 and DHCPv6. The option has a fixed format
+and carries exactly two values: the intended upstream rate and the intended downstream rate, each as
+a 64-bit unsigned integer in bits per second. The rates are always Layer 3 rates: they refer to the
+IP header and payload of each packet as transmitted on the link of the receiver (see {{layer3}}).
 
 If the CPE knows the upstream rate, it can shape its upstream traffic to this rate, regardless of
 where the bottleneck is located. The queue then builds at the CPE, where it can be managed using
@@ -233,40 +232,50 @@ DHCPv6
 
 Upstream
 : The direction of traffic from the client towards the network. For a client, this corresponds to
-  traffic sent over the link on which the rate options were received. For a relay agent or
+  traffic sent over the link on which the Rate Option was received. For a relay agent or
   snooping device, this corresponds to traffic received on the client-facing interface or port.
 
 Downstream
 : The direction of traffic from the network towards the client. For a client, this corresponds to
-  traffic received over the link on which the rate options were received. For a relay agent or
+  traffic received over the link on which the Rate Option was received. For a relay agent or
   snooping device, this corresponds to traffic sent on the client-facing interface or port.
 
 Enforcement Point
 : The node or link at which the provisioned rates are enforced or which constitutes the bottleneck
   of the path, for example a policer at the BNG or an access link.
 
+Intended Rate
+: The maximum rate, in a given direction, at which the network intends to forward the traffic of a
+  client. Traffic exceeding the intended rate is subject to being dropped or delayed at the
+  enforcement point. The intended rate is not a guarantee: the achievable rate can be lower, for
+  example due to congestion elsewhere in the network. The Rate Option signals the intended rates;
+  this document also refers to them as the signaled rates.
+
 Intermediate Node
-: A relay agent or snooping device on the path between a client and a server that processes the
-  rate options, for example a BNG acting as a DHCP relay agent or an access node performing DHCP
-  snooping.
+: A relay agent or snooping device on the path between a client and a server that processes the Rate
+  Option, for example a BNG acting as a DHCP relay agent or an access node performing DHCP snooping.
 
 Layer 3 Rate
-: A rate calculated over the IP header and IP payload of each packet (see {{layer3}}).
+: A rate calculated over the outermost IP header of each packet and its payload, as transmitted on
+  the link of the receiver (see {{layer3}}).
 
 Provisioned Rate
-: The rate configured for a subscriber according to the subscribed service, typically enforced
-  at the enforcement point (e.g., the BNG). The signaled rates are typically derived from the
-  provisioned rates.
+: The rate configured in the network for a subscriber according to the subscribed service, typically
+  enforced at the enforcement point (e.g., the BNG). The intended rates are typically derived from
+  the provisioned rates.
 
-Rate Options
-: Collectively, the options defined in this document: OPTION_V4_UPSTREAM_RATE,
-  OPTION_V4_DOWNSTREAM_RATE, OPTION_V6_UPSTREAM_RATE, and OPTION_V6_DOWNSTREAM_RATE. The upstream
-  rate option refers to OPTION_V4_UPSTREAM_RATE or OPTION_V6_UPSTREAM_RATE, and the downstream rate
-  option to OPTION_V4_DOWNSTREAM_RATE or OPTION_V6_DOWNSTREAM_RATE.
+Rate Option
+: The DHCPv4 Rate Option (OPTION_V4_RATE) or the DHCPv6 Rate Option (OPTION_V6_RATE) defined in this
+  document. Where the distinction is not relevant, this document refers to both as the Rate Option.
+
+Binding
+: The state that an intermediate node maintains for a client, associating the client with its
+  client-facing port or session and with the addresses or prefixes leased to it, for example the
+  subscriber session of a BNG or the binding table of a snooping device.
 
 Receiver
-: Any node that processes a received rate option, including DHCP clients, relay agents (including
-  Lightweight DHCPv6 Relay Agents {{?RFC6221}} and Layer 2 DHCPv4 Relay Agents {{TR101}}), and DHCP
+: Any node that processes a received Rate Option, including DHCP clients, relay agents (including
+  Lightweight DHCPv6 Relay Agents {{!RFC6221}} and Layer 2 DHCPv4 Relay Agents {{TR101}}), and DHCP
   snooping devices.
 
 Subscriber
@@ -274,48 +283,80 @@ Subscriber
   represented by a subscriber session at the BNG (e.g., an IPoE or PPPoE session), to which the
   provisioned rates and other per-subscriber policies are applied.
 
-# Rate Options {#rate-options}
+# Rate Option {#rate-options}
 
-This document defines one upstream rate option and one downstream rate option for each of DHCPv4
-and DHCPv6. The encoding of each option follows the conventions of the respective base protocol
-(see {{dhcpv4}} and {{dhcpv6}}). The semantics of the four options are identical and are specified
-in this section.
+This document defines one Rate Option for each of DHCPv4 and DHCPv6. The encoding of the option
+follows the conventions of the respective base protocol (see {{dhcpv4}} and {{dhcpv6}}). The value
+of the option has the same fixed format in both protocols, and its semantics are identical and are
+specified in this section.
 
-The value of each rate option is a 64-bit unsigned integer in network byte order, indicating the
-intended rate for the respective direction in bits per second (bps). The 64-bit format allows rates
-beyond the approximately 4.29 Gbit/s that can be represented by 32-bit rate attributes in bits per
-second, such as those defined in {{?RFC4679}}.
+The value of the Rate Option consists of two fields, in the following order:
 
-A value of 0 indicates that no rate is signaled for the respective direction. A receiver that has
-previously applied a rate learned from a rate option for that direction MUST remove that rate and
-revert to its default configuration for that direction (see {{processing}}).
+Upstream Rate:
+: A 64-bit unsigned integer in network byte order, indicating the intended rate for the upstream
+  direction in bits per second (bps).
+
+Downstream Rate:
+: A 64-bit unsigned integer in network byte order, indicating the intended rate for the downstream
+  direction in bits per second (bps).
+
+The 64-bit format allows rates beyond the approximately 4.29 Gbit/s that can be represented by
+32-bit rate attributes in bits per second, such as those defined in {{?RFC4679}}.
+
+A value of 0 in either field indicates that no rate is signaled for the respective direction. A
+receiver that has previously applied a rate learned from a Rate Option for that direction MUST
+remove that rate and revert to its default configuration for that direction (see {{processing}}).
 
 ## Layer 3 Rates {#layer3}
 
-All rates signaled by the rate options are Layer 3 rates. A Layer 3 rate is calculated over the IP
-header (including any IPv6 extension headers) and the IP payload of each packet. It excludes all
-headers and trailers below the IP layer, such as Ethernet headers, Virtual LAN (VLAN) tags, PPPoE
-and PPP headers, and the Ethernet Frame Check Sequence (FCS), as well as all physical-layer
-overhead.
+All rates signaled by the Rate Option are Layer 3 rates. A Layer 3 rate is calculated over the
+outermost IP header of each packet (including any IPv6 extension headers) and its payload, as
+transmitted or received on the link of the receiver. For a client, this is the link on which the
+Rate Option was received; for a relay agent or snooping device, it is the client-facing link. The
+Layer 3 rate excludes all headers and trailers below the outermost IP header, such as Ethernet
+headers, Virtual LAN (VLAN) tags, PPPoE and PPP headers, and the Ethernet Frame Check Sequence
+(FCS), as well as all physical-layer overhead.
+
+Consequently, any tunnel or translation applied by the receiver itself is part of the Layer 3 rate.
+For example:
+
+- For a client acting as a Dual-Stack Lite (DS-Lite) Basic Bridging BroadBand (B4) element
+  {{?RFC6333}} or as a Mapping of Address and Port with Encapsulation (MAP-E) Customer Edge
+  {{?RFC7597}}, the Layer 3 rate covers the outer IPv6 header and the encapsulated IPv4 packet.
+- For a client using translation, such as Mapping of Address and Port using Translation (MAP-T)
+  {{?RFC7599}} or the customer-side translator of 464XLAT {{?RFC6877}}, the Layer 3 rate covers the
+  translated packet as transmitted on the link.
+- For a client that encapsulates traffic in an IP-based tunnel on the link of the receiver, such as
+  an IPsec, Generic Routing Encapsulation (GRE), or Layer 2 Tunneling Protocol (L2TP) tunnel, the
+  Layer 3 rate covers the outer IP header and all headers and payload carried within it.
+
+A receiver that applies its traffic management functions to the inner traffic of such a tunnel or
+translation, rather than to the packets on the link, accounts for the resulting difference locally,
+as the encapsulation or translation is performed by the receiver itself. Encapsulations added or
+removed by other nodes between the receiver and the enforcement point, such as an L2TP tunnel
+between an L2TP Access Concentrator (LAC) and an L2TP Network Server (LNS) {{?RFC3931}}, are
+not part of the Layer 3 rate of the receiver; they are treated like any other difference in
+accounting at the enforcement point (see {{operations}}).
 
 Layer 3 rates have the following properties:
 
 - They correspond to the speed perceived by users and measured by common speed test applications,
   and to the rate in which service tiers are typically described and marketed.
-- They are independent of the encapsulation used on the link of the receiver and on any other
-  segment of the path. A single value applies at every node, regardless of VLAN tags or tunnel
-  headers that are added or removed between the receiver and the enforcement point.
+- They are independent of the link-layer encapsulation used on the link of the receiver and on any
+  other segment of the path. Unless an IP-based tunnel is added or removed between the receiver and
+  the enforcement point, a single value applies at every node, regardless of VLAN tags or PPPoE
+  headers that are added or removed along the path.
 - They can be applied directly by traffic management functions that account traffic at the IP
   layer, such as shapers attached to a PPP or IP interface, or shapers that can be configured to
   account the network-layer packet size (see {{application}}).
 
-The rate options do not describe the per-packet accounting of the enforcement point. Operators
+The Rate Option does not describe the per-packet accounting of the enforcement point. Operators
 account for differences between the Layer 3 rate and the accounting of the enforcement point when
-configuring the signaled rate or the enforcement point (see {{operations}}).
+configuring the signaled rates or the enforcement point (see {{operations}}).
 
 ## Traffic Management Using Signaled Rates {#application}
 
-The rate options convey rates that are intended to be applied to local traffic management functions,
+The Rate Option conveys rates that are intended to be applied to local traffic management functions,
 such as traffic shapers, policers, or AQM parameters. A client that supports such traffic management
 functions SHOULD apply the upstream rate and MAY apply the downstream rate. Relay agents and
 snooping devices MAY apply the rates in either direction (see {{dhcpv4}}, {{dhcpv6}}, and
@@ -349,7 +390,7 @@ default configuration of the receiver.
 
 ## Rate Processing {#processing}
 
-The processing of the rate options is stateless with respect to the DHCP protocol version and the
+The processing of the Rate Option is stateless with respect to the DHCP protocol version and the
 DHCP lease, such that it can be implemented by simple event-driven scripts on the client. A receiver
 only needs to retain the rate currently in effect for each direction.
 
@@ -357,22 +398,27 @@ Rates are maintained per link and per direction. DHCPv4 and DHCPv6 messages rece
 link share the rates in effect, even if they are processed on different logical interfaces of the
 receiver.
 
-Each valid rate option received in a DHCPv4 DHCPACK message or a DHCPv6 Reply message (or, for
-DHCPv6 relay agents, in the corresponding Relay-reply message) replaces the rate in effect for the
-corresponding direction, regardless of whether the previous rate was learned via DHCPv4 or DHCPv6:
+Each valid Rate Option received in a DHCPv4 DHCPACK message or a DHCPv6 Reply message (or, for
+DHCPv6 relay agents, in the corresponding Relay-reply message) replaces the rates in effect for both
+directions, regardless of whether the previous rates were learned via DHCPv4 or DHCPv6. For each
+direction:
 
 - If the value is non-zero, the receiver applies the signaled rate as specified in {{application}}.
 - If the value is 0, the receiver MUST remove any rate previously applied for that direction and
   revert to its default configuration for that direction.
-- If the rate option for a direction is absent, the receiver MUST retain the rate in effect for that
-  direction unchanged.
+
+If a DHCPACK or Reply message does not contain a Rate Option, the receiver MUST retain the rates in
+effect unchanged.
 
 If a signaled rate is identical to the rate currently in effect, the receiver SHOULD NOT reconfigure
 its traffic management functions.
 
 For clients, the rates in effect are not bound to the lifetime of the DHCP lease from which they
 were learned. Relay agents and snooping devices remove the rates applied for a client together with
-the corresponding binding (see {{dhcpv4}}, {{dhcpv6-relay}}, and {{snooping}}). A receiver MUST
+the corresponding binding (see {{dhcpv4}}, {{dhcpv6-relay}}, and {{snooping}}). An intermediate node
+that does not maintain bindings removes the rates applied for a client when the lease or the
+longest valid lifetime conveyed in the message that carried the Rate Option expires without being
+extended, or when the client-facing port or session is terminated. A receiver MUST
 revert to its default configuration when the underlying link or session (e.g., the PPPoE session) is
 terminated.
 
@@ -385,9 +431,9 @@ the signaled rates to that port.
 
 Intermediate nodes that enforce the signaled rates MAY apply an implementation-specific
 correction factor, for example by enforcing a rate slightly above the signaled rate (e.g., by
-1%). This allows a client that supports these options to shape its traffic to the signaled rate
+1%). This allows a client that supports this option to shape its traffic to the signaled rate
 without triggering the enforcement at the intermediate node, while the intermediate node still
-enforces the provisioned rate for clients that do not support or ignore these options.
+enforces the provisioned rate for clients that do not support or ignore this option.
 Alternatively, in DHCPv6, the server can signal node-specific rates (see {{dhcpv6-server}}).
 
 A client can receive a rate that exceeds the maximum physical link speed of its interfaces (e.g.,
@@ -395,43 +441,44 @@ A client can receive a rate that exceeds the maximum physical link speed of its 
 client SHOULD cap the applied traffic shaping, policing, or AQM parameters to the capacity of the
 physical link.
 
-In dual-stack deployments, servers SHOULD either signal identical rates via both DHCPv4 and DHCPv6,
-or signal rates via only one of the two protocols that is expected to be negotiated by every client.
-In the latter case, messages of the other protocol do not carry rate options and therefore leave the
-rates in effect unchanged. If neither approach is followed, the rate in effect for each direction
-depends on which message was received last.
+In dual-stack deployments, servers MUST NOT signal different rates to the same client via DHCPv4 and
+DHCPv6. Servers either signal identical rates via both protocols, or signal rates via only one of
+the two protocols that is expected to be negotiated by every client. In the latter case, messages of
+the other protocol do not carry a Rate Option and therefore leave the rates in effect unchanged.
+Where DHCPv4 and DHCPv6 are served by different servers, operators ensure that both are provisioned
+with the same rates; otherwise, the rates in effect depend on which message was received last.
 
 ## Error Handling {#errors}
 
-A rate option whose length is not 8 octets is malformed. A receiver MUST discard a malformed rate
-option, which is then treated as if it were not present (see {{processing}}). A malformed rate
-option for one direction does not affect the processing of the rate option for the other direction.
+A Rate Option whose length is not 16 octets is malformed. A receiver MUST discard a malformed Rate
+Option, which is then treated as if it were not present (see {{processing}}).
 
-A sender MUST NOT include more than one instance of each rate option in a DHCPv4 message, or at the
+A sender MUST NOT include more than one instance of the Rate Option in a DHCPv4 message, or at the
 same encapsulation level of a DHCPv6 message (i.e., within the message exchanged with the client or
-within a given Relay-reply message). If a DHCPv4 receiver nevertheless receives multiple instances
-of a rate option, it concatenates them as specified in {{!RFC3396}}; the result is malformed unless
-its length is 8 octets. If a DHCPv6 receiver receives more than one instance of a rate option at the
-same encapsulation level, it MUST discard all instances of that option.
+within a given Relay-reply message). A receiver that receives more than one instance MUST discard
+all instances. For DHCPv4, this is consistent with {{?RFC3396}}: the concatenation of multiple
+instances is not 16 octets long and is therefore malformed.
 
-Rate options contained in messages other than those listed in {{dhcpv4}} and {{dhcpv6}} MUST be
+A Rate Option contained in a message other than those listed in {{dhcpv4}} and {{dhcpv6}} MUST be
 ignored.
 
 # DHCPv4 {#dhcpv4}
 
-## DHCPv4 Rate Options
+## DHCPv4 Rate Option
 
-The DHCPv4 Upstream Rate option (OPTION_V4_UPSTREAM_RATE) uses option code TBD1, and the DHCPv4
-Downstream Rate option (OPTION_V4_DOWNSTREAM_RATE) uses option code TBD2. Both options have the
-following format:
+The DHCPv4 Rate Option (OPTION_V4_RATE) has the following format:
 
 ~~~ aasvg
  0                   1                   2                   3
  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|     Code      |   Length=8    |                               |
+|  Code (TBD1)  |   Length=16   |                               |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                               +
-|                         Rate (64 bits)                        |
+|                     Upstream Rate (64 bits)                   |
++                               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                               |                               |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                               +
+|                    Downstream Rate (64 bits)                  |
 +                               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 |                               |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -439,28 +486,28 @@ following format:
 {: #fig-v4-format title="DHCPv4 Rate Option Format"}
 
 Code:
-: TBD1 for OPTION_V4_UPSTREAM_RATE, TBD2 for OPTION_V4_DOWNSTREAM_RATE.
+: TBD1.
 
 Length:
-: 8.
+: 16.
 
-Rate:
-: The Layer 3 rate in bits per second, as a 64-bit unsigned integer in network byte order (see
-  {{rate-options}}).
+Upstream Rate, Downstream Rate:
+: The Layer 3 rates in bits per second, each as a 64-bit unsigned integer in network byte order
+  (see {{rate-options}}).
 
-The DHCPv4 rate options can appear in the following messages:
+The DHCPv4 Rate Option can appear in the following messages:
 
 | Message                                  | Use                                        |
 | :--------------------------------------- | :----------------------------------------- |
 | DHCPOFFER                                | Server selection (see {{dhcpv4-client}})   |
 | DHCPACK                                  | Rate information (see {{processing}})      |
-{: #tab-appearance-v4 title="Appearance of DHCPv4 Rate Options"}
+{: #tab-appearance-v4 title="Appearance of the DHCPv4 Rate Option"}
 
 ## DHCPv4 Client Behavior {#dhcpv4-client}
 
-DHCPv4 clients that support the rate options SHOULD include the codes of the rate options they
-support in the Parameter Request List (PRL). This signals client support, enabling the DHCPv4 server
-to determine whether to include the rate options in its response. Furthermore, it provides network
+DHCPv4 clients that support the Rate Option SHOULD include its code in the Parameter Request List
+(PRL). This signals client support, enabling the DHCPv4 server to determine whether to include the
+Rate Option in its response. Furthermore, it provides network
 operators with visibility into client capabilities, which aids in troubleshooting and resolving
 customer service quality complaints.
 
@@ -470,17 +517,18 @@ Rates received in a DHCPACK message are processed as specified in {{processing}}
 
 ## DHCPv4 Server Behavior {#dhcpv4-server}
 
-When a DHCPv4 server that supports the rate options receives a client message whose PRL includes a
-rate option code, and a rate is configured for the client for the corresponding direction, the
-server MUST include that rate option in the resulting DHCPOFFER and DHCPACK messages. Because a
-missing rate option leaves the rate in effect unchanged, a server that needs to remove a previously
-signaled rate MUST include the corresponding rate option with a value of 0.
+When a DHCPv4 server that supports the Rate Option receives a client message whose PRL includes the
+code of the Rate Option, and a rate is configured for the client for at least one direction, the
+server MUST include the Rate Option in the resulting DHCPOFFER and DHCPACK messages, with a value
+of 0 for a direction for which no rate is configured. Because a missing Rate Option leaves the rates
+in effect unchanged, a server that needs to remove previously signaled rates MUST include the Rate
+Option with a value of 0 for the respective directions.
 
 The server MAY derive the rates from local configuration profiles, centralized AAA systems such as
 RADIUS, or external policy servers.
 
-A server MAY include the rate options in its responses even if the client did not request them via
-the PRL, provided the operator has explicitly configured the server to do so, for example to
+A server MAY include the Rate Option in its responses even if the client did not request it via the
+PRL, provided the operator has explicitly configured the server to do so, for example to
 provision Layer 2 DHCPv4 Relay Agents or snooping devices.
 
 To update the rates of a client before its next scheduled renewal, a server MAY send a
@@ -492,65 +540,67 @@ controlled by the renewal (T1) time value.
 
 ## DHCPv4 Relay Agent Behavior
 
-DHCPv4 relay agents, including Layer 2 DHCPv4 Relay Agents {{TR101}}, MAY extract the rate options
+DHCPv4 relay agents, including Layer 2 DHCPv4 Relay Agents {{TR101}}, MAY extract the Rate Option
 from DHCPACK messages traversing the network and use them to instantiate shapers and policers on
 their client-facing interfaces. Relay agents SHOULD remove rates applied for a client when the
-corresponding binding is removed. Layer 2 DHCPv4 Relay Agents MUST only process rate options
+corresponding binding is removed. Layer 2 DHCPv4 Relay Agents MUST only process a Rate Option
 contained in DHCPACK messages received on trusted, network-facing ports.
 
 Modifying the message destined for the client is outside the relay agent behavior specified in
-{{!RFC2131}} and {{?RFC3046}}. A device that populates, modifies, or removes the rate options
+{{!RFC2131}} and {{?RFC3046}}. A device that populates, modifies, or removes the Rate Option
 destined for the client based on subscriber attributes (e.g., retrieved from an AAA server such as
 RADIUS) therefore acts as a DHCPv4 server or DHCPv4 proxy towards the client, and the server
 behavior specified in this document applies to it.
 
 # DHCPv6 {#dhcpv6}
 
-## DHCPv6 Rate Options
+## DHCPv6 Rate Option
 
-The DHCPv6 Upstream Rate option (OPTION_V6_UPSTREAM_RATE) uses option code TBD3, and the DHCPv6
-Downstream Rate option (OPTION_V6_DOWNSTREAM_RATE) uses option code TBD4. Both options have the
-following format:
+The DHCPv6 Rate Option (OPTION_V6_RATE) has the following format:
 
 ~~~ aasvg
  0                   1                   2                   3
  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|          option-code          |         option-len=8          |
+|      option-code (TBD2)       |         option-len=16         |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 |                                                               |
-+                         Rate (64 bits)                        +
++                    Upstream Rate (64 bits)                    +
+|                                                               |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                                                               |
++                   Downstream Rate (64 bits)                   +
 |                                                               |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 ~~~
 {: #fig-v6-format title="DHCPv6 Rate Option Format"}
 
 option-code:
-: TBD3 for OPTION_V6_UPSTREAM_RATE, TBD4 for OPTION_V6_DOWNSTREAM_RATE.
+: TBD2.
 
 option-len:
-: 8.
+: 16.
 
-Rate:
-: The Layer 3 rate in bits per second, as a 64-bit unsigned integer in network byte order (see
-  {{rate-options}}).
+Upstream Rate, Downstream Rate:
+: The Layer 3 rates in bits per second, each as a 64-bit unsigned integer in network byte order
+  (see {{rate-options}}).
 
-The DHCPv6 rate options can appear in the following messages:
+The DHCPv6 Rate Option can appear in the following messages:
 
 | Message                                  | Use                                        |
 | :--------------------------------------- | :----------------------------------------- |
 | Advertise                                | Server selection (see {{dhcpv6-client}})   |
 | Reply to Solicit, Request, Renew, Rebind, or Information-request | Rate information (see {{processing}}) |
 | Relay-reply                              | Rate information for the relay agent (see {{dhcpv6-relay}}) |
-{: #tab-appearance-v6 title="Appearance of DHCPv6 Rate Options"}
+{: #tab-appearance-v6 title="Appearance of the DHCPv6 Rate Option"}
 
-The rate options are not included in Reconfigure messages, as specified in
+The Rate Option is not included in Reconfigure messages, as specified in
 {{Section 18.3.11 of !RFC9915}}.
 
 ## DHCPv6 Client Behavior {#dhcpv6-client}
 
-DHCPv6 clients that support the rate options SHOULD include the codes of the rate options they
-support in the Option Request option (ORO) {{!RFC9915}}, for the same reasons as specified for
+DHCPv6 clients that support the Rate Option SHOULD include its code in the Option Request option
+(ORO) {{!RFC9915}}, for the same reasons as specified for
 DHCPv4 in {{dhcpv4-client}}.
 
 A client MUST NOT apply rates received in any DHCPv6 message other than Reply. A client MAY use
@@ -559,24 +609,31 @@ messages. Rates received in a Reply message are processed as specified in {{proc
 
 ## DHCPv6 Server Behavior {#dhcpv6-server}
 
-When a DHCPv6 server that supports the rate options receives a Solicit, Request, Renew, Rebind, or
-Information-request message whose ORO includes a rate option code, and a rate is configured for the
-client for the corresponding direction, the server MUST include that rate option in the resulting
-Advertise and Reply messages. A server that needs to remove a previously signaled rate MUST include
-the corresponding rate option with a value of 0.
+When a DHCPv6 server that supports the Rate Option receives a Solicit, Request, Renew, Rebind, or
+Information-request message whose ORO includes the code of the Rate Option, and a rate is configured
+for the client for at least one direction, the server MUST include the Rate Option in the resulting
+Advertise and Reply messages, with a value of 0 for a direction for which no rate is configured. A
+server that needs to remove previously signaled rates MUST include the Rate Option with a value of 0
+for the respective directions.
 
-A server MAY include the rate options in its responses even if the client did not request them via
-the ORO, provided the operator has explicitly configured the server to do so.
+A server MAY include the Rate Option in its responses even if the client did not request it via the
+ORO, provided the operator has explicitly configured the server to do so.
 
-In relayed exchanges, the rate options for the client are included in the Reply message, which is
-encapsulated in one or more Relay-reply messages. The server MAY additionally include the rate
-options in a Relay-reply message to provision the corresponding relay agent. The nested Relay-reply
+In relayed exchanges, the Rate Option for the client is included in the Reply message, which is
+encapsulated in one or more Relay-reply messages. The server MAY additionally include the Rate
+Option in a Relay-reply message to provision the corresponding relay agent. The nested Relay-reply
 structure of DHCPv6 allows the server to address each relay agent in the path individually, in
 addition to the client. As DHCPv6 does not define a mechanism for relay agents to request options
-from the server, the server includes the rate options in a Relay-reply message based on local
+from the server, the server includes the Rate Option in a Relay-reply message based on local
 configuration, for example by identifying the relay agent by the link-address or peer-address field
 of the Relay-forward message, or by relay agent options such as Interface-Id {{!RFC9915}} or
 Remote-Id {{?RFC4649}}.
+
+Including the Rate Option in a Relay-reply message is OPTIONAL for servers, and processing it is
+OPTIONAL for relay agents. Relay agents that do not support this document are expected to ignore the
+option, as they do not recognize it. Relay agents that do not receive rates in this way can instead
+obtain them by inspecting the Rate Option destined for the client, as specified for snooping devices
+in {{snooping}}, or through other means, such as AAA.
 
 When provisioning multiple encapsulation levels, the server MAY supply different rates to each
 node. For example, an operator might configure the upstream policer of a relay agent with a
@@ -598,21 +655,21 @@ Refresh Time option ({{Section 21.23 of !RFC9915}}).
 
 ## DHCPv6 Relay Agent Behavior {#dhcpv6-relay}
 
-DHCPv6 relay agents that support the rate options, including Lightweight DHCPv6 Relay Agents (LDRA)
-{{?RFC6221}}, process rate options contained in a Relay-reply message addressed to them as specified
-in {{processing}}. Such relay agents MAY use the signaled rates to instantiate shapers, policers, or
-AQM disciplines on their client-facing interfaces. Relay agents SHOULD remove rates applied for a
-client when the corresponding binding is removed. Relay agents MUST only process Relay-reply
-messages received from the network side; in particular, an LDRA discards Relay-reply messages
-received on client-facing interfaces as specified in {{Section 6.1.1 of ?RFC6221}}.
+DHCPv6 relay agents that support the Rate Option, including Lightweight DHCPv6 Relay Agents (LDRA)
+{{!RFC6221}}, process a Rate Option contained in a Relay-reply message addressed to them as
+specified in {{processing}}. Such relay agents MAY use the signaled rates to instantiate shapers,
+policers, or AQM disciplines on their client-facing interfaces. Relay agents SHOULD remove rates
+applied for a client when the corresponding binding is removed. Relay agents MUST only process
+Relay-reply messages received from the network side; in particular, an LDRA discards Relay-reply
+messages received on client-facing interfaces as specified in {{Section 6.1.1 of !RFC6221}}.
 
-Rate options contained in the encapsulated message destined for the client target the client only.
-Relay agents MUST NOT use such options to configure their own traffic management, since the DHCPv6
+A Rate Option contained in the encapsulated message destined for the client targets the client only.
+Relay agents MUST NOT use such an option to configure their own traffic management, since the DHCPv6
 relay architecture provides the Relay-reply message as a dedicated channel for signaling rates to
 relay agents.
 
 Modifying the message destined for the client is outside the relay agent behavior specified in
-{{!RFC9915}}. A device that populates, modifies, or removes the rate options destined for the client
+{{!RFC9915}}. A device that populates, modifies, or removes the Rate Option destined for the client
 based on subscriber attributes (e.g., retrieved from an AAA server such as RADIUS) therefore acts as
 a DHCPv6 server or DHCPv6 proxy towards the client, and the server behavior specified in this
 document applies to it.
@@ -621,14 +678,14 @@ document applies to it.
 
 DHCP snooping devices are typically deployed as intermediate Layer 2 devices that passively monitor
 DHCP message exchanges to enforce security policies and build binding databases, without modifying
-the DHCP payloads. These devices MAY inspect the rate options in messages destined for clients and
+the DHCP payloads. These devices MAY inspect the Rate Option in messages destined for clients and
 use them to provision traffic shapers, policers, or hardware queues on the corresponding
 client-facing ports. Snooping devices SHOULD remove rates applied for a client when the
 corresponding binding is removed.
 
-Snooping devices MUST only process rate options contained in DHCPACK (DHCPv4) and Reply (DHCPv6)
-messages received on trusted, network-facing ports. Rate options contained in messages received on
-client-facing ports MUST NOT be used to configure traffic management.
+Snooping devices MUST only process a Rate Option contained in DHCPACK (DHCPv4) and Reply (DHCPv6)
+messages received on trusted, network-facing ports. A Rate Option contained in a message received on
+a client-facing port MUST NOT be used to configure traffic management.
 
 # Deployment Scenarios
 
@@ -636,24 +693,24 @@ client-facing ports MUST NOT be used to configure traffic management.
 
 In PPPoE {{?RFC2516}} architectures, the CPE typically employs DHCPv6 over the PPP {{?RFC1661}} link
 to obtain an IPv6 prefix via Prefix Delegation (IA_PD) {{!RFC9915}}. This DHCPv6 exchange conveys
-the rate options in the same way as in IPoE deployments. DHCPv4 transactions within a PPPoE session
-can similarly convey the DHCPv4 rate options.
+the Rate Option in the same way as in IPoE deployments. DHCPv4 transactions within a PPPoE session
+can similarly convey the DHCPv4 Rate Option.
 
-The processing rules for rate options received over PPPoE are identical to those defined for IPoE,
+The processing rules for a Rate Option received over PPPoE are identical to those defined for IPoE,
 as specified in {{processing}}. In particular, the rates in effect revert to the default
 configuration of the device when the PPPoE session is terminated.
 
 As the signaled rates are Layer 3 rates, a CPE that attaches its shaper to the PPP interface applies
 them directly, without accounting for the PPPoE, PPP, Ethernet, or VLAN headers.
 
-If a client receives rate information embedded within a PPP authentication message and also receives
-rate options, the client SHOULD give precedence to the rate options. This ensures that the
-standardized, dynamic DHCP signaling supersedes proprietary rate information conveyed during the PPP
-authentication phase.
+If a client receives rate information from other sources, for example within PPP authentication
+messages, and also receives a Rate Option, the client SHOULD give precedence to the Rate Option.
+This ensures that rate information that is refreshed with every DHCP renewal supersedes rate
+information that is conveyed only once per session.
 
 ## Local Area Networks {#lan}
 
-The rate options can also be used by DHCP servers in local area networks, for example a DHCP server
+The Rate Option can also be used by DHCP servers in local area networks, for example a DHCP server
 co-located with a CPE or another gateway, to inform clients about the rates available to them. In
 this case, the signaled rates indicate the maximum rate a client can expect through the network it
 is attached to. Examples include:
@@ -672,7 +729,8 @@ network-facing interface, from local configuration, or both. In this case, it SH
 lower of the learned rate and any locally configured limit for the client. When the learned rates
 change, the device SHOULD signal the updated rates to its LAN clients with their next renewal and
 MAY trigger an earlier update as specified in {{dhcpv4-server}} and {{dhcpv6-server}}. As Layer 3
-rates are independent of the encapsulation, the learned rates can be passed on unchanged.
+rates are independent of the link-layer encapsulation, the learned rates can typically be passed on
+unchanged.
 
 Unless the signaled rates are enforced for each client individually, they describe a capacity shared
 by all clients of the LAN. A client that shapes its traffic to such a rate does not exceed the
@@ -686,8 +744,8 @@ The signaled rates do not account for other bottlenecks along the path to a remo
 MUST NOT use the signaled rates as a replacement for congestion control or other adaptive rate
 mechanisms, and MUST NOT use them to increase the sending rate of a congestion control algorithm,
 such as its initial sending rate, beyond the rate that the algorithm would otherwise use. Where rate
-limits need to be enforced, enforcement remains the responsibility of the network; the rate options
-only inform clients about such limits.
+limits need to be enforced, enforcement remains the responsibility of the network; the Rate Option
+only informs clients about such limits.
 
 # Operational Considerations {#operations}
 
@@ -704,8 +762,8 @@ regardless of VLAN tags or PPPoE encapsulation added or removed along the path.
 On the CPE, the signaled rate can be fed directly into the shaper. A shaper attached to a PPP or IP
 interface accounts IP packets and applies the rate as is. Shapers that account Ethernet frames can
 typically be configured to account the network-layer packet size instead, or to subtract the locally
-known link-layer headers; for example, CAKE with an explicitly configured overhead of 0 accounts the
-network-layer packet size and thereby enforces exactly the signaled Layer 3 rate. Where no such
+known link-layer headers, and thereby enforce exactly the signaled Layer 3 rate (see
+{{impl-status}} for an example). Where no such
 configuration is possible, applying the rate to the frame size results in a slightly lower effective
 Layer 3 rate and is therefore safe (see {{application}}).
 
@@ -739,10 +797,9 @@ with the next renewal of the client. Operators should consider this delay when c
 and renewal times, for example when rates are changed due to service upgrades or fair-use
 policies.
 
-The inclusion of the rate option codes in the Parameter Request List or Option Request option allows
-operators to determine the share of clients supporting these options, for example to plan the
-introduction of correction factors or to identify clients that require enforcement at the
-network.
+The inclusion of the code of the Rate Option in the Parameter Request List or Option Request option
+allows operators to determine the share of clients supporting these options, for example to plan the
+introduction of correction factors or to identify clients that require enforcement at the network.
 
 Implementations are encouraged to expose the signaled rates within CPE management interfaces, such
 as the local Web User Interface (UI) or remote management protocols. As the signaled rates are
@@ -766,10 +823,10 @@ At the time of writing, no implementations of this document are known to the aut
 
 The authors analyzed the feasibility of implementing the client behavior on OpenWrt without
 modifying the DHCP client software. The DHCPv4 client (BusyBox udhcpc) and DHCPv6 client (odhcp6c)
-used by OpenWrt can request the rate options and expose received options of unknown type as
+used by OpenWrt can request the Rate Option and expose received options of unknown type as
 hexadecimal environment variables to user-defined hook scripts. All client behavior specified in
-this document can therefore be implemented in such scripts, which convert the 8-octet value to an
-integer, apply the processing rules of {{processing}}, and configure local traffic management, for
+this document can therefore be implemented in such scripts, which split the 16-octet value into two
+integers, apply the processing rules of {{processing}}, and configure local traffic management, for
 example via Smart Queue Management (SQM) or the CAKE queue discipline. As the signaled rates are
 Layer 3 rates, they can be passed to CAKE directly as its bandwidth parameter, together with an
 overhead of 0, without any encapsulation-specific calculation. The rates learned on the WAN
@@ -778,13 +835,13 @@ DHCPv4 server (dnsmasq) and DHCPv6 server (odhcpd).
 
 # Security Considerations {#security}
 
-DHCP messages are typically transmitted as plaintext and are unauthenticated. Consequently, the rate
-options defined in this document are vulnerable to interception, modification, or spoofing by
-on-path attackers. This applies to any path the options traverse, including the path between
-servers and clients as well as the path between servers and relay agents, where rate options carried
-in a Relay-reply message configure the relay agent itself (see {{dhcpv6-relay}}). A malicious actor
-or a rogue DHCP server could inject artificially low rates to throttle a client's connection,
-resulting in a localized Denial of Service (DoS).
+DHCP messages are typically transmitted as plaintext and are unauthenticated. Consequently, the Rate
+Option defined in this document is vulnerable to interception, modification, or spoofing by on-path
+attackers. This applies to any path the options traverse, including the path between servers and
+clients as well as the path between servers and relay agents, where a Rate Option carried in a
+Relay-reply message configures the relay agent itself (see {{dhcpv6-relay}}). A malicious actor or a
+rogue DHCP server could inject artificially low rates to throttle a client's connection, resulting
+in a localized Denial of Service (DoS).
 
 The severity of this risk is generally no greater than that of standard DHCP threat vectors, such
 as rogue default gateway assignment, DNS hijacking, or IP pool exhaustion, which typically yield a
@@ -797,7 +854,7 @@ rates.
 
 To mitigate the impact of malicious or malformed options, client implementations MAY apply sanity
 checks before applying signaled rates. In particular, a client implementation MAY assume a minimum
-rate below which basic connectivity is no longer ensured, and treat a rate option signaling a
+rate below which basic connectivity is no longer ensured, and treat a Rate Option signaling a
 non-zero rate below this minimum as if it were not present (see {{processing}}). The appropriate
 minimum depends on the deployment and the use case of the device and is therefore left to the client
 implementation. For example, a broadband CPE might reject rates below 1 Mbit/s.
@@ -806,8 +863,8 @@ Conversely, an attacker could inject an excessively high rate or a rate of 0, th
 effective rate limit. Because clients are expected to cap the effective rate to the capacity of the
 physical link (see {{processing}}), the impact is limited to the loss of the benefits of rate
 signaling, such as increased queuing delay at the bottleneck, which corresponds to the behavior of a
-device without support for these options. Where an intermediate node derives the enforcement of the
-provisioned rate from the rate options (see {{solution-overview}}), however, an attacker on the path
+device without support for this option. Where an intermediate node derives the enforcement of the
+provisioned rate from the Rate Option (see {{solution-overview}}), however, an attacker on the path
 between the server and that node that raises or removes the signaled rates also raises or removes
 the enforcement, allowing a client to exceed its provisioned rate. Mechanisms for securing the
 messages exchanged between servers and relay agents are described in {{?RFC8213}}.
@@ -818,8 +875,13 @@ to reduce their quality or to prefer another network interface, which can incur 
 (e.g., cellular data). Clients SHOULD NOT use the signaled rates as the sole criterion for
 selecting a network interface, and the sanity checks described above apply.
 
-Relay agents and snooping devices that instantiate traffic management functions based on the rate
-options consume finite resources, such as hardware queues and shapers. Because only server messages
+A rogue server can also advertise excessively high rates in DHCPOFFER or Advertise messages to be
+selected by clients that use rates as a criterion for selecting among servers (see {{dhcpv4-client}}
+and {{dhcpv6-client}}). Clients SHOULD NOT use the rates as the sole criterion for server selection,
+and the mitigations against rogue DHCP servers described above apply.
+
+Relay agents and snooping devices that instantiate traffic management functions based on the Rate
+Option consume finite resources, such as hardware queues and shapers. Because only server messages
 received on trusted ports are processed and rates are applied per client-facing port (see
 {{processing}}), the amount of such resources is bounded by the number of client-facing ports.
 However, a client can trigger frequent DHCP exchanges, potentially causing repeated reconfiguration
@@ -831,16 +893,16 @@ of traffic management functions.
 
 The general privacy considerations for DHCP specified in {{?RFC7844}} apply to this document.
 
-The rate options convey the rates provisioned for a client, which typically reflect the service tier
+The Rate Option conveys the rates provisioned for a client, which typically reflect the service tier
 of a subscriber. Because DHCP messages are typically transmitted as plaintext, this information is
 exposed to on-path observers, as well as to relay agents and snooping devices that process the
 options. The rate information itself does not identify a subscriber, but in combination with other
 information it can reveal commercial details of the service contract.
 
-Clients that include the rate option codes in the Parameter Request List or Option Request option
-disclose additional information that can contribute to fingerprinting the device. Clients that
-implement the anonymity profiles specified in {{?RFC7844}} MAY omit the rate option codes from the
-Parameter Request List or Option Request option.
+Clients that include the code of the Rate Option in the Parameter Request List or Option Request
+option disclose additional information that can contribute to fingerprinting the device. Clients
+that implement the anonymity profiles specified in {{?RFC7844}} MAY omit the code of the Rate Option
+from the Parameter Request List or Option Request option.
 
 The operational practice of exposing and logging signaled and effective rates (see {{operations}})
 can provide operators with information about the equipment installed by a subscriber. Such data
@@ -848,30 +910,28 @@ is subject to the operator's applicable privacy policies.
 
 # IANA Considerations {#iana}
 
-IANA is requested to replace TBD1, TBD2, TBD3, and TBD4 throughout this document with the values
-assigned as specified below. RFC Editor: please replace "RFC XXXX" throughout this document with the
-RFC number assigned to this document, and remove this note.
+IANA is requested to replace TBD1 and TBD2 throughout this document with the values assigned as
+specified below. RFC Editor: please replace "RFC XXXX" throughout this document with the RFC number
+assigned to this document, and remove this note.
 
-## DHCPv4 Options
+## DHCPv4 Option
 
-IANA is requested to assign two new DHCP Option Codes in the "BOOTP Vendor Extensions and DHCP
-Options" registry as follows:
+IANA is requested to assign a new DHCP Option Code in the "BOOTP Vendor Extensions and DHCP Options"
+registry as follows:
 
-| Tag  | Name                      | Data Length | Meaning                    | Reference |
-| :--- | :------------------------ | ----------: | :------------------------- | :-------- |
-| TBD1 | OPTION_V4_UPSTREAM_RATE   |           8 | DHCPv4 Upstream Rate       | RFC XXXX  |
-| TBD2 | OPTION_V4_DOWNSTREAM_RATE |           8 | DHCPv4 Downstream Rate     | RFC XXXX  |
-{: #tab-iana-v4 title="DHCPv4 Option Codes"}
+| Tag  | Name           | Data Length | Meaning          | Reference |
+| :--- | :------------- | ----------: | :--------------- | :-------- |
+| TBD1 | OPTION_V4_RATE |          16 | DHCPv4 Rate      | RFC XXXX  |
+{: #tab-iana-v4 title="DHCPv4 Option Code"}
 
-## DHCPv6 Options
+## DHCPv6 Option
 
-IANA is requested to assign two new DHCPv6 Option Codes in the "Option Codes" registry as follows:
+IANA is requested to assign a new DHCPv6 Option Code in the "Option Codes" registry as follows:
 
-| Value | Description               | Client ORO | Singleton Option | Reference |
-| :---- | :------------------------ | :--------- | :--------------- | :-------- |
-| TBD3  | OPTION_V6_UPSTREAM_RATE   | Yes        | Yes              | RFC XXXX  |
-| TBD4  | OPTION_V6_DOWNSTREAM_RATE | Yes        | Yes              | RFC XXXX  |
-{: #tab-iana-v6 title="DHCPv6 Option Codes"}
+| Value | Description    | Client ORO | Singleton Option | Reference |
+| :---- | :------------- | :--------- | :--------------- | :-------- |
+| TBD2  | OPTION_V6_RATE | Yes        | Yes              | RFC XXXX  |
+{: #tab-iana-v6 title="DHCPv6 Option Code"}
 
 This document does not create any new registries.
 
@@ -899,9 +959,9 @@ practical means to control upstream latency and to make prioritization effective
 
 Shaping at the CPE complements the enforcement at the BNG: the BNG continues to enforce the
 provisioned rate, for example with a small correction factor (see {{processing}}), while the CPE
-ensures that this enforcement is not triggered under normal operation. CPE that do not support
-these options continue to be subject to the enforcement at the BNG, so that the provisioned
-service tier is maintained in all cases.
+ensures that this enforcement is not triggered under normal operation. CPE that do not support this
+option continue to be subject to the enforcement at the BNG, so that the provisioned service tier is
+maintained in all cases.
 
 ## Why Not Shape Upstream Traffic at the BNG?
 
@@ -968,14 +1028,15 @@ Restricting the signaled rates to Layer 3 removes this complexity:
   of the enforcement point or of the signaled rate (see {{operations}}). Precise modeling of legacy
   cell-based link layers remains possible through local configuration of the CPE.
 
-## Why Separate Options Instead of a Container Option?
+## Why a Single Fixed-Format Option?
 
-Each option defined in this document carries exactly one fixed-size value. This avoids sub-option
-parsing, a dedicated sub-option registry, and the corner cases of empty or partially valid
-containers, and it allows each direction to be requested, signaled, and processed independently,
-consistent with the guidance for simple option formats in {{?RFC7227}}. A client that only applies
-the upstream rate can request and process only the upstream rate option. Should additional
-parameters be required in the future, they can be defined as separate options.
+The Rate Option carries exactly two fixed-size values. Compared with a container option with
+sub-options, this avoids sub-option parsing, a dedicated sub-option registry, and the corner cases
+of empty or partially valid containers. Compared with separate options per direction, it consumes
+only one code from the limited DHCPv4 option code space, and a single option conveys the complete
+rate information, so that receivers never need to combine rates from different options or messages.
+Receivers that only apply the upstream rate simply ignore the Downstream Rate field. Should
+additional parameters be required in the future, they can be defined as separate options.
 
 ## Relation to Access Line Information
 
@@ -1014,17 +1075,17 @@ Motivation and scope:
   explaining upstream policing at the BNG, other upstream bottlenecks, and the limitations of
   prioritization at the CPE; added a figure.
 - Added the Design Rationale appendix addressing frequently raised questions, including the
-  restriction to Layer 3 rates, the use of separate options, and the relation to access line
-  information and to existing proprietary solutions.
+  restriction to Layer 3 rates, the use of a single fixed-format option, and the relation to access
+  line information and to existing proprietary solutions.
 - Added applicability to local area networks.
 
 Protocol changes (not backward compatible with -00):
 
-- Replaced the container option with sub-options by four top-level options:
-  OPTION_V4_UPSTREAM_RATE, OPTION_V4_DOWNSTREAM_RATE, OPTION_V6_UPSTREAM_RATE, and
-  OPTION_V6_DOWNSTREAM_RATE, each carrying a single 64-bit rate in bits per second.
-- All rates are Layer 3 rates. Removed the rate type and layer selection, the informational rates,
-  and the DHCP Rate Sub-Options registry.
+- Replaced the sub-option structure of OPTION_V4_RATE and OPTION_V6_RATE by a fixed 16-octet
+  format carrying the upstream and downstream rates as 64-bit values in bits per second.
+- All rates are Layer 3 rates, calculated over the outermost IP header on the link of the receiver,
+  including tunnels and translations performed by the receiver. Removed the rate type and layer
+  selection, the informational rates, and the DHCP Rate Sub-Options registry.
 
 Processing and behavior:
 
@@ -1032,10 +1093,15 @@ Processing and behavior:
   and specified the messages in which the options can appear.
 - Clarified the requirement levels for applying rates, the precedence of administrator
   configuration, and the behavior of servers, relay agents, and snooping devices.
+- Defined the terms Intended Rate and Binding, including the removal of rates by intermediate nodes
+  without per-client state.
+- Servers no longer signal different rates via DHCPv4 and DHCPv6 to the same client.
+- Made the provisioning of relay agents via Relay-reply messages explicitly optional.
 
 Other:
 
 - Changed the intended status to Standards Track; replaced RFC 8415 by RFC 9915.
+- Moved TR-101 to the informative references and RFC 6221 to the normative references.
 - Extended the Security Considerations; added Privacy Considerations, Operational Considerations,
   and Implementation Status.
 - Explained the use of 64-bit rates and the derivation of rates from access line information
