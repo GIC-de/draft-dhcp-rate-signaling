@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-10-18T01:59:03.943109+00:00",
+  "timestamp": "2026-10-20T02:30:19.459037+00:00",
   "repo": "GIC-de/draft-dhcp-rate-signaling",
   "labels": [
     {
@@ -630,9 +630,9 @@
         "GIC-de"
       ],
       "labels": [],
-      "body": "## Summary\r\n\r\nThis PR revises the draft based on feedback from the last IETF presentation and subsequent\r\nmailing list discussions. The main feedback was that the use case was not clear to everyone:\r\nreaders who had faced the problem, or had deployed proprietary alternatives, supported the\r\ndraft, while others questioned why the CPE needs to know its rate if the BNG already enforces\r\nit, or why shaping is not simply implemented in the BNG. In addition, it was requested to make\r\nthe option applicable to LAN environments as well (#11), and to improve the accuracy of rate\r\nsignaling for traffic shaping by describing the accounting of the enforcement point, including\r\nper-packet overhead and cell-based link layers (#8, #9, #10).\r\n\r\nBesides clarifying the motivation, the PR addresses a full technical and editorial review,\r\nincluding undefined behaviors, security considerations, RFC compliance, alignment with current\r\nDHCP specifications, and implementability with existing DHCP clients.\r\n\r\n## Motivation and Use Case\r\n\r\n- **Rewritten Introduction** with a clear structure: *Problem Statement*, *Solution Overview*,\r\n  and *Applicability*.\r\n- **Problem Statement** now explains the actual mechanism:\r\n  - Upstream rates are commonly enforced by **ingress policers** at the BNG, as per-subscriber\r\n    upstream queuing is not supported by all BNG platforms or only with restrictions and\r\n    reduced scale. A CPE sending at line rate causes policer drops, sawtooth throughput, and\r\n    poor speed test results.\r\n  - Other upstream bottlenecks: access devices (ONT, DSL modem, cable modem) and limitations\r\n    within the access network (PON upstream allocation, DSL synchronization rate, cable modem\r\n    rate limits).\r\n  - Upstream **prioritization at the CPE** (DNS, VoIP, gaming, video conferencing, TCP ACKs,\r\n    selected clients) is ineffective unless the CPE is the bottleneck.\r\n  - Downstream rates are mainly informational for the CPE but relevant for intermediate nodes.\r\n- **Solution Overview** with a figure showing upstream policing with and without CPE shaping.\r\n  BNG enforcement remains in place; the CPE shaper prevents it from being triggered.\r\n- **New Appendix \"Design Rationale\"** addressing frequently raised questions: why BNG\r\n  enforcement alone is not sufficient, why upstream shaping is not performed at the BNG\r\n  (including NAT limitations), why not TR-069 or manual configuration, why DHCP, and the\r\n  limitations of existing proprietary solutions, while CPE implementations already provide\r\n  Layer 2 and Layer 3 shaping functions.\r\n- **Abstract** rewritten accordingly, including intermediate nodes and LAN applicability.\r\n\r\n## LAN Applicability (closes #11)\r\n\r\n- New section *Local Area Networks* under *Deployment Scenarios*: use cases (VPN gateways,\r\n  Wi-Fi hotspots with per-user limits, applications using the rates as initial estimate),\r\n  propagation of WAN rates to LAN clients, recommendation of informational rate types for\r\n  shared capacity, and the requirement that clients do not use signaled rates as a replacement\r\n  for congestion control.\r\n- Direction definitions (*Upstream*, *Downstream*) are now relative to the interface on which\r\n  the option is received, independent of broadband terminology.\r\n\r\n## Rate Types and Per-Packet Overhead (refs #8, #9, #10)\r\n\r\n- **Rate Types:** type 1 is now *Informational Layer 3 rate*. A direction without an applicable\r\n  Rate Type is interpreted as *Informational Layer 2 rate*; servers must explicitly signal type\r\n  2 or 3 for rates to be applied. Precise Layer 2 rate definition (VLAN tags and PPPoE headers\r\n  included; FCS, preamble, SFD, and IPG excluded).\r\n- For applied rates, the Rate Type indicates the **layer at which the enforcement point\r\n  accounts traffic**, so that receivers can model this accounting.\r\n- **Per-direction Rate Type:** *Rate Type* (code 3) applies to both directions; the new\r\n  optional *Rate Type Downstream* (code 4) overrides it for downstream. This allows, e.g., an\r\n  applied upstream rate together with an informational downstream rate, or different\r\n  accounting layers per direction.\r\n- **Layer 3 rates** closely correspond to speed test results and are identical on every node,\r\n  independent of encapsulation; receivers shaping at a lower layer compensate for the headers\r\n  implicitly.\r\n- **New optional *Per-Packet Overhead* sub-options:** code 5 applies to both directions, code\r\n  6 overrides it for downstream. Each carries a signed overhead (including physical-layer\r\n  overhead such as preamble, SFD, and IPG where the bottleneck is a physical link), a minimum\r\n  packet unit (MPU), and parametric **cell-based accounting** (cell payload and cell size,\r\n  e.g., 48/53 for ATM/AAL5 on ADSL), without requiring an additional registry. The parameters\r\n  map directly to shaper parameters such as those of CAKE.\r\n- Receivers that cannot apply the overhead, fully or partially, still apply the signaled\r\n  rates; the option remains valid.\r\n- Guidance on applying rates at a different accounting layer, on PPPoE interfaces, and on\r\n  VDSL2 PTM encapsulation.\r\n- **New Appendix with example parameter values** for Ethernet links, VLAN tags added by the\r\n  access node, Layer 3 policers, and ADSL with PPPoE over LLC/SNAP and PPPoA.\r\n- Rate Type section restructured into format, definitions, semantics, and server and\r\n  receiver guidance.\r\n\r\n## Protocol Changes and Clarifications\r\n\r\n- **New section *Rate Processing*:** deliberately stateless processing that can be implemented\r\n  by simple DHCP client hook scripts:\r\n  - the last valid OPTION_RATE wins, regardless of DHCPv4 or DHCPv6, maintained per interface;\r\n  - an absent rate sub-option or a value of 0 resets that direction;\r\n  - an informational Rate Type resets the applied rate of that direction;\r\n  - a message without OPTION_RATE leaves the applied rates unchanged;\r\n  - rates are not bound to the lease; they are reset when the link or session is terminated;\r\n  - no reconfiguration if rates, rate types, and overhead are unchanged;\r\n  - optional correction factor for intermediate nodes (e.g., +1%) so that CPE shaping does not\r\n    trigger enforcement, while non-supporting CPE are still policed.\r\n- **New section *Client Hints*:** hints indicate client capacity and preferred rate types;\r\n  honoring a hint can only lower the signaled rate. Relays and snooping devices must not use\r\n  client-supplied values.\r\n- **Error Handling:** length validation, malformed option handling, multiple instances\r\n  (RFC 3396 concatenation for DHCPv4), sub-option codes 0 and 255 reserved, shared 0-255 code\r\n  space for DHCPv4 and DHCPv6.\r\n- **Server behavior:** aligned for DHCPv4 and DHCPv6; explicit rules for removing previously\r\n  signaled rates; DHCPFORCERENEW (RFC 3203/6704) and Reconfigure (with RKAP) for mid-lease\r\n  updates; DSL actual line rate guidance.\r\n- **Relay agent behavior:** DHCPv6 relays process only their own Relay-reply; optional\r\n  zero-length OPTION_RATE in Relay-forward as support indication; devices modifying the\r\n  client's option act as server or proxy; trusted-port processing for Layer 2 relays and\r\n  snooping devices.\r\n- **Assumption of one client per physical or logical port** for intermediate nodes.\r\n- **New Appendix \"Example Receiver Processing\"** summarizing the complete processing,\r\n  including per-direction rate types and overhead, as pseudocode for implementers.\r\n\r\n## Security, Privacy, and Operations\r\n\r\n- Security Considerations extended: all signaling paths, DHCP snooping / DHCPv6-Shield,\r\n  configurable minimum rate sanity checks, removal of rate limits, excessive overhead values,\r\n  resource exhaustion on intermediate nodes, unauthenticated client hints, rogue servers in\r\n  LANs.\r\n- New *Privacy Considerations* section (RFC 7844, fingerprinting via hints).\r\n- Operational Considerations extended: choice of rate type and overhead, payload-based\r\n  contracted rates, VDSL2 PTM, correction factors, actual line rates, update latency, and\r\n  measuring client support.\r\n- New *Implementation Status* section (RFC 7942) including a feasibility analysis for OpenWrt\r\n  (udhcpc, odhcp6c, dnsmasq, odhcpd, CAKE) without changes to the DHCP client software.\r\n\r\n## IANA and References\r\n\r\n- Category changed to **Standards Track**.\r\n- Registries use **Specification Required**, allowing e.g. Broadband Forum TRs as\r\n  specifications; DHCP Rate Types registry restored and applies to both Rate Type\r\n  sub-options; Designated Expert guidelines extended.\r\n- New sub-options *Rate Type Downstream* (code 4), *Per-Packet Overhead* (code 5), and\r\n  *Per-Packet Overhead Downstream* (code 6); no additional registries.\r\n- DHCPv6 option registration includes *Client ORO* and *Singleton Option*.\r\n- RFC 8415 replaced by **RFC 9915** (no technical impact; section numbers unchanged).\r\n- New references: RFC 2364, 2684, 3203, 3396, 4649, 6704, 7227, 7610, 7844, 7942,\r\n  IEEE 802.1Q, IEEE 802.3; corrected TR-069 reference.\r\n- Justification for the use of sub-options with respect to RFC 7227.\r\n\r\n## Editorial\r\n\r\n- New and revised definitions: *Enforcement Point*, *Provisioned Rate*, *Receiver*,\r\n  *Subscriber* (based on the subscriber session), *Upstream*, *Downstream*.\r\n- Additional discussion venue (broadband@ietf.org) moved into the venue section, so it is\r\n  removed by the RFC Editor, with proper links.\r\n- Consistent RFC 9915 message names and IEEE 802.3 terminology, neutral IETF wording (removed\r\n  promotional language), consistent terminology (client-facing, Layer 2 DHCPv4 Relay Agent).\r\n- Body restructured: *Error Handling* moved next to *Rate Processing*, *PPPoE* and *Local Area\r\n  Networks* grouped under *Deployment Scenarios*, *Interaction with AQM and L4S* merged into\r\n  the Introduction.\r\n- Figures adjusted to the xml2rfc width limit (idnits clean).\r\n\r\n## Review Notes\r\n\r\n- Large diff due to restructuring; reviewing the rendered HTML is recommended.\r\n- Feedback is particularly welcome on the Introduction and the Design Rationale appendix, as\r\n  they address the main concerns raised during the last presentation, and on the per-direction\r\n  *Rate Type* and *Per-Packet Overhead* sub-options and the example values (#8, #9, #10).",
+      "body": "> [!NOTE]\r\n> **Prioritizing a simpler packet format**\r\n>\r\n> The overhead optimizations appear to cause more problems than they solve, so I\u2019ve developed a simpler alternative without them in [PR #14](https://github.com/GIC-de/draft-dhcp-rate-signaling/pull/14). We plan to prioritize that version going forward.\r\n\r\n## Summary\r\n\r\nThis PR revises the draft based on feedback from the last IETF presentation and subsequent\r\nmailing list discussions. The main feedback was that the use case was not clear to everyone:\r\nreaders who had faced the problem, or had deployed proprietary alternatives, supported the\r\ndraft, while others questioned why the CPE needs to know its rate if the BNG already enforces\r\nit, or why shaping is not simply implemented in the BNG. In addition, it was requested to make\r\nthe option applicable to LAN environments as well (#11), and to improve the accuracy of rate\r\nsignaling for traffic shaping by describing the accounting of the enforcement point, including\r\nper-packet overhead and cell-based link layers (#8, #9, #10).\r\n\r\nBesides clarifying the motivation, the PR addresses a full technical and editorial review,\r\nincluding undefined behaviors, security considerations, RFC compliance, alignment with current\r\nDHCP specifications, and implementability with existing DHCP clients.\r\n\r\n## Motivation and Use Case\r\n\r\n- **Rewritten Introduction** with a clear structure: *Problem Statement*, *Solution Overview*,\r\n  and *Applicability*.\r\n- **Problem Statement** now explains the actual mechanism:\r\n  - Upstream rates are commonly enforced by **ingress policers** at the BNG, as per-subscriber\r\n    upstream queuing is not supported by all BNG platforms or only with restrictions and\r\n    reduced scale. A CPE sending at line rate causes policer drops, sawtooth throughput, and\r\n    poor speed test results.\r\n  - Other upstream bottlenecks: access devices (ONT, DSL modem, cable modem) and limitations\r\n    within the access network (PON upstream allocation, DSL synchronization rate, cable modem\r\n    rate limits).\r\n  - Upstream **prioritization at the CPE** (DNS, VoIP, gaming, video conferencing, TCP ACKs,\r\n    selected clients) is ineffective unless the CPE is the bottleneck.\r\n  - Downstream rates are mainly informational for the CPE but relevant for intermediate nodes.\r\n- **Solution Overview** with a figure showing upstream policing with and without CPE shaping.\r\n  BNG enforcement remains in place; the CPE shaper prevents it from being triggered.\r\n- **New Appendix \"Design Rationale\"** addressing frequently raised questions: why BNG\r\n  enforcement alone is not sufficient, why upstream shaping is not performed at the BNG\r\n  (including NAT limitations), why not TR-069 or manual configuration, why DHCP, and the\r\n  limitations of existing proprietary solutions, while CPE implementations already provide\r\n  Layer 2 and Layer 3 shaping functions.\r\n- **Abstract** rewritten accordingly, including intermediate nodes and LAN applicability.\r\n\r\n## LAN Applicability (closes #11)\r\n\r\n- New section *Local Area Networks* under *Deployment Scenarios*: use cases (VPN gateways,\r\n  Wi-Fi hotspots with per-user limits, applications using the rates as initial estimate),\r\n  propagation of WAN rates to LAN clients, recommendation of informational rate types for\r\n  shared capacity, and the requirement that clients do not use signaled rates as a replacement\r\n  for congestion control.\r\n- Direction definitions (*Upstream*, *Downstream*) are now relative to the interface on which\r\n  the option is received, independent of broadband terminology.\r\n\r\n## Rate Types and Per-Packet Overhead (refs #8, #9, #10)\r\n\r\n- **Rate Types:** type 1 is now *Informational Layer 3 rate*. A direction without an applicable\r\n  Rate Type is interpreted as *Informational Layer 2 rate*; servers must explicitly signal type\r\n  2 or 3 for rates to be applied. Precise Layer 2 rate definition (VLAN tags and PPPoE headers\r\n  included; FCS, preamble, SFD, and IPG excluded).\r\n- For applied rates, the Rate Type indicates the **layer at which the enforcement point\r\n  accounts traffic**, so that receivers can model this accounting.\r\n- **Per-direction Rate Type:** *Rate Type* (code 3) applies to both directions; the new\r\n  optional *Rate Type Downstream* (code 4) overrides it for downstream. This allows, e.g., an\r\n  applied upstream rate together with an informational downstream rate, or different\r\n  accounting layers per direction.\r\n- **Layer 3 rates** closely correspond to speed test results and are identical on every node,\r\n  independent of encapsulation; receivers shaping at a lower layer compensate for the headers\r\n  implicitly.\r\n- **New optional *Per-Packet Overhead* sub-options:** code 5 applies to both directions, code\r\n  6 overrides it for downstream. Each carries a signed overhead (including physical-layer\r\n  overhead such as preamble, SFD, and IPG where the bottleneck is a physical link), a minimum\r\n  packet unit (MPU), and parametric **cell-based accounting** (cell payload and cell size,\r\n  e.g., 48/53 for ATM/AAL5 on ADSL), without requiring an additional registry. The parameters\r\n  map directly to shaper parameters such as those of CAKE.\r\n- Receivers that cannot apply the overhead, fully or partially, still apply the signaled\r\n  rates; the option remains valid.\r\n- Guidance on applying rates at a different accounting layer, on PPPoE interfaces, and on\r\n  VDSL2 PTM encapsulation.\r\n- **New Appendix with example parameter values** for Ethernet links, VLAN tags added by the\r\n  access node, Layer 3 policers, and ADSL with PPPoE over LLC/SNAP and PPPoA.\r\n- Rate Type section restructured into format, definitions, semantics, and server and\r\n  receiver guidance.\r\n\r\n## Protocol Changes and Clarifications\r\n\r\n- **New section *Rate Processing*:** deliberately stateless processing that can be implemented\r\n  by simple DHCP client hook scripts:\r\n  - the last valid OPTION_RATE wins, regardless of DHCPv4 or DHCPv6, maintained per interface;\r\n  - an absent rate sub-option or a value of 0 resets that direction;\r\n  - an informational Rate Type resets the applied rate of that direction;\r\n  - a message without OPTION_RATE leaves the applied rates unchanged;\r\n  - rates are not bound to the lease; they are reset when the link or session is terminated;\r\n  - no reconfiguration if rates, rate types, and overhead are unchanged;\r\n  - optional correction factor for intermediate nodes (e.g., +1%) so that CPE shaping does not\r\n    trigger enforcement, while non-supporting CPE are still policed.\r\n- **New section *Client Hints*:** hints indicate client capacity and preferred rate types;\r\n  honoring a hint can only lower the signaled rate. Relays and snooping devices must not use\r\n  client-supplied values.\r\n- **Error Handling:** length validation, malformed option handling, multiple instances\r\n  (RFC 3396 concatenation for DHCPv4), sub-option codes 0 and 255 reserved, shared 0-255 code\r\n  space for DHCPv4 and DHCPv6.\r\n- **Server behavior:** aligned for DHCPv4 and DHCPv6; explicit rules for removing previously\r\n  signaled rates; DHCPFORCERENEW (RFC 3203/6704) and Reconfigure (with RKAP) for mid-lease\r\n  updates; DSL actual line rate guidance.\r\n- **Relay agent behavior:** DHCPv6 relays process only their own Relay-reply; optional\r\n  zero-length OPTION_RATE in Relay-forward as support indication; devices modifying the\r\n  client's option act as server or proxy; trusted-port processing for Layer 2 relays and\r\n  snooping devices.\r\n- **Assumption of one client per physical or logical port** for intermediate nodes.\r\n- **New Appendix \"Example Receiver Processing\"** summarizing the complete processing,\r\n  including per-direction rate types and overhead, as pseudocode for implementers.\r\n\r\n## Security, Privacy, and Operations\r\n\r\n- Security Considerations extended: all signaling paths, DHCP snooping / DHCPv6-Shield,\r\n  configurable minimum rate sanity checks, removal of rate limits, excessive overhead values,\r\n  resource exhaustion on intermediate nodes, unauthenticated client hints, rogue servers in\r\n  LANs.\r\n- New *Privacy Considerations* section (RFC 7844, fingerprinting via hints).\r\n- Operational Considerations extended: choice of rate type and overhead, payload-based\r\n  contracted rates, VDSL2 PTM, correction factors, actual line rates, update latency, and\r\n  measuring client support.\r\n- New *Implementation Status* section (RFC 7942) including a feasibility analysis for OpenWrt\r\n  (udhcpc, odhcp6c, dnsmasq, odhcpd, CAKE) without changes to the DHCP client software.\r\n\r\n## IANA and References\r\n\r\n- Category changed to **Standards Track**.\r\n- Registries use **Specification Required**, allowing e.g. Broadband Forum TRs as\r\n  specifications; DHCP Rate Types registry restored and applies to both Rate Type\r\n  sub-options; Designated Expert guidelines extended.\r\n- New sub-options *Rate Type Downstream* (code 4), *Per-Packet Overhead* (code 5), and\r\n  *Per-Packet Overhead Downstream* (code 6); no additional registries.\r\n- DHCPv6 option registration includes *Client ORO* and *Singleton Option*.\r\n- RFC 8415 replaced by **RFC 9915** (no technical impact; section numbers unchanged).\r\n- New references: RFC 2364, 2684, 3203, 3396, 4649, 6704, 7227, 7610, 7844, 7942,\r\n  IEEE 802.1Q, IEEE 802.3; corrected TR-069 reference.\r\n- Justification for the use of sub-options with respect to RFC 7227.\r\n\r\n## Editorial\r\n\r\n- New and revised definitions: *Enforcement Point*, *Provisioned Rate*, *Receiver*,\r\n  *Subscriber* (based on the subscriber session), *Upstream*, *Downstream*.\r\n- Additional discussion venue (broadband@ietf.org) moved into the venue section, so it is\r\n  removed by the RFC Editor, with proper links.\r\n- Consistent RFC 9915 message names and IEEE 802.3 terminology, neutral IETF wording (removed\r\n  promotional language), consistent terminology (client-facing, Layer 2 DHCPv4 Relay Agent).\r\n- Body restructured: *Error Handling* moved next to *Rate Processing*, *PPPoE* and *Local Area\r\n  Networks* grouped under *Deployment Scenarios*, *Interaction with AQM and L4S* merged into\r\n  the Introduction.\r\n- Figures adjusted to the xml2rfc width limit (idnits clean).\r\n\r\n## Review Notes\r\n\r\n- Large diff due to restructuring; reviewing the rendered HTML is recommended.\r\n- Feedback is particularly welcome on the Introduction and the Design Rationale appendix, as\r\n  they address the main concerns raised during the last presentation, and on the per-direction\r\n  *Rate Type* and *Per-Packet Overhead* sub-options and the example values (#8, #9, #10).",
       "createdAt": "2026-10-11T21:42:49Z",
-      "updatedAt": "2026-10-15T13:36:28Z",
+      "updatedAt": "2026-10-19T09:25:32Z",
       "baseRepository": "GIC-de/draft-dhcp-rate-signaling",
       "baseRefName": "main",
       "baseRefOid": "47498ded0ed7805376a4bf72cc3124b79440e5ba",
@@ -664,6 +664,132 @@
               "updatedAt": "2026-10-12T21:21:23Z"
             }
           ]
+        },
+        {
+          "id": "PRR_kwDOSj3KQc8AAAABS-8YBg",
+          "commit": {
+            "abbreviatedOid": "d686f50"
+          },
+          "author": "blocktrron",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-10-19T08:40:23Z",
+          "updatedAt": "2026-10-19T09:12:13Z",
+          "comments": [
+            {
+              "originalPosition": 911,
+              "body": "For clarification - the effect of the `OPTION_RATE` being missing is identical with including a all-zero \"reset\" rate, right?",
+              "createdAt": "2026-10-19T08:40:23Z",
+              "updatedAt": "2026-10-19T09:12:13Z"
+            },
+            {
+              "originalPosition": 1503,
+              "body": "This might go to much into detail, but in case a L2 rate is received in a LAN by a WiFI client, the Layer 2 overhead differs between WiFi and wired. Either this behavior is unspecified, ow it shall explicitly assume the layer2 overhead of a ethernet frame w/o VLAN Tag.",
+              "createdAt": "2026-10-19T09:08:31Z",
+              "updatedAt": "2026-10-19T09:12:13Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOSj3KQc8AAAABS_ThVQ",
+          "commit": {
+            "abbreviatedOid": "d686f50"
+          },
+          "author": "blocktrron",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-10-19T09:15:01Z",
+          "updatedAt": "2026-10-19T09:15:01Z",
+          "comments": [
+            {
+              "originalPosition": 999,
+              "body": "One idea: explicitly state a client shall not assume a `hint` is signalled to a DHCPv4 server is communicated internally to the DHCPv6 server on the link",
+              "createdAt": "2026-10-19T09:15:01Z",
+              "updatedAt": "2026-10-19T09:15:01Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOSj3KQc8AAAABS_Uu3A",
+          "commit": {
+            "abbreviatedOid": "d686f50"
+          },
+          "author": "GIC-de",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-10-19T09:16:49Z",
+          "updatedAt": "2026-10-19T09:16:49Z",
+          "comments": [
+            {
+              "originalPosition": 911,
+              "body": "Actually opposite, missing option MUST NOT affect configured rates. ",
+              "createdAt": "2026-10-19T09:16:49Z",
+              "updatedAt": "2026-10-19T09:16:49Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOSj3KQc8AAAABS_WN4g",
+          "commit": {
+            "abbreviatedOid": "d686f50"
+          },
+          "author": "GIC-de",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-10-19T09:18:54Z",
+          "updatedAt": "2026-10-19T09:18:54Z",
+          "comments": [
+            {
+              "originalPosition": 1503,
+              "body": "Agreed. Since all this overhead optimization seems to cause more harm than good, I've worked on a separate version without it that uses a simpler packet format. This looks like the version we'll favor going forward.\r\n\r\nhttps://github.com/GIC-de/draft-dhcp-rate-signaling/pull/14",
+              "createdAt": "2026-10-19T09:18:54Z",
+              "updatedAt": "2026-10-19T09:18:55Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOSj3KQc8AAAABS_WiDQ",
+          "commit": {
+            "abbreviatedOid": "d686f50"
+          },
+          "author": "GIC-de",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-10-19T09:19:19Z",
+          "updatedAt": "2026-10-19T09:19:20Z",
+          "comments": [
+            {
+              "originalPosition": 999,
+              "body": "Noted",
+              "createdAt": "2026-10-19T09:19:20Z",
+              "updatedAt": "2026-10-19T09:19:20Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOSj3KQc8AAAABS_bY-w",
+          "commit": {
+            "abbreviatedOid": "d686f50"
+          },
+          "author": "blocktrron",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-10-19T09:25:31Z",
+          "updatedAt": "2026-10-19T09:25:31Z",
+          "comments": [
+            {
+              "originalPosition": 911,
+              "body": "~~But does this not contradict the paragraph~~\n\n```\n- If an Applied Rate sub-option is absent, or carries a value of 0, the receiver MUST remove any\n  rate previously applied for the corresponding direction and revert to its default configuration\n  for that direction.\n```\n\nAh sorry, this is a different case (option <--> suboption)",
+              "createdAt": "2026-10-19T09:25:31Z",
+              "updatedAt": "2026-10-19T09:25:32Z"
+            }
+          ]
         }
       ]
     },
@@ -679,9 +805,9 @@
         "GIC-de"
       ],
       "labels": [],
-      "body": "## Simplify to Layer 3 upstream/downstream rate options\n\nReduce the protocol to the two parameters that are actually needed:\nthe intended upstream and downstream rate.\n\n- Replace the OPTION_V4_RATE/OPTION_V6_RATE container and its\n  sub-options with four top-level options: OPTION_V4_UPSTREAM_RATE,\n  OPTION_V4_DOWNSTREAM_RATE, OPTION_V6_UPSTREAM_RATE and\n  OPTION_V6_DOWNSTREAM_RATE, each carrying a 64-bit rate in bps\n- Define all rates as Layer 3 (IP header + payload) rates; remove the\n  Applied Rate Layer sub-options\n- Remove the Per-Packet Overhead sub-options, including cell-based\n  accounting, and the related appendices\n- Remove the Advertised Rate sub-options\n- Remove client hints, the relay support indication, the Minimal\n  Implementation section and the example receiver processing appendix\n- Process each direction independently: 0 removes the rate, an\n  absent option leaves it unchanged\n- IANA: request two DHCPv4 and two DHCPv6 option codes; drop the\n  DHCP Rate Sub-Options registry\n- Rewrite the Abstract, Introduction and Operational Considerations\n  around Layer 3 rates (matches user-perceived speed, the same value\n  is valid at every node, can be fed directly into CAKE/SQM)\n- Add rationale for Layer 3-only rates and for separate options\n",
+      "body": "Review Version: \r\nhttps://gic-de.github.io/draft-dhcp-rate-signaling/draft-01-light/draft-ietf-intarea-dhcp-rate-signaling.html\r\n\r\n## Simplify to Layer 3 upstream/downstream rate options\r\n\r\nReduce the protocol to the two parameters that are actually needed:\r\nthe intended upstream and downstream rate.\r\n\r\n- Replace the OPTION_V4_RATE/OPTION_V6_RATE container and its\r\n  sub-options with four top-level options: OPTION_V4_UPSTREAM_RATE,\r\n  OPTION_V4_DOWNSTREAM_RATE, OPTION_V6_UPSTREAM_RATE and\r\n  OPTION_V6_DOWNSTREAM_RATE, each carrying a 64-bit rate in bps\r\n- Define all rates as Layer 3 (IP header + payload) rates; remove the\r\n  Applied Rate Layer sub-options\r\n- Remove the Per-Packet Overhead sub-options, including cell-based\r\n  accounting, and the related appendices\r\n- Remove the Advertised Rate sub-options\r\n- Remove client hints, the relay support indication, the Minimal\r\n  Implementation section and the example receiver processing appendix\r\n- Process each direction independently: 0 removes the rate, an\r\n  absent option leaves it unchanged\r\n- IANA: request two DHCPv4 and two DHCPv6 option codes; drop the\r\n  DHCP Rate Sub-Options registry\r\n- Rewrite the Abstract, Introduction and Operational Considerations\r\n  around Layer 3 rates (matches user-perceived speed, the same value\r\n  is valid at every node, can be fed directly into CAKE/SQM)\r\n- Add rationale for Layer 3-only rates and for separate options\r\n",
       "createdAt": "2026-10-14T07:23:10Z",
-      "updatedAt": "2026-10-14T11:14:46Z",
+      "updatedAt": "2026-10-19T09:23:16Z",
       "baseRepository": "GIC-de/draft-dhcp-rate-signaling",
       "baseRefName": "main",
       "baseRefOid": "47498ded0ed7805376a4bf72cc3124b79440e5ba",
