@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-10-22T02:24:56.039448+00:00",
+  "timestamp": "2026-10-25T02:10:25.847045+00:00",
   "repo": "GIC-de/draft-dhcp-rate-signaling",
   "labels": [
     {
@@ -336,7 +336,7 @@
       "id": "I_kwDOSj3KQc8AAAABKIwwgg",
       "title": "Add L2-overhead information",
       "url": "https://github.com/GIC-de/draft-dhcp-rate-signaling/issues/9",
-      "state": "CLOSED",
+      "state": "OPEN",
       "author": "moeller0",
       "authorAssociation": "NONE",
       "assignees": [
@@ -345,8 +345,8 @@
       "labels": [],
       "body": "To properly configure a traffic shaper one needs at least both the true L2-bottleneck rate (or a somewhat lower estimate thereof, e.g. if reporting sync rates of DSL links using PTM the reported rate should be derated for PTM's 64/65 encoding) and the applicable effective per-packet overhead (applicable in that all effective parts are accounted, e.g. ethernet's inter frame gap is not a data, but \"radio-silence\" worth 12 octets worth of transmission time). As the overhead is hard to deduce even when the true effective bottleneck rate is known, let's add two more mandatory fields to report here downstream and upstream per-packet overhead.\nGiven the goal of this method is to allow competent CPE-side traffic shaping/scheduling/queue management, let's make sure we mandate the necessary pieces of information to actually make that happen.",
       "createdAt": "2026-07-25T09:44:59Z",
-      "updatedAt": "2026-10-20T20:30:46Z",
-      "closedAt": "2026-10-15T12:38:14Z",
+      "updatedAt": "2026-10-23T22:32:10Z",
+      "closedAt": null,
       "comments": [
         {
           "author": "GIC-de",
@@ -438,6 +438,55 @@
           "body": "Thanks, Sebastian. Your comments helped identify two points that need to be separated more clearly: the accounting basis of a service-rate limit and the physical capacity required to carry the traffic.\n\nFirst, I checked the speed-test question. You are correct: **speed-test throughput should not be equated with L3 throughput**. \"breitbandmessung.de\" explicitly specifies TCP payload accounting for both download and upload. Research on Ookla likewise identifies TCP payload as its accounting basis. My earlier speed-test argument was therefore too broad, and I will correct it.\n\nSources:\n- [Breitbandmessung technical specification, pages 26\u201327](https://download.breitbandmessung.de/bbm/Technische_Spezifikation_der_Breitbandmessung.pdf#page=26)\n- [Ookla measurement study, Section 2](https://arxiv.org/pdf/2205.12376#page=4)\n\nThe reason for choosing L3 is that it provides a consistent accounting basis for the intended IP service rate. It also builds on existing operational practice: **from our deployment experience, L3 rate signaling is already used across millions of CPE in German PPPoE networks**, through proprietary PPP-based mechanisms. The goal is to make this capability available through a standardized DHCP option. That deployment experience supports its practical usefulness, although it does not prove that two rate values describe every possible bottleneck.\n\nL3 rates are also closer to the payload throughput measured by speed tests than gross link rates, because link-layer and physical-layer overhead have already been excluded. The remaining difference includes IP and transport headers and, depending on the measurement, application-protocol overhead. This makes L3 a useful basis for display, provided the UI identifies the value as an IP-layer rate rather than a guaranteed speed-test result.\n\n**The displayed service rate does not need to change merely because the local link uses different VLAN tags, PPPoE, or Ethernet encapsulation.** A CPE can also pass that rate to LAN clients as information about the upstream Internet connection. Where the IP packet lengths remain unchanged, the accounting basis remains valid across the WAN and LAN despite their different link-layer encapsulations. The advertised rate then describes a shared upstream limit, not a guaranteed allocation to every LAN client or a limit on local LAN traffic. IP encapsulation or translation that changes packet lengths requires additional consideration.\n\nBy L3 accounting, I mean counting the actual IP packet length for every packet. A 1500-octet IP packet consumes 1500 octets of the rate budget; a 64-octet IP packet consumes 64. This does not require assuming a reference packet size or converting the rate into a fixed Ethernet gross rate.\n\nWhen the CPE and BNG observe the same IP packets, they can therefore account the same lengths despite different VLAN encapsulations. Local header compensation means excluding the locally present link-layer headers from that accounting.\n\nYour calculations correctly show that sustaining 970 Mbit/s of IP traffic requires different physical capacities for different packet sizes and encapsulations. They demonstrate a physical-capacity constraint, rather than an inconsistency between the two L3 accounting functions. If the physical link becomes the limiting resource, the achievable IP rate falls below the configured L3 limit.\n\nI agree that this distinction limits what the option can promise. **An L3 rate alone cannot guarantee that the CPE controls the bottleneck queue for every packet-size distribution.** A physical or gross-rate bottleneck may require additional overhead, padding, and cell-accounting information. Matching average rates also does not automatically align burst allowances.\n\nI would therefore retain L3 as the base definition, while making those limitations explicit. Whether DHCP should additionally convey a bottleneck overhead model is a separate design decision. Choosing L3 neither implies that operators lack overhead information nor makes that information unnecessary in every deployment.",
           "createdAt": "2026-10-20T20:30:46Z",
           "updatedAt": "2026-10-20T20:30:46Z"
+        },
+        {
+          "author": "moeller0",
+          "authorAssociation": "NONE",
+          "body": "Instead of diving into the details yet again, let me try to argue from the top.\n\nThe goal of version 3 of draft-ietf-intarea-dhcp-rate-signaling is stated as:\n_By learning the intended upstream rate via DHCP, the\nCPE can shape its upstream traffic, moving the queue to the CPE, where it can be managed by\nprioritization, Active Queue Management (AQM), and the Low Latency, Low Loss, and Scalable\nThroughput (L4S) architecture._\n\nto achieve that the CPE traffic shaper needs to be configured with a `shaper rate <= true bottleneck rate` and it needs to account `shaper per-packet-overhead >= effective bottleneck per-packet-overhead`. There are no ifs and no buts, if these two conditions are not met, the CPE side shaper is likely to fail depending on traffic conditions*. The CPE-side traffic shaping needs to model the behaviour of the true bottleneck veridically enough to ensure, the real queue does not \"escape\" from the well-managed CPE back into the over-sized and under-managed true bottleneck node.\nIt does not really matter on what OSI-layer we would like the bottleneck rate to be in, what matters is on what layer does the true bottleneck effectively operate in. If that is \"L3\", by all means, we should signal \"L3\" rates, if that is L2, it would be more optimal to signal L2 rates, if the bottleneck operated on L4, then L4 rates would be appropriate. \nSame for the overhead, what counts is to avoid having the CPE send more data into the true bottleneck than the bottleneck can service in the respective service interval, and to do so we absolutely need to look at each bottleneck individually. For a competent ISP that should be easy, as they are in control of all/most of the relevant nodes along the path.\n\nHaving browsed through some Huawei and Juniper documentation regarding traffic shaping, I am pretty sure they do account for L2 overhead and hence likely operate on L2-rates to L1-rates by default, which makes a ton of sense, as these tend often to be the real bottlenecks**\n\nNow, L3 rates in all likelihood are `<=  true bottleneck rate` so if the draft converges on L3 rates (or better L2-payload rates) that would not be counter to the draft's goals. That said, I still find it sad if an IETF RFC would not be to the point and clear about the details here, but that is something where a little word-smithing can go far. \nSomething like this: \"while optimally an ISP would signal the true bottleneck rate to the CPEs, L3-rates typically are close to but smaller than the true bottleneck rates and are conveniently available and can be a decent compromise when selecting which rate to signal\".  Or maybe better, if we mandate L3 rates: \"this draft mandates L3-rates, as these are readily available and fulfilling the `shaper rate <= true bottleneck rate` requirement, inclined parties can re-calculate the corresponding L2 or L1 rates\".  While not an 100% L3-rate-fan, I do see good reasons for mandating one and only one rate to signal unambiguously.\n\n\nRegarding overhead, I really think we can not skip this, as it is essential to achieve the stated goal. If the problem is runing out of space, I would argue that two 64bit values for the rates are a bit excessive, especially since granularity below 1kBit is unlikely to be relevant today, let alone into the future... (we we easily could carve off a few bits from these rates to accommodate the overhead value, if adding another byte or two is unpalatable).\n\n\n\n\n\n\n*) There are edge cases, if the shaper rate is low enough below the true bottleneck rate, there can be conditions in which overhead settings do not matter and vice versa, if the only goal is to keep the effective bottleneck in the CPE. However these configurations are clearly sub-optimal, and should not be something an IETF RFC recommends.\n\n**) But see the mandated traffic shaper in DOCSIS that is defined to only take 18 Bytes L2-overhead into account, so when encountering such a bottleneck, the CPE side traffic shaper only needs to account for the same 18 Bytes L2-overhead, as competent queue location control needs to be tailored to each individual bottleneck. Again, one can take short-cuts by erring on the side of too small for the rate and too large for the overhead.\n",
+          "createdAt": "2026-10-22T12:55:58Z",
+          "updatedAt": "2026-10-22T12:55:58Z"
+        },
+        {
+          "author": "moeller0",
+          "authorAssociation": "NONE",
+          "body": "> The displayed service rate does not need to change merely because the local link uses different VLAN tags, PPPoE, or Ethernet encapsulation. \n\nTrue, and not strictly related to what rates are transmitted. If the rate is well defined, it is not hard to approximate (maximal) service rates on any OSI-layer.\n\nHowever, VLAN tags live in L2-overhead, PPPoE tags live in L2-payload, so these will not behave equally.",
+          "createdAt": "2026-10-22T13:32:40Z",
+          "updatedAt": "2026-10-22T13:32:40Z"
+        },
+        {
+          "author": "GIC-de",
+          "authorAssociation": "OWNER",
+          "body": "Thanks, Sebastian. My main concern is the scope of the mechanism.\n\nWe started with a choice between L2 and L3 rates. Supporting accurate L2 accounting then led to signed overhead adjustments, minimum packet sizes, and cell-framing parameters. Each addition has a valid technical justification, but together they turn a simple rate signal into a description of the access bottleneck. That increases both provisioning requirements and implementation complexity.\n\nEven \u201cL2 rate\u201d needs further qualification: does it include the Ethernet FCS, VLAN tags, or account for preamble and inter-packet gap? L3 gives us a clear accounting boundary: the outermost IP header and its payload, as observed on the specified link. Ethernet, VLAN, and PPPoE/PPP headers are all outside that boundary, regardless of their position within the Ethernet frame.\n\nThe reason for retaining L3 is practical as well as architectural. From our deployment experience, L3 rate signaling already serves more than 20 million PPPoE sessions in Germany across ADSL, VDSL, and GPON. That is substantial evidence that a useful mechanism does not have to signal every characteristic of the underlying access technology.\n\nL3 signaling also does not prevent access-specific compensation. An integrated DSL gateway already knows its line rate and whether ATM framing applies, and can combine that information with the advertised IP service limit. DHCP does not need to duplicate knowledge the device already has.\n\nWith an external modem, that knowledge may be missing. Additional signaling could help, but only if the operator provisions the relevant bottleneck information correctly. That is a useful additional capability, with its own requirements.\n\nI agree that an L3 rate alone cannot describe every bottleneck or guarantee queue control for every traffic mix. The draft should say that clearly. But that limitation does not make comprehensive bottleneck modeling a prerequisite for standardizing a useful, widely deployed service-rate signal.\n\nI would therefore retain L3 as the common base and consider additional bottleneck information separately, with its own deployment justification.\n\nBy the way, I\u2019ll be at DENOG18. If you\u2019re there too, I\u2019d be happy to meet and discuss this in more depth.",
+          "createdAt": "2026-10-22T14:42:15Z",
+          "updatedAt": "2026-10-22T14:42:15Z"
+        },
+        {
+          "author": "GIC-de",
+          "authorAssociation": "OWNER",
+          "body": "Re-opened since discussion is still ongoing. ",
+          "createdAt": "2026-10-22T17:28:57Z",
+          "updatedAt": "2026-10-22T17:28:57Z"
+        },
+        {
+          "author": "moeller0",
+          "authorAssociation": "NONE",
+          "body": "Oh, I agree that our last attempt likely did not strike the right balance but went deep down the complexity rabbit hole, too deep, but shaper-rates alone are not the right balance either.\n\nAgain, instead of trying to tackle your valid points one by one, I will try to make my case:\n\nA) shaper rates:\nI essentially concede that any well-defined rate will do, as with sufficient information we can convert from one OSI layer to the next (or rather between the different layers that matter in reality)* So if L3-rates is convenient and can be defined unambiguously, I will not object.\n\nB) per-packet overhead:\nI will not be able to concede that... that is essential to achieve the stated goal of keeping queuing under the CPE's control. Unlike the actually (BNG?-)shaped rates overhead is really hard to measure, but easy for a competent ISP to supply. So if we have to drop a number, I would opt for the rates... ;) (but I accept that I have a peculiar vantage point here, speaking for the operate your own not-ISP-supplied router crowd here, and being in the queue control business now for one and a half decades).\n\n\n\n*) AVM/Fritz! allows both L3 and L2 rates according to https://fritz.support/resources/PPP-Controlled_Settings_for_FRITZOS_v1.3.pdf\n_1.1 Speed Rate Shaping\nUsing the speed rates over this interface is especially useful for service providers if they have\ncustomers with line speeds exceeding the speed rates declared in their contract. For instance, on a\nDSL line the synchronized speed is 100/40 Mbit/s, but the customer signed a contract that offers\nonly 50/10 Mbit/s. In this case the service provider can utilize this interface to set the speed rates to\n50/10 Mbit/s, so that FRITZ!OS will automatically adopt these new speed rates and set up the\ninternal shaping parameters accordingly. This will ensure proper QoS configuration in FRITZ!OS\nfor services such as voice or others, even during high data load situations.\nIn addition to the speed rates, the type of rate will be transferred. The type can be either layer 2\n(L2, Ethernet) or layer 3 (L3, IP only). FRITZ!OS will interpret the transferred speed rates with\nrespect to the type provided. L2 means that the speed rate already includes the Ethernet header \u2013\nthis is not the case for L3.\nFor clarification: Normally, Ethernet frames are transmitted in any case. But the type of rate\ninstructs the FRITZ!OS to interpret the rate as a value either including the Ethernet header (L2) or\nnot (L3) ._\nI asked around for recent examples of the signaled rates, and will update this thread if there is anything interesting in there.\n\n\n\nI read this clarification to mean, that AVM will deduce the relevant L1/L2 rate from a given L3 rate, not that they will configure their shaper to operate on L3.\n\nC) DENOG18; alas not, as much as I would like to I am out of time and they are out of tickets ;) (I likely will watch some of the recorded talks later).",
+          "createdAt": "2026-10-22T18:46:23Z",
+          "updatedAt": "2026-10-22T18:46:23Z"
+        },
+        {
+          "author": "GIC-de",
+          "authorAssociation": "OWNER",
+          "body": "Here is a capture from DTAG showing the default L3 rates. I\u2019ll also reach out directly to my contact at FRITZ! for their input and further clarification.\n\n```\nFrame 981: Packet, 65 bytes on wire (520 bits), 65 bytes captured (520 bits)\nEthernet II, Src: XX:XX:XX:XX:XX, Dst: XX:XX:XX:XX:XX\nPPP-over-Ethernet Session\nPoint-to-Point Protocol\nPPP Password Authentication Protocol\n    Code: Authenticate-Ack (2)\n    Identifier: 1\n    Length: 43\n    Data\n        Message-Length: 38\n        Message: SRU=549773#SRD=1099607#ISP=DTAG#C=DEU#\n```",
+          "createdAt": "2026-10-22T23:54:00Z",
+          "updatedAt": "2026-10-22T23:54:28Z"
+        },
+        {
+          "author": "moeller0",
+          "authorAssociation": "NONE",
+          "body": "Here a current capture from a Telekom FTTH600 link:\n`\"SRU=330000#SRD=660000#ISP=DTAG#C=DEU#\"]`\nIn both cases these are L3-rates according to AVM's definition:\nSRT=zz\nzz = speed rate type. Possible values are L2 or L3.\nIf the speed rate type is not delivered, the default value L3 will be used.\n\nHowever, what L3 here means is neither well-defined nor easily measurable (but also not that important, as long as the signaled raet is <= the true bottleneck rate).\n\nI am still waiting for examples for 1&1.\n\nNow, the bigger question is, what level/rate does the actual traffic shaper operate on. (The one in the BNG/OLT)\n",
+          "createdAt": "2026-10-23T22:32:10Z",
+          "updatedAt": "2026-10-23T22:32:10Z"
         }
       ]
     },
@@ -821,13 +870,13 @@
       "labels": [],
       "body": "Review Version: \r\nhttps://gic-de.github.io/draft-dhcp-rate-signaling/draft-01-light/draft-ietf-intarea-dhcp-rate-signaling.html\r\n\r\n## Simplify to Layer 3 upstream/downstream rate options\r\n\r\nReduce the protocol to the two parameters that are actually needed:\r\nthe intended upstream and downstream rate.\r\n\r\n- Replace the OPTION_V4_RATE/OPTION_V6_RATE container and its\r\n  sub-options with four top-level options: OPTION_V4_UPSTREAM_RATE,\r\n  OPTION_V4_DOWNSTREAM_RATE, OPTION_V6_UPSTREAM_RATE and\r\n  OPTION_V6_DOWNSTREAM_RATE, each carrying a 64-bit rate in bps\r\n- Define all rates as Layer 3 (IP header + payload) rates; remove the\r\n  Applied Rate Layer sub-options\r\n- Remove the Per-Packet Overhead sub-options, including cell-based\r\n  accounting, and the related appendices\r\n- Remove the Advertised Rate sub-options\r\n- Remove client hints, the relay support indication, the Minimal\r\n  Implementation section and the example receiver processing appendix\r\n- Process each direction independently: 0 removes the rate, an\r\n  absent option leaves it unchanged\r\n- IANA: request two DHCPv4 and two DHCPv6 option codes; drop the\r\n  DHCP Rate Sub-Options registry\r\n- Rewrite the Abstract, Introduction and Operational Considerations\r\n  around Layer 3 rates (matches user-perceived speed, the same value\r\n  is valid at every node, can be fed directly into CAKE/SQM)\r\n- Add rationale for Layer 3-only rates and for separate options\r\n",
       "createdAt": "2026-10-14T07:23:10Z",
-      "updatedAt": "2026-10-19T09:23:16Z",
+      "updatedAt": "2026-10-23T23:02:03Z",
       "baseRepository": "GIC-de/draft-dhcp-rate-signaling",
       "baseRefName": "main",
       "baseRefOid": "47498ded0ed7805376a4bf72cc3124b79440e5ba",
       "headRepository": "GIC-de/draft-dhcp-rate-signaling",
       "headRefName": "draft-01-light",
-      "headRefOid": "61951ea8854a7e426a2953974adb30ac17a67284",
+      "headRefOid": "13d445059bf80cf598d4869024232528d62b9b50",
       "closedAt": null,
       "mergedAt": null,
       "mergedBy": null,
@@ -851,6 +900,32 @@
               "body": "````suggestion\nintermediate nodes. In many broadband access networks, the provisioned upstream rate is enforced\nat the service edge by ingress policers, while the Customer Premises Equipment (CPE) sends at the\nspeed of its physical link. The resulting policer drops cause unstable and reduced throughput and\nrender upstream prioritization at the CPE ineffective. By learning the avialable rate via DHCP, the\nCPE can shape its upstream traffic, moving the queue to the CPE, where it can be managed by\nprioritization, Active Queue Management (AQM), and the Low Latency, Low Loss, and Scalable Throughput\n(L4S) architecture. Intermediate nodes acting as DHCP relay agents or performing DHCP snooping can\nuse the same information to instantiate per-subscriber shapers and policers. These options are also\napplicable within local area networks, for example to inform end devices about the capacity of the\n````",
               "createdAt": "2026-10-14T07:23:41Z",
               "updatedAt": "2026-10-14T07:23:41Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOSj3KQc8AAAABT-Gfbw",
+          "commit": {
+            "abbreviatedOid": "c7cb959"
+          },
+          "author": "github-actions",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-10-23T22:37:19Z",
+          "updatedAt": "2026-10-23T22:37:19Z",
+          "comments": [
+            {
+              "originalPosition": 527,
+              "body": "````suggestion\nthe receiver MUST clear the previous pair before processing the new source's response; omission\n````",
+              "createdAt": "2026-10-23T22:37:19Z",
+              "updatedAt": "2026-10-23T22:37:19Z"
+            },
+            {
+              "originalPosition": 104,
+              "body": "````suggestion\npayloads, independently of link-layer encapsulation.\n````",
+              "createdAt": "2026-10-23T22:37:19Z",
+              "updatedAt": "2026-10-23T22:37:19Z"
             }
           ]
         }
