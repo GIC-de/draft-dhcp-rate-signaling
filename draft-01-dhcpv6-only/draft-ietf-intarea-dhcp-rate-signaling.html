@@ -1,0 +1,2506 @@
+<!DOCTYPE html>
+<html lang="en" class="Internet-Draft">
+<head>
+<meta charset="utf-8">
+<meta content="Common,Latin" name="scripts">
+<meta content="initial-scale=1.0" name="viewport">
+<title>DHCPv6 Options for Explicit Rate Signaling</title>
+<meta content="Christian Giese" name="author">
+<meta content="Richard Patterson" name="author">
+<meta content="
+       This document defines two options for the Dynamic Host Configuration Protocol for IPv6 (DHCPv6)
+that signal the intended upstream and downstream rates of a network connection to clients. Each
+rate applies to the combined IPv4 and IPv6 traffic of the corresponding logical interface. In
+broadband access networks, the Customer Premises Equipment (CPE) typically sends at the speed of its
+physical link while the upstream rate is enforced by policers at the service edge. By learning the
+upstream rate, the CPE can shape its traffic and manage the queue using prioritization and active
+queue management (AQM). 
+    " name="description">
+<meta content="xml2rfc 3.34.1" name="generator">
+<meta content="DHCPv6" name="keyword">
+<meta content="broadband" name="keyword">
+<meta content="BNG" name="keyword">
+<meta content="CPE" name="keyword">
+<meta content="AQM" name="keyword">
+<meta content="L4S" name="keyword">
+<meta content="draft-ietf-intarea-dhcp-rate-signaling-latest" name="ietf.draft">
+<!-- Generator version information:
+  xml2rfc 3.34.1
+    Python 3.14.8
+    ConfigArgParse 1.8.0
+    google-i18n-address 3.1.1
+    intervaltree 3.2.1
+    Jinja2 3.1.6
+    lxml 6.1.1
+    natsort 8.4.0
+    platformdirs 4.13.4
+    pycountry 24.6.1
+    PyYAML 6.0.3
+    requests 2.33.1
+    wcwidth 0.9.2
+-->
+<link href="draft-ietf-intarea-dhcp-rate-signaling.xml" rel="alternate" type="application/rfc+xml">
+<link href="#copyright" rel="license">
+<style type="text/css">@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-vietnamese.woff2') format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+1EA0-1EF9, U+20AB;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-cyrillic.woff2') format('woff2');
+  unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-vietnamese.woff2') format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+1EA0-1EF9, U+20AB;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-cyrillic.woff2') format('woff2');
+  unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-vietnamese.woff2') format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+1EA0-1EF9, U+20AB;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: local('Lora SemiBold'), local('Lora-SemiBold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-semibold-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Oxygen Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Oxygen Mono'), local('OxygenMono-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/oxygenmono-regular-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Oxygen Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Oxygen Mono'), local('OxygenMono-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/oxygenmono-regular-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: italic;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-italic-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: italic;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-italic-cyrillic.woff2') format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: italic;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-italic-greek.woff2') format('woff2');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: italic;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-italic-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: italic;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-italic-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: normal;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-regular-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: normal;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-regular-cyrillic.woff2') format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: normal;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-regular-greek.woff2') format('woff2');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: normal;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-regular-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: normal;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-regular-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+:root {
+  color-scheme: light dark;
+  --background-color: #fff;
+  --text-color: #222;
+  --title-color: #191919;
+  --link-color: #2a6496;
+  --highlight-color: #f9f9f9;
+  --line-color: #eee;
+  --pilcrow-weak: #ddd;
+  --pilcrow-strong: #bbb;
+  --small-font-size: 14.5px;
+  --font-mono: 'Oxygen Mono', monospace;
+  --font-title: "Sofia Sans Semi Condensed", sans-serif;
+  scrollbar-color: #bbb #eee;
+}
+body {
+  max-width: 600px;
+  margin: 75px auto;
+  padding: 0 5px;
+  color: var(--text-color);
+  background-color: var(--background-color);
+  font: 16px/22px "Lora", serif;
+  scroll-behavior: smooth;
+}
+
+.ears {
+  display: none;
+}
+
+/* headings */
+section {
+  clear: both;
+}
+.section-number {
+  padding-right: 0.5em;
+}
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-title);
+  font-weight: 680;
+  margin: 0.8em 0 0.3em;
+  font-size-adjust: 0.5;
+  color: var(--title-color);
+}
+h1 {
+  &#title {
+    font-size: 32px;
+    line-height: 40px;
+    clear: both;
+    margin: 1.5em 0 0.2em;
+  }
+  &#rfcnum {
+    margin: 1.5em 0 0.2em;
+    & + h1#title {
+      margin: 0.2em 0;
+    }
+  }
+}
+
+h1, h2, h3 {
+  font-size: 22px;
+  line-height: 27px;
+}
+h4, h5, h6 {
+  font-size: 20px;
+  line-height: 24px;
+}
+
+/* general structure */
+.author {
+  padding-bottom: 0.3em;
+  vertical-align: top;
+}
+#abstract+p {
+  font-size: 18px;
+  line-height: 24px;
+  & code, & samp, & tt {
+    font-size: 16px;
+    line-height: 0;
+  }
+}
+
+p {
+  padding: 0;
+  margin: 0.5em 0;
+  text-align: left;
+}
+div {
+  margin: 0;
+}
+.alignRight {
+  margin: 1em 0;
+  &.art-text {
+    background-color: var(--highlight-color);
+    border: 1px solid var(--line-color);
+    border-radius: 3px;
+    padding: 0.5em 1em 0;
+    margin-bottom: 0.5em;
+    & pre {
+      padding: 0;
+      width: auto;
+    }
+  }
+  & > *:first-child {
+    border: none;
+    margin: 0;
+    float: right;
+    clear: both;
+  }
+  & > *:nth-child(2) {
+    clear: both;
+    display: block;
+    border: none;
+  }
+}
+svg {
+  display: block;
+  /* font-family isn't space-separated, but =~ will have to do */
+  &[font-family~="monospace" i], & [font-family~="monospace" i] {
+    font-family: var(--font-mono);
+  }
+}
+.alignCenter {
+  margin: 1em 0;
+  &.art-text {
+    background-color: var(--highlight-color);
+    border: 1px solid var(--line-color);
+    border-radius: 3px;
+    padding: 0.5em 1em 0;
+    margin-bottom: 0.5em;
+    & pre {
+      padding: 0;
+      width: auto;
+    }
+  }
+  & > *:first-child {
+    border: none;
+    /* this isn't optimal, but it's an existence proof.  PrinceXML doesn't
+       support flexbox yet.
+    */
+    display: table;
+    margin: 0 auto;
+  }
+}
+
+/* lists */
+ol, ul {
+  padding: 0;
+  margin: 0 0 0.5em 2em;
+  & :is(ol, ul) {
+    margin-left: 1em;
+  }
+}
+li {
+  margin: 0 0 0.25em 0;
+}
+ul.empty, .ulEmpty {
+  list-style-type: none;
+  & li {
+    margin-top: 0.5em;
+  }
+}
+:is(ul, ol).compact, .ulCompact, .olCompact {
+  margin: 0 0 0 2em;
+  & li {
+    margin: 0;
+    & :first-child { margin-top: 0; }
+    & :last-child { margin-bottom: 0; }
+  }
+}
+
+/* definition lists */
+dl {
+  clear: left;
+  --indent: 3ch;
+  /* --indent: attr(indent ch); not supported in any browser, but we can dream */
+  &.olPercent {
+    --indent: 5ch;
+    & > dt {
+      min-width: calc(var(--indent) - 2ch);
+      float: none;
+    }
+  }
+
+  dl > dd > & {
+    margin-top: 0.5em;
+    margin-bottom: 0;
+  }
+
+  &:not(.dlNewline) > dt {
+    float: left;
+    margin-right: 2ch;
+    min-width: 8ch;
+  }
+  & > dd {
+    margin-bottom: .8em;
+    margin-left: var(--indent) !important; /* stupid element overrides */
+    min-height: 2ex;
+  }
+}
+:is(dl.compact, .dlCompact) > dd {
+  margin-bottom: 0;
+  & > :is(:first-child, .break:first-child + *) {
+    margin-top: 0;
+  }
+  & > :is(:last-child) {
+    margin-bottom: 0;
+  }
+}
+:is(dd, span).break {
+  display: none;
+}
+
+/* links */
+a {
+  text-decoration: none;
+  &[href] {
+    color: var(--link-color);
+    &:hover { text-decoration: underline; }
+    &.selfRef {
+      color: var(--text-color);
+      &:hover {
+        text-decoration: none;
+        background-color: var(--highlight-color);
+      }
+    }
+  }
+}
+.iref + a[href].internal {
+  color: var(--text-color);
+}
+a.xref:is(.cite, .auto), :is(#status-of-memo, #copyright) a {
+  white-space: nowrap;
+}
+
+/* Figures */
+tt, code, pre {
+  background-color: var(--highlight-color);
+  font: 14px/22px var(--font-mono);
+}
+tt, code {
+  /* changing the font for inline elements leads to different ascender
+     and descender heights; as we want to retain baseline alignment,
+     remove leading to avoid altering the final height of lines
+     note: this fails if these blocks take an entire line,
+     a different solution would be great */
+  line-height: 0;
+}
+:is(h1, h2, h3, h4, h5, h6) :is(tt, code) {
+  font-size: 84%;
+}
+pre {
+  border: 1px solid var(--line-color);
+  font-size: 13.5px;
+  line-height: 16px;
+  letter-spacing: -0.2px;
+  margin: 5px;
+  padding: 5px;
+}
+img {
+  max-width: 100%;
+}
+figure {
+  margin: 0.5em 0;
+  padding: 0;
+  & blockquote {
+    margin: 0.8em 0.4em 0.4em;
+  }
+}
+figcaption, caption {
+  font-style: italic;
+  margin: 0.5em 1.5em;
+  text-align: left;
+  caption-side: bottom;
+}
+@media screen {
+  /* Auto-collapse boilerplate. */
+  :is(#status-of-memo, #copyright) {
+    & p {
+      margin: -2px 0;
+      max-height: 0;
+      transition: max-height 2s ease, margin 0.5s ease 0.5s;
+      overflow: hidden;
+    }
+    &:hover p,
+    & h2:target ~ p {
+      margin: 0.5em 0;
+      max-height: 500px;
+      overflow: auto;
+    }
+  }
+  pre, svg {
+    display: inline-block;
+    /* In the horizontal direction, sometimes people make over-sized figures.
+       Scrollbars for those is therefore necessary: auto adds them as necessary..
+       In the vertical direction, the line-height can combine with the font
+       asender/descender height to produce scrollbars: hidden avoids that. */
+    overflow: auto hidden;
+  }
+  pre {
+    max-width: 100%;
+    width: calc(100% - 22px - 1em);
+  }
+  svg {
+    max-width: calc(100% - 22px - 1em);
+  }
+  figure pre {
+    display: block;
+    width: calc(100% - 25px);
+  }
+  :is(pre, svg) + .pilcrow {
+    display: inline-block;
+    vertical-align: text-bottom;
+    padding-bottom: 8px;
+  }
+}
+
+/* aside, blockquote */
+aside, blockquote {
+  margin-left: 0;
+  padding: 0 2em;
+  font-style: italic;
+}
+blockquote {
+  margin: 1em 0;
+  border-left: 2px var(--pilcrow-strong) solid;
+}
+cite {
+  display: block;
+  text-align: right;
+  font-style: italic;
+}
+
+/* tables */
+table {
+  width: auto;
+  max-width: 100%;
+  margin: 0 0 1em;
+  border-collapse: collapse;
+  &.right { margin-left: auto; }
+  &.center { margin-left: auto; margin-right: auto; }
+  &.left { margin-right: auto; }
+  & .text-left { text-align: left; }
+  & .text-center { text-align: center; }
+  & .text-right { text-align: right; }
+  & caption {
+    margin: 0;
+    padding: 3px 0 3px 1em;
+  }
+  & p { margin: 0; }
+}
+
+thead, tbody {
+  border: 1px solid var(--line-color);
+}
+th, td {
+  text-align: left;
+  vertical-align: top;
+  padding: 5px 10px;
+}
+th {
+  background-color: var(--line-color);
+}
+:is(tr:nth-child(2n), thead+tbody > tr:nth-child(2n+1)) > td {
+  background-color: var(--background-color);
+}
+:is(tr:nth-child(2n+1), thead+tbody > tr:nth-child(2n)) > td {
+  background-color: var(--highlight-color);
+}
+
+/* pilcrow */
+a.pilcrow {
+  margin-left: 3px;
+  opacity: 0.2;
+  user-select: none;
+  &[href] {
+    color: var(--pilcrow-weak);
+    &:hover { text-decoration: none; }
+  }
+  @media not print {
+    :hover > &, &:focus {
+      opacity: 1;
+    }
+    &[href]:hover {
+      color: var(--pilcrow-strong);
+      background-color: transparent;
+    }
+  }
+  @media print {
+    display: none;
+  }
+}
+
+/* misc */
+hr {
+  border: 0;
+  border-top: 1px solid var(--line-color);
+}
+.bcp14 {
+  font-variant: small-caps;
+  font-weight: 600;
+  font-size: var(--small-font-size);
+}
+.role {
+  font-variant: all-small-caps;
+}
+sub, sup {
+  line-height: 1;
+  font-size: 80%;
+}
+
+/* info block */
+#identifiers {
+  margin: 0;
+  font-size: var(--small-font-size);
+  line-height: 18px;
+  --identifier-width: 15ch;
+  & dt {
+    width: var(--identifier-width);
+    min-width: var(--identifier-width);
+    clear: left;
+    float: left;
+    text-align: right;
+    margin-right: 1ch;
+  }
+  & dd {
+    margin: 0;
+    margin-left: calc(1em + var(--identifier-width)) !important;
+    min-width: 5em;
+  }
+  & .authors {
+    & .author {
+      display: inline-block;
+      margin-right: 1.5em;
+    }
+    & .org {
+      font-style: italic;
+    }
+  }
+}
+
+/* The prepared/rendered info at the very bottom of the page */
+.docInfo {
+  color: #999;
+  font-size: 0.9em;
+  font-style: italic;
+  margin-top: 2em;
+  & .prepared {
+    float: right;
+  }
+}
+
+/* table of contents */
+#toc {
+  padding: 0.75em 0 2em 0;
+  margin-bottom: 1em;
+
+  & nav {
+    & ul {
+      margin: 0 0.5em 0 0;
+      padding: 0;
+      list-style: none;
+    }
+    & li {
+      line-height: 1.3em;
+      margin: 2px 0;
+      padding-left: 1.2em;
+      text-indent: -1.2em;
+    }
+  }
+  & a.xref {
+    white-space: normal;
+  }
+}
+
+.references {
+  & > dt {
+    text-align: right;
+    font-weight: bold;
+    min-width: 10ch;
+    margin-right: 1.5ch;
+    &:target::before {
+      content: "⇒";
+      margin: 0 10px 0 -25px;
+    }
+  }
+  & > dd {
+    margin-left: 12ch !important;
+    overflow: visible;
+    & .refInstance {
+      margin-bottom: 0.8em;
+    }
+    & .ascii {
+      margin-bottom: 0.25em;
+    }
+  }
+}
+
+#rfc\.index\.index + ul {
+  margin-left: 0;
+}
+
+/* authors */
+address.vcard {
+  font-style: normal;
+  max-width: 20em;
+  margin: 1em auto 1em 0;
+
+  & .nameRole {
+    font-weight: 700;
+    margin-left: 0;
+  }
+  & .label {
+    margin: 0.5em 0;
+  }
+  & .type {
+    display: none;
+  }
+  & .alternative-contact {
+    margin: 0.5em 0 0.25em 0;
+  }
+  & .non-ascii {
+    margin: 0 0 0 2em;
+  }
+  & div.left {
+    text-align: left;
+  }
+  & div.right {
+    text-align: right;
+  }
+}
+
+hr.addr {
+  border-top: 1px dashed;
+  margin: 0;
+  color: #ddd;
+  max-width: calc(100% - 16px);
+}
+@media (min-width: 500px) {
+  #authors-addresses {
+    & > section {
+      column-count: 2;
+      column-gap: 20px;
+    }
+    & > section > h2 {
+      column-span: all;
+    }
+    /* hack for break-inside: avoid-column */
+    & address {
+      display: inline-block;
+      break-inside: avoid-column;
+    }
+  }
+}
+
+/* Comments */
+.rfcEditorRemove {
+  & p:first-of-type {
+    font-style: italic;
+  }
+}
+.cref {
+  background-color: rgba(249, 232, 105, 0.3);
+  padding: 2px 4px;
+}
+.crefSource {
+  font-style: italic;
+}
+
+@media screen {
+  #toc {
+    & nav {
+      font-family: var(--font-title);
+      font-weight: 360;
+      & > ul { margin-bottom: 2em; }
+      & ul {
+        margin: 0 0 0 4px;
+        & :is(p, li) {
+          margin: 2px 0;
+        }
+      }
+    }
+    & a.toplink {
+      float: right;
+    }
+  }
+}
+@media not screen {
+  #toc a.toplink {
+    display: none;
+  }
+}
+
+
+/* TOC layout for smaller screens */
+@media screen and (max-width: 929px) {
+  #toc {
+    position: fixed;
+    z-index: 2;
+    top: 0;
+    right: 0;
+    padding: 1px 0 0 0;
+    margin: 0;
+    border-bottom: 1px solid #ccc;
+    opacity: 0.6;
+    & h2 {
+      margin: 0;
+      padding: 2px 0 2px 6px;
+      padding-right: 1em;
+      font-size: 18px;
+      line-height: 24px;
+      min-width: 190px;
+      text-align: right;
+      background-color: #444;
+      color: white;
+      cursor: pointer;
+      &::before { /* css hamburger */
+        float: right;
+        position: relative;
+        width: 1em;
+        height: 1px;
+        left: -164px;
+        margin: 8px 0 0 0;
+        background: white none repeat scroll 0 0;
+        box-shadow: 0 4px 0 0 white, 0 8px 0 0 white;
+        content: "";
+      }
+    }
+    & nav {
+      display: none;
+      background-color: var(--background-color);
+      padding: 0.5em 1em 1em;
+      overflow: auto;
+      overscroll-behavior: contain;
+      height: calc(100vh - 48px);
+      border-left: 1px solid #ddd;
+    }
+    &.active {
+      opacity: 1;
+      & nav { display: block; }
+    }
+    /* Make the collapsed ToC header render white on gray also when it's a link */
+    & h2 a,
+    & h2 a:is(:link, :focus, :hover),
+    & a.toplink,
+    & a.toplink:hover {
+      color: white;
+      background-color: #444;
+      text-decoration: none;
+    }
+    & a.toplink {
+      margin: 2px 0.5em 0;
+    }
+  }
+}
+
+/* TOC layout for wide screens */
+@media screen and (min-width: 930px) {
+  body {
+    padding-right: 360px;
+    padding-right: calc(min(180px + 20%, 500px));
+  }
+  #toc {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    right: calc(50vw - 480px);
+    width: 312px;
+    margin: 0;
+    padding: 0;
+    z-index: 1;
+    & h2 {
+      margin: 0;
+      padding: 0.25em 1em 1em 0;
+    }
+    & nav {
+      display: block;
+      height: calc(90vh - 84px);
+      bottom: 0;
+      padding: 0.5em 0 2em;
+      overflow: auto;
+      overscroll-behavior: contain;
+      scrollbar-width: thin;
+    }
+    & a.toplink {
+      margin: 8px 0.5em 0;
+    }
+  }
+  img { /* future proofing */
+    max-width: 100%;
+    height: auto;
+  }
+}
+
+/* pagination */
+@media print {
+  body {
+    width: 100%;
+  }
+  p {
+    orphans: 3;
+    widows: 3;
+  }
+  #n-copyright-notice {
+    border-bottom: none;
+  }
+  #toc {
+    page-break-before: always;
+    border-top: none;
+    padding-top: 0;
+  }
+  #n-introduction {
+    page-break-before: always;
+  }
+  figure, pre, .vcard {
+    page-break-inside: avoid;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    page-break-after: avoid;
+  }
+  :is(h2, h3, h4, h5, h6)+*, dd {
+    page-break-before: avoid;
+  }
+  pre {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    font-size: 10pt;
+  }
+  table {
+    border: 1px solid #ddd;
+  }
+  td {
+    border-top: 1px solid #ddd;
+  }
+}
+
+@page :first {
+  padding-top: 0;
+  @top-left {
+    content: normal;
+    border: none;
+  }
+  @top-center {
+    content: normal;
+    border: none;
+  }
+  @top-right {
+    content: normal;
+    border: none;
+  }
+}
+
+@page {
+  size: A4;
+  margin-bottom: 45mm;
+  padding-top: 20px;
+}
+
+/* Dark mode. */
+@media (prefers-color-scheme: dark) {
+:root {
+  --background-color: #121212;
+  --text-color: #f0f0f0;
+  --title-color: #fff;
+  --link-color: #4da4f0;
+  --highlight-color: #282828;
+  --line-color: #444;
+  --pilcrow-weak: #444;
+  --pilcrow-strong: #666;
+  scrollbar-color: #777 #333;
+}
+}
+
+/* SVG Trick: a prefix match works because only black and white are allowed */
+svg {
+  & :is([stroke="black"], [stroke^="#000"]) {
+    stroke: var(--text-color);
+  }
+  & :is([stroke="white"], [stroke^="#fff"]) {
+    stroke: var(--background-color);
+  }
+  & :is([fill="black"], [fill^="#000"], :not([fill])) {
+    fill: var(--text-color);
+  }
+  & :is([fill="white"], [fill^="#fff"]) {
+    fill: var(--background-color);
+  }
+}
+</style>
+
+</head>
+<body class="xml2rfc">
+<table class="ears">
+<thead><tr>
+<td class="left">Internet-Draft</td>
+<td class="center">DHCPv6 Rate Signaling</td>
+<td class="right">October 2026</td>
+</tr></thead>
+<tfoot><tr>
+<td class="left">Giese &amp; Patterson</td>
+<td class="center">Expires 28 April 2027</td>
+<td class="right">[Page]</td>
+</tr></tfoot>
+</table>
+<div id="external-metadata" class="document-information"></div>
+<div id="internal-metadata" class="document-information">
+<dl id="identifiers">
+<dt class="label-workgroup">Workgroup:</dt>
+<dd class="workgroup">Internet Area Working Group</dd>
+<dt class="label-internet-draft">Internet-Draft:</dt>
+<dd class="internet-draft">draft-ietf-intarea-dhcp-rate-signaling-latest</dd>
+<dt class="label-published">Published:</dt>
+<dd class="published">
+<time datetime="2026-10-25" class="published">25 October 2026</time>
+    </dd>
+<dt class="label-intended-status">Intended Status:</dt>
+<dd class="intended-status">Standards Track</dd>
+<dt class="label-expires">Expires:</dt>
+<dd class="expires"><time datetime="2027-04-28">28 April 2027</time></dd>
+<dt class="label-authors">Authors:</dt>
+<dd class="authors">
+<div class="author">
+      <div class="author-name">C. Giese</div>
+<div class="org">RtBrick</div>
+</div>
+<div class="author">
+      <div class="author-name">R. Patterson</div>
+<div class="org">Sky UK</div>
+</div>
+</dd>
+</dl>
+</div>
+<h1 id="title">DHCPv6 Options for Explicit Rate Signaling</h1>
+<section id="section-abstract">
+      <h2 id="abstract"><a href="#abstract" class="selfRef">Abstract</a></h2>
+<p id="section-abstract-1">This document defines two options for the Dynamic Host Configuration Protocol for IPv6 (DHCPv6)
+that signal the intended upstream and downstream rates of a network connection to clients. Each
+rate applies to the combined IPv4 and IPv6 traffic of the corresponding logical interface. In
+broadband access networks, the Customer Premises Equipment (CPE) typically sends at the speed of its
+physical link while the upstream rate is enforced by policers at the service edge. By learning the
+upstream rate, the CPE can shape its traffic and manage the queue using prioritization and active
+queue management (AQM).<a href="#section-abstract-1" class="pilcrow">¶</a></p>
+</section>
+<section class="note rfcEditorRemove" id="section-note.1">
+      <h2 id="name-about-this-document">
+<a href="#name-about-this-document" class="section-name selfRef">About This Document</a>
+      </h2>
+<p id="section-note.1-1">This note is to be removed before publishing as an RFC.<a href="#section-note.1-1" class="pilcrow">¶</a></p>
+<p id="section-note.1-2">
+        The latest revision of this draft can be found at <span><a href="https://GIC-de.github.io/draft-dhcp-rate-signaling/draft-ietf-intarea-dhcp-rate-signaling.html">https://GIC-de.github.io/draft-dhcp-rate-signaling/draft-ietf-intarea-dhcp-rate-signaling.html</a></span>.
+        Status information for this document may be found at <span><a href="https://datatracker.ietf.org/doc/draft-ietf-intarea-dhcp-rate-signaling/">https://datatracker.ietf.org/doc/draft-ietf-intarea-dhcp-rate-signaling/</a></span>.<a href="#section-note.1-2" class="pilcrow">¶</a></p>
+<p id="section-note.1-3">
+        Discussion of this document takes place on the
+        Internet Area Working Group mailing list (<span><a href="mailto:int-area@ietf.org">mailto:int-area@ietf.org</a></span>),
+        which is archived at <span><a href="https://mailarchive.ietf.org/arch/browse/int-area/">https://mailarchive.ietf.org/arch/browse/int-area/</a></span>.
+        Subscribe at <span><a href="https://www.ietf.org/mailman/listinfo/int-area/">https://www.ietf.org/mailman/listinfo/int-area/</a></span>.<a href="#section-note.1-3" class="pilcrow">¶</a></p>
+<p id="section-note.1-4">Source for this draft and an issue tracker can be found at
+        <span><a href="https://github.com/GIC-de/draft-dhcp-rate-signaling">https://github.com/GIC-de/draft-dhcp-rate-signaling</a></span>.<a href="#section-note.1-4" class="pilcrow">¶</a></p>
+<p id="section-note.1-5">Broadband-specific aspects of this document can also be discussed on the non-WG broadband mailing list (<a href="mailto:broadband@ietf.org">broadband@ietf.org</a>), which is archived at <a href="https://mailarchive.ietf.org/arch/browse/broadband/">https://mailarchive.ietf.org/arch/browse/broadband/</a>. The Internet Area Working Group mailing list remains the primary venue for this document.<a href="#section-note.1-5" class="pilcrow">¶</a></p>
+</section>
+<div id="status-of-memo">
+<section id="section-boilerplate.1">
+        <h2 id="name-status-of-this-memo">
+<a href="#name-status-of-this-memo" class="section-name selfRef">Status of This Memo</a>
+        </h2>
+<p id="section-boilerplate.1-1">
+        This Internet-Draft is submitted in full conformance with the
+        provisions of BCP 78 and BCP 79.<a href="#section-boilerplate.1-1" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.1-2">
+        Internet-Drafts are working documents of the Internet Engineering Task
+        Force (IETF). Note that other groups may also distribute working
+        documents as Internet-Drafts. The list of current Internet-Drafts is
+        at <span><a href="https://datatracker.ietf.org/drafts/current/">https://datatracker.ietf.org/drafts/current/</a></span>.<a href="#section-boilerplate.1-2" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.1-3">
+        Internet-Drafts are draft documents valid for a maximum of six months
+        and may be updated, replaced, or obsoleted by other documents at any
+        time. It is inappropriate to use Internet-Drafts as reference
+        material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.1-4">
+        This Internet-Draft will expire on 28 April 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="copyright">
+<section id="section-boilerplate.2">
+        <h2 id="name-copyright-notice">
+<a href="#name-copyright-notice" class="section-name selfRef">Copyright Notice</a>
+        </h2>
+<p id="section-boilerplate.2-1">
+            Copyright (c) 2026 IETF Trust and the persons identified as the
+            document authors. All rights reserved.<a href="#section-boilerplate.2-1" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.2-2">
+            This document is subject to BCP 78 and the IETF Trust's Legal
+            Provisions Relating to IETF Documents
+            (<span><a href="https://trustee.ietf.org/license-info">https://trustee.ietf.org/license-info</a></span>) in effect on the date of
+            publication of this document. Please review these documents
+            carefully, as they describe your rights and restrictions with
+            respect to this document. Code Components extracted from this
+            document must include Revised BSD License text as described in
+            Section 4.e of the Trust Legal Provisions and are provided without
+            warranty as described in the Revised BSD License.<a href="#section-boilerplate.2-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="toc">
+<section id="section-toc.1">
+        <a href="#" onclick="scroll(0,0)" class="toplink">▲</a><h2 id="name-table-of-contents">
+<a href="#name-table-of-contents" class="section-name selfRef">Table of Contents</a>
+        </h2>
+<nav class="toc"><ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1">
+            <p id="section-toc.1-1.1.1"><a href="#section-1" class="auto internal xref">1</a>.  <a href="#name-introduction" class="internal xref">Introduction</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1.2.1">
+                <p id="section-toc.1-1.1.2.1.1" class="keepWithNext"><a href="#section-1.1" class="auto internal xref">1.1</a>.  <a href="#name-problem-statement" class="internal xref">Problem Statement</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1.2.2">
+                <p id="section-toc.1-1.1.2.2.1" class="keepWithNext"><a href="#section-1.2" class="auto internal xref">1.2</a>.  <a href="#name-solution-overview" class="internal xref">Solution Overview</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1.2.3">
+                <p id="section-toc.1-1.1.2.3.1" class="keepWithNext"><a href="#section-1.3" class="auto internal xref">1.3</a>.  <a href="#name-applicability" class="internal xref">Applicability</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2">
+            <p id="section-toc.1-1.2.1"><a href="#section-2" class="auto internal xref">2</a>.  <a href="#name-conventions-and-definitions" class="internal xref">Conventions and Definitions</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3">
+            <p id="section-toc.1-1.3.1"><a href="#section-3" class="auto internal xref">3</a>.  <a href="#name-rate-semantics" class="internal xref">Rate Semantics</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.1">
+                <p id="section-toc.1-1.3.2.1.1"><a href="#section-3.1" class="auto internal xref">3.1</a>.  <a href="#name-rate-values" class="internal xref">Rate Values</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.2">
+                <p id="section-toc.1-1.3.2.2.1"><a href="#section-3.2" class="auto internal xref">3.2</a>.  <a href="#name-layer-3-rates" class="internal xref">Layer 3 Rates</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.3">
+                <p id="section-toc.1-1.3.2.3.1"><a href="#section-3.3" class="auto internal xref">3.3</a>.  <a href="#name-ipv4-and-ipv6-traffic" class="internal xref">IPv4 and IPv6 Traffic</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.4">
+                <p id="section-toc.1-1.3.2.4.1"><a href="#section-3.4" class="auto internal xref">3.4</a>.  <a href="#name-use-of-signaled-rates" class="internal xref">Use of Signaled Rates</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4">
+            <p id="section-toc.1-1.4.1"><a href="#section-4" class="auto internal xref">4</a>.  <a href="#name-dhcpv6-rate-options" class="internal xref">DHCPv6 Rate Options</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.1">
+                <p id="section-toc.1-1.4.2.1.1"><a href="#section-4.1" class="auto internal xref">4.1</a>.  <a href="#name-upstream-rate-option" class="internal xref">Upstream Rate Option</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.2">
+                <p id="section-toc.1-1.4.2.2.1"><a href="#section-4.2" class="auto internal xref">4.2</a>.  <a href="#name-downstream-rate-option" class="internal xref">Downstream Rate Option</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.3">
+                <p id="section-toc.1-1.4.2.3.1"><a href="#section-4.3" class="auto internal xref">4.3</a>.  <a href="#name-option-placement" class="internal xref">Option Placement</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5">
+            <p id="section-toc.1-1.5.1"><a href="#section-5" class="auto internal xref">5</a>.  <a href="#name-client-behavior" class="internal xref">Client Behavior</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6">
+            <p id="section-toc.1-1.6.1"><a href="#section-6" class="auto internal xref">6</a>.  <a href="#name-server-behavior" class="internal xref">Server Behavior</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7">
+            <p id="section-toc.1-1.7.1"><a href="#section-7" class="auto internal xref">7</a>.  <a href="#name-pppoe-deployments" class="internal xref">PPPoE Deployments</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8">
+            <p id="section-toc.1-1.8.1"><a href="#section-8" class="auto internal xref">8</a>.  <a href="#name-operational-considerations" class="internal xref">Operational Considerations</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9">
+            <p id="section-toc.1-1.9.1"><a href="#section-9" class="auto internal xref">9</a>.  <a href="#name-security-considerations" class="internal xref">Security Considerations</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10">
+            <p id="section-toc.1-1.10.1"><a href="#section-10" class="auto internal xref">10</a>. <a href="#name-privacy-considerations" class="internal xref">Privacy Considerations</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11">
+            <p id="section-toc.1-1.11.1"><a href="#section-11" class="auto internal xref">11</a>. <a href="#name-iana-considerations" class="internal xref">IANA Considerations</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12">
+            <p id="section-toc.1-1.12.1"><a href="#section-12" class="auto internal xref">12</a>. <a href="#name-references" class="internal xref">References</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12.2.1">
+                <p id="section-toc.1-1.12.2.1.1"><a href="#section-12.1" class="auto internal xref">12.1</a>.  <a href="#name-normative-references" class="internal xref">Normative References</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12.2.2">
+                <p id="section-toc.1-1.12.2.2.1"><a href="#section-12.2" class="auto internal xref">12.2</a>.  <a href="#name-informative-references" class="internal xref">Informative References</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13">
+            <p id="section-toc.1-1.13.1"><a href="#appendix-A" class="auto internal xref">Appendix A</a>.  <a href="#name-implementation-status" class="internal xref">Implementation Status</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13.2.1">
+                <p id="section-toc.1-1.13.2.1.1"><a href="#appendix-A.1" class="auto internal xref">A.1</a>.  <a href="#name-applicability-to-openwrt" class="internal xref">Applicability to OpenWrt</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.14">
+            <p id="section-toc.1-1.14.1"><a href="#appendix-B" class="auto internal xref">Appendix B</a>.  <a href="#name-design-rationale" class="internal xref">Design Rationale</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.14.2.1">
+                <p id="section-toc.1-1.14.2.1.1"><a href="#appendix-B.1" class="auto internal xref">B.1</a>.  <a href="#name-dhcpv6-only" class="internal xref">DHCPv6 Only</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.14.2.2">
+                <p id="section-toc.1-1.14.2.2.1"><a href="#appendix-B.2" class="auto internal xref">B.2</a>.  <a href="#name-overhead-signaling" class="internal xref">Overhead Signaling</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.14.2.3">
+                <p id="section-toc.1-1.14.2.3.1"><a href="#appendix-B.3" class="auto internal xref">B.3</a>.  <a href="#name-relay-directed-rates" class="internal xref">Relay-Directed Rates</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.15">
+            <p id="section-toc.1-1.15.1"><a href="#appendix-C" class="auto internal xref">Appendix C</a>.  <a href="#name-change-log" class="internal xref">Change Log</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.15.2.1">
+                <p id="section-toc.1-1.15.2.1.1"><a href="#appendix-C.1" class="auto internal xref">C.1</a>.  <a href="#name-since-draft-ietf-intarea-dh" class="internal xref">Since draft-ietf-intarea-dhcp-rate-signaling-00</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.16">
+            <p id="section-toc.1-1.16.1"><a href="#appendix-D" class="auto internal xref"></a><a href="#name-acknowledgments" class="internal xref">Acknowledgments</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.17">
+            <p id="section-toc.1-1.17.1"><a href="#appendix-E" class="auto internal xref"></a><a href="#name-authors-addresses" class="internal xref">Authors' Addresses</a></p>
+</li>
+        </ul>
+</nav>
+</section>
+</div>
+<div id="introduction">
+<section id="section-1">
+      <h2 id="name-introduction">
+<a href="#section-1" class="section-number selfRef">1. </a><a href="#name-introduction" class="section-name selfRef">Introduction</a>
+      </h2>
+<div id="problem-statement">
+<section id="section-1.1">
+        <h3 id="name-problem-statement">
+<a href="#section-1.1" class="section-number selfRef">1.1. </a><a href="#name-problem-statement" class="section-name selfRef">Problem Statement</a>
+        </h3>
+<p id="section-1.1-1">In broadband access networks, the rate available to a subscriber is typically lower than the speed
+of the physical link that connects the Customer Premises Equipment (CPE) to the network. The
+service edge is typically a Broadband Network Gateway (BNG) <span>[<a href="#TR101" class="cite xref">TR101</a>]</span>. The available rate can also
+be limited by an access device connected to the CPE, such as an Optical Network Terminal (ONT)
+<span>[<a href="#G.984.1" class="cite xref">G.984.1</a>]</span>, a Digital Subscriber Line (DSL) modem, or a cable modem, or within the access
+network, for example by the synchronization rate of a DSL line. The CPE is typically unaware of
+these rates and sends at the speed of its physical link.<a href="#section-1.1-1" class="pilcrow">¶</a></p>
+<p id="section-1.1-2">Per-subscriber queuing in the upstream direction is not supported by all BNG platforms. Where it
+is supported, it is often restricted to specific hardware or available only at reduced scale, as
+it competes for the same queuing and scheduling resources as downstream hierarchical scheduling.
+Upstream enforcement is therefore commonly implemented using ingress policers, which discard
+packets that exceed the configured rate and burst size instead of queuing them. As the speed of
+the physical link of the CPE can exceed the provisioned rate by an order of magnitude, traffic
+bursts are discarded at the policer. Congestion control algorithms react to these losses by
+repeatedly reducing their sending rate, resulting in an unstable sawtooth throughput pattern well
+below the provisioned rate. Users experience this as poor and fluctuating results, for example in
+speed tests, even though no part of the network is congested.<a href="#section-1.1-2" class="pilcrow">¶</a></p>
+<p id="section-1.1-3">Where the upstream bottleneck is located at the access device or within the access network, the
+resulting queue is typically managed by neither active queue management (AQM) <span>[<a href="#RFC7567" class="cite xref">RFC7567</a>]</span> nor
+prioritization. Depending on the buffering of the access device, this results in packet loss or in
+increased latency under load, affecting all of the subscriber's traffic.<a href="#section-1.1-3" class="pilcrow">¶</a></p>
+<p id="section-1.1-4">In both cases, upstream prioritization at the CPE, for example of DNS, Voice over IP (VoIP), or
+video conferencing traffic, or of TCP acknowledgments, is ineffective. As long as the CPE sends at
+the speed of its physical link, its queues remain empty, and packets are discarded or delayed at the
+actual bottleneck regardless of their priority.<a href="#section-1.1-4" class="pilcrow">¶</a></p>
+<p id="section-1.1-5">Because the downstream rate is typically enforced at the BNG using egress shapers, it is of lower
+relevance for traffic management at the CPE. It remains relevant for informational purposes, such
+as displaying the provisioned service tier in the CPE user interface.<a href="#section-1.1-5" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="solution-overview">
+<section id="section-1.2">
+        <h3 id="name-solution-overview">
+<a href="#section-1.2" class="section-number selfRef">1.2. </a><a href="#name-solution-overview" class="section-name selfRef">Solution Overview</a>
+        </h3>
+<p id="section-1.2-1">This document defines two DHCPv6 <span>[<a href="#RFC9915" class="cite xref">RFC9915</a>]</span> options: the Upstream Rate option and the Downstream
+Rate option. Each carries one unsigned 64-bit integer: the intended rate for its direction in bits
+per second (bit/s). Each rate counts the IP header and its payload at the IP layer of the link to
+which the option applies (see <a href="#layer3" class="auto internal xref">Section 3.2</a>) and covers the combined IPv4 and IPv6 traffic of that
+link (see <a href="#dual-stack" class="auto internal xref">Section 3.3</a>). This document specifies the encoding, transport, and meaning of the
+options. The usage examples are illustrative; clients choose whether and how to use the
+information according to local policy (see <a href="#application" class="auto internal xref">Section 3.4</a>).<a href="#section-1.2-1" class="pilcrow">¶</a></p>
+<p id="section-1.2-2">A CPE that knows the upstream rate can use it to configure an upstream shaper. Queuing at the CPE
+can then be managed using prioritization, AQM, and flow queuing <span>[<a href="#RFC8290" class="cite xref">RFC8290</a>]</span>. Where the queue at
+the CPE implements an AQM that supports the Low Latency, Low Loss, and Scalable Throughput (L4S)
+architecture <span>[<a href="#RFC9330" class="cite xref">RFC9330</a>]</span>, such as the DualQ Coupled AQM <span>[<a href="#RFC9332" class="cite xref">RFC9332</a>]</span>, it can additionally provide
+low latency for L4S traffic, provided that the shaper at the CPE is the bottleneck. When the shaper
+accounts for the bottleneck rate and burst tolerance, this can reduce policer drops and queuing in
+the access network (see <a href="#fig-policer" class="auto internal xref">Figure 1</a>).<a href="#section-1.2-2" class="pilcrow">¶</a></p>
+<span id="name-upstream-policing-at-the-bn"></span><div id="fig-policer">
+<figure id="figure-1">
+          <div id="section-1.2-3.1">
+            <div class="alignLeft art-svg artwork" id="section-1.2-3.1.1">
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="272" width="560" viewBox="0 0 560 272" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
+                <path d="M 8,64 L 8,128" fill="none" stroke="black"></path>
+                <path d="M 8,192 L 8,256" fill="none" stroke="black"></path>
+                <path d="M 120,64 L 120,128" fill="none" stroke="black"></path>
+                <path d="M 120,192 L 120,256" fill="none" stroke="black"></path>
+                <path d="M 280,64 L 280,96" fill="none" stroke="black"></path>
+                <path d="M 280,192 L 280,224" fill="none" stroke="black"></path>
+                <path d="M 352,64 L 352,96" fill="none" stroke="black"></path>
+                <path d="M 352,192 L 352,224" fill="none" stroke="black"></path>
+                <path d="M 392,64 L 392,128" fill="none" stroke="black"></path>
+                <path d="M 392,192 L 392,256" fill="none" stroke="black"></path>
+                <path d="M 552,64 L 552,128" fill="none" stroke="black"></path>
+                <path d="M 552,192 L 552,256" fill="none" stroke="black"></path>
+                <path d="M 8,64 L 120,64" fill="none" stroke="black"></path>
+                <path d="M 280,64 L 352,64" fill="none" stroke="black"></path>
+                <path d="M 392,64 L 552,64" fill="none" stroke="black"></path>
+                <path d="M 128,80 L 272,80" fill="none" stroke="black"></path>
+                <path d="M 360,80 L 384,80" fill="none" stroke="black"></path>
+                <path d="M 280,96 L 352,96" fill="none" stroke="black"></path>
+                <path d="M 8,128 L 120,128" fill="none" stroke="black"></path>
+                <path d="M 392,128 L 552,128" fill="none" stroke="black"></path>
+                <path d="M 8,192 L 120,192" fill="none" stroke="black"></path>
+                <path d="M 280,192 L 352,192" fill="none" stroke="black"></path>
+                <path d="M 392,192 L 552,192" fill="none" stroke="black"></path>
+                <path d="M 128,208 L 272,208" fill="none" stroke="black"></path>
+                <path d="M 360,208 L 384,208" fill="none" stroke="black"></path>
+                <path d="M 280,224 L 352,224" fill="none" stroke="black"></path>
+                <path d="M 8,256 L 120,256" fill="none" stroke="black"></path>
+                <path d="M 392,256 L 552,256" fill="none" stroke="black"></path>
+                <polygon class="arrowhead" points="392,208 380,202.4 380,213.6" fill="black" transform="rotate(0,384,208)"></polygon>
+                <polygon class="arrowhead" points="392,80 380,74.4 380,85.6" fill="black" transform="rotate(0,384,80)"></polygon>
+                <polygon class="arrowhead" points="280,208 268,202.4 268,213.6" fill="black" transform="rotate(0,272,208)"></polygon>
+                <polygon class="arrowhead" points="280,80 268,74.4 268,85.6" fill="black" transform="rotate(0,272,80)"></polygon>
+                <g class="text">
+                  <text x="224" y="36">Without</text>
+                  <text x="276" y="36">rate</text>
+                  <text x="336" y="36">signaling</text>
+                  <text x="144" y="68">1</text>
+                  <text x="180" y="68">Gbit/s</text>
+                  <text x="236" y="68">bursts</text>
+                  <text x="64" y="84">CPE</text>
+                  <text x="316" y="84">Access</text>
+                  <text x="472" y="84">BNG</text>
+                  <text x="432" y="100">ingress</text>
+                  <text x="496" y="100">policer</text>
+                  <text x="416" y="116">100</text>
+                  <text x="464" y="116">Mbit/s:</text>
+                  <text x="520" y="116">drops</text>
+                  <text x="220" y="164">With</text>
+                  <text x="260" y="164">rate</text>
+                  <text x="320" y="164">signaling</text>
+                  <text x="156" y="196">shaped</text>
+                  <text x="200" y="196">100</text>
+                  <text x="244" y="196">Mbit/s</text>
+                  <text x="64" y="212">CPE</text>
+                  <text x="316" y="212">Access</text>
+                  <text x="472" y="212">BNG</text>
+                  <text x="48" y="228">shaper,</text>
+                  <text x="96" y="228">AQM</text>
+                  <text x="432" y="228">ingress</text>
+                  <text x="496" y="228">policer</text>
+                  <text x="32" y="244">100</text>
+                  <text x="76" y="244">Mbit/s</text>
+                  <text x="416" y="244">100</text>
+                  <text x="464" y="244">Mbit/s:</text>
+                  <text x="516" y="244">pass</text>
+                </g>
+              </svg><a href="#section-1.2-3.1.1" class="pilcrow">¶</a>
+</div>
+</div>
+<figcaption><a href="#figure-1" class="selfRef">Figure 1</a>:
+<a href="#name-upstream-policing-at-the-bn" class="selfRef">Upstream Policing at the BNG with and without CPE Shaping</a>
+          </figcaption></figure>
+</div>
+<p id="section-1.2-4">Enforcement at the BNG remains in place. The rate of the BNG policer can be configured slightly
+above the signaled rate to accommodate CPE shaping and burst behavior.<a href="#section-1.2-4" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="applicability">
+<section id="section-1.3">
+        <h3 id="name-applicability">
+<a href="#section-1.3" class="section-number selfRef">1.3. </a><a href="#name-applicability" class="section-name selfRef">Applicability</a>
+        </h3>
+<p id="section-1.3-1">The mechanism defined in this document is primarily designed for broadband access networks using
+IP over Ethernet (IPoE) <span>[<a href="#TR101" class="cite xref">TR101</a>]</span> or Point-to-Point Protocol over Ethernet (PPPoE) <span>[<a href="#RFC2516" class="cite xref">RFC2516</a>]</span>. In
+both cases, DHCPv6 is commonly used by the CPE to obtain addresses and delegated prefixes; in PPPoE
+deployments, it runs over the Point-to-Point Protocol (PPP) <span>[<a href="#RFC1661" class="cite xref">RFC1661</a>]</span> session (see <a href="#pppoe" class="auto internal xref">Section 7</a>).<a href="#section-1.3-1" class="pilcrow">¶</a></p>
+<p id="section-1.3-2">The options are defined for DHCPv6 only. DHCPv6 is available in dual-stack and IPv6-only
+deployments, including those that provide IPv4 service over IPv6, and a single protocol avoids
+reconciling rates signaled by two protocols for the same traffic. The rates nevertheless cover IPv4
+traffic (see <a href="#dual-stack" class="auto internal xref">Section 3.3</a>); DHCPv6 options that configure IPv4 service have precedent, for example
+the Address Family Transition Router (AFTR) Name option for DS-Lite <span>[<a href="#RFC6334" class="cite xref">RFC6334</a>]</span> and the options for
+Mapping of Address and Port (MAP) <span>[<a href="#RFC7598" class="cite xref">RFC7598</a>]</span>. Networks that do not use DHCPv6 on the link are
+outside the scope of this document.<a href="#section-1.3-2" class="pilcrow">¶</a></p>
+<p id="section-1.3-3">DHCPv6 is widely deployed on CPE, including customer-owned devices and devices running open-source
+firmware. It provides an existing path for initial configuration and updates, complementing manual
+configuration and management protocols such as TR-069 <span>[<a href="#TR069" class="cite xref">TR069</a>]</span>.<a href="#section-1.3-3" class="pilcrow">¶</a></p>
+<p id="section-1.3-4">The options are applicable to any access link on which DHCPv6 is used to configure the
+network-facing interface and on which the intended rates are determined by a subscription, contract,
+or policy, including enterprise access links. They convey provisioned, slowly changing values and do
+not describe the instantaneous capacity of links whose capacity varies over time, such as wireless
+or cellular links; on such links, they can serve as an upper bound. Signaling rates to relay agents
+or other network nodes, and to end devices in local area networks, is outside the scope of this
+document.<a href="#section-1.3-4" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="definitions">
+<section id="section-2">
+      <h2 id="name-conventions-and-definitions">
+<a href="#section-2" class="section-number selfRef">2. </a><a href="#name-conventions-and-definitions" class="section-name selfRef">Conventions and Definitions</a>
+      </h2>
+<p id="section-2-1">The key words "<span class="bcp14">MUST</span>", "<span class="bcp14">MUST NOT</span>", "<span class="bcp14">REQUIRED</span>", "<span class="bcp14">SHALL</span>", "<span class="bcp14">SHALL NOT</span>", "<span class="bcp14">SHOULD</span>", "<span class="bcp14">SHOULD NOT</span>", "<span class="bcp14">RECOMMENDED</span>", "<span class="bcp14">NOT RECOMMENDED</span>",
+"<span class="bcp14">MAY</span>", and "<span class="bcp14">OPTIONAL</span>" in this document are to be interpreted as
+described in BCP 14 <span>[<a href="#RFC2119" class="cite xref">RFC2119</a>]</span> <span>[<a href="#RFC8174" class="cite xref">RFC8174</a>]</span> when, and only when, they
+appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶</a></p>
+<p id="section-2-2">This document makes use of the terms defined in <span>[<a href="#RFC9915" class="cite xref">RFC9915</a>]</span>. The following additional terms are
+used:<a href="#section-2-2" class="pilcrow">¶</a></p>
+<span class="break"></span><dl class="dlParallel" id="section-2-3">
+        <dt id="section-2-3.1">Downstream</dt>
+        <dd style="margin-left: 1.5em" id="section-2-3.2">
+          <p id="section-2-3.2.1">The direction of traffic from the network toward the client, received by the client over the
+link on which the Rate Option was received.<a href="#section-2-3.2.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-2-3.3">Enforcement Point</dt>
+        <dd style="margin-left: 1.5em" id="section-2-3.4">
+          <p id="section-2-3.4.1">The node or link at which the rates of a subscriber are enforced or which constitutes the
+bottleneck of the path, for example a policer at the BNG or an access link.<a href="#section-2-3.4.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-2-3.5">Intended Rate</dt>
+        <dd style="margin-left: 1.5em" id="section-2-3.6">
+          <p id="section-2-3.6.1">The maximum rate, in a given direction, at which the network intends to forward the traffic of a
+client. Traffic exceeding the intended rate is subject to being dropped or delayed at the
+enforcement point. The intended rate is not a guarantee: the achievable rate can be lower, for
+example due to congestion elsewhere in the network. The Rate Options signal the intended rates;
+this document also refers to them as the signaled rates.<a href="#section-2-3.6.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-2-3.7">Layer 3 Rate</dt>
+        <dd style="margin-left: 1.5em" id="section-2-3.8">
+          <p id="section-2-3.8.1">A rate calculated over the IP header and its payload at the IP layer of the link to which the
+Rate Option applies (see <a href="#layer3" class="auto internal xref">Section 3.2</a>).<a href="#section-2-3.8.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-2-3.9">Rate Option</dt>
+        <dd style="margin-left: 1.5em" id="section-2-3.10">
+          <p id="section-2-3.10.1">The Upstream Rate option (OPTION_UPSTREAM_RATE) or the Downstream Rate option
+(OPTION_DOWNSTREAM_RATE) defined in this document. Where the distinction is not relevant, this
+document refers to either as a Rate Option.<a href="#section-2-3.10.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-2-3.11">Subscriber</dt>
+        <dd style="margin-left: 1.5em" id="section-2-3.12">
+          <p id="section-2-3.12.1">The customer of a network access service. Within the network, a subscriber is typically
+represented by a subscriber session at the BNG, for example an IPoE or PPPoE session, to which the
+subscribed rates and other per-subscriber policies are applied.<a href="#section-2-3.12.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-2-3.13">Upstream</dt>
+        <dd style="margin-left: 1.5em" id="section-2-3.14">
+          <p id="section-2-3.14.1">The direction of traffic from the client toward the network, sent by the client over the link on
+which the Rate Option was received.<a href="#section-2-3.14.1" class="pilcrow">¶</a></p>
+</dd>
+      <dd class="break"></dd>
+</dl>
+</section>
+</div>
+<div id="semantics">
+<section id="section-3">
+      <h2 id="name-rate-semantics">
+<a href="#section-3" class="section-number selfRef">3. </a><a href="#name-rate-semantics" class="section-name selfRef">Rate Semantics</a>
+      </h2>
+<div id="values">
+<section id="section-3.1">
+        <h3 id="name-rate-values">
+<a href="#section-3.1" class="section-number selfRef">3.1. </a><a href="#name-rate-values" class="section-name selfRef">Rate Values</a>
+        </h3>
+<p id="section-3.1-1">Each Rate Option carries a single rate as an unsigned 64-bit integer in network byte order
+(big-endian), expressing the rate in bits per second (bit/s), not in bytes (octets) per second.
+Throughout this document, Mbit/s and Gbit/s denote 10^6 and 10^9 bits per second, respectively. The
+largest representable rate is 2^64 - 1 bit/s (18,446,744,073,709,551,615 bit/s), approximately
+18.45 Ebit/s, where Ebit/s denotes 10^18 bits per second.<a href="#section-3.1-1" class="pilcrow">¶</a></p>
+<p id="section-3.1-2">The value 0 is not a valid rate. A server <span class="bcp14">MUST NOT</span> send a Rate Option with the value 0. A direction
+for which no rate is signaled is indicated by the absence of the respective option.<a href="#section-3.1-2" class="pilcrow">¶</a></p>
+<p id="section-3.1-3">The two options are independent: a server can send either or both, and the presence or absence of
+one does not affect the processing of the other.<a href="#section-3.1-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="layer3">
+<section id="section-3.2">
+        <h3 id="name-layer-3-rates">
+<a href="#section-3.2" class="section-number selfRef">3.2. </a><a href="#name-layer-3-rates" class="section-name selfRef">Layer 3 Rates</a>
+        </h3>
+<p id="section-3.2-1">Servers and clients <span class="bcp14">MUST</span> interpret each rate as a Layer 3 rate: the number of bits per second
+counted over the IP header and its entire payload, including IP options, IPv6 extension headers,
+and transport headers. The reference is the IP layer of the physical or logical link on which the
+DHCPv6 exchange takes place.<a href="#section-3.2-1" class="pilcrow">¶</a></p>
+<p id="section-3.2-2">This reference remains the same when the link is carried over a tunnel. If DHCPv6 runs inside a
+tunnel, the rate refers to the IP packets on that logical link, excluding the tunnel's carrier
+headers. If the link instead carries tunneled data, such as IPv4-in-IPv6 traffic from a Dual-Stack
+Lite (DS-Lite) basic bridging broadband (B4) element <span>[<a href="#RFC6333" class="cite xref">RFC6333</a>]</span>, the IPv6 header and its
+encapsulated payload are counted. Thus the reference is the IP layer of the DHCPv6-configured link,
+not necessarily the outermost IP header on the underlying physical interface. Translation is
+accounted for as seen on the reference link.<a href="#section-3.2-2" class="pilcrow">¶</a></p>
+<p id="section-3.2-3">Layer 3 accounting excludes link-layer headers, trailers, padding, and physical-layer overhead.
+Virtual LAN (VLAN) tags or PPPoE and PPP headers added or removed along the path do not change the
+rate. IP encapsulation or translation between the client and the enforcement point can change the
+counted packet size, which operators need to take into account when selecting the signaled rate.<a href="#section-3.2-3" class="pilcrow">¶</a></p>
+<p id="section-3.2-4">For 1500-octet TCP/IP packets without options or extension headers, TCP payload throughput is
+approximately 2% to 4% lower than the Layer 3 rate due to the IP and transport headers.<a href="#section-3.2-4" class="pilcrow">¶</a></p>
+<p id="section-3.2-5">Traffic management that counts IP packet sizes can use the signaled rate directly. Traffic
+management that counts link-layer frames needs to exclude the counted link-layer overhead to
+reproduce Layer 3 accounting. This header compensation is local: only overhead actually counted by
+the implementation is removed, including padding where applicable. For example, a shaper counting
+an Ethernet header, one VLAN tag, PPPoE, and PPP, but no frame check sequence (FCS) or padding,
+subtracts 14 + 4 + 6 + 2 = 26 octets per packet. Overhead inserted later by hardware is not
+subtracted. Applying the same numeric rate without compensation yields a lower IP rate that
+depends on packet size; it does not change the meaning of the signaled value.<a href="#section-3.2-5" class="pilcrow">¶</a></p>
+<p id="section-3.2-6">The Layer 3 meaning of the Rate Options is fixed. Future documents can define additional options,
+for example to signal link-layer overhead or rates at another layer; such options complement the
+Rate Options and do not change their meaning. A client that does not support such an option
+ignores it and uses the Rate Options as specified in this document.<a href="#section-3.2-6" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="dual-stack">
+<section id="section-3.3">
+        <h3 id="name-ipv4-and-ipv6-traffic">
+<a href="#section-3.3" class="section-number selfRef">3.3. </a><a href="#name-ipv4-and-ipv6-traffic" class="section-name selfRef">IPv4 and IPv6 Traffic</a>
+        </h3>
+<p id="section-3.3-1">Although the Rate Options are carried in DHCPv6, each rate describes the aggregate IP traffic of
+the service on the reference link in its direction, including both IPv4 and IPv6. The rates are not
+an allowance for IPv6 traffic only, and there is no separate allowance for IPv4: for example, a
+signaled upstream rate of 1 Gbit/s describes 1 Gbit/s in total for IPv4 and IPv6 together.<a href="#section-3.3-1" class="pilcrow">¶</a></p>
+<p id="section-3.3-2">This applies regardless of how IPv4 is provided on the logical interface, for example natively and
+configured by DHCPv4 <span>[<a href="#RFC2131" class="cite xref">RFC2131</a>]</span> or by the IP Control Protocol (IPCP) <span>[<a href="#RFC1332" class="cite xref">RFC1332</a>]</span>, or over IPv6
+using a transition mechanism such as DS-Lite <span>[<a href="#RFC6333" class="cite xref">RFC6333</a>]</span>. In the latter case, IPv4 traffic is
+counted as the encapsulating IPv6 packets on the reference link (see <a href="#layer3" class="auto internal xref">Section 3.2</a>).<a href="#section-3.3-2" class="pilcrow">¶</a></p>
+<p id="section-3.3-3">The rates cover only the traffic of the logical interface on which the DHCPv6 exchange takes place.
+Where IPv4 is provided on a different logical interface, for example in a separate PPPoE session or
+on a separate VLAN, the signaled rates do not apply to that IPv4 traffic.<a href="#section-3.3-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="application">
+<section id="section-3.4">
+        <h3 id="name-use-of-signaled-rates">
+<a href="#section-3.4" class="section-number selfRef">3.4. </a><a href="#name-use-of-signaled-rates" class="section-name selfRef">Use of Signaled Rates</a>
+        </h3>
+<p id="section-3.4-1">A client <span class="bcp14">MAY</span> use the signaled rates for traffic management, display, or other local purposes. This
+document does not require shaping, AQM, or a particular response to rates that exceed local link or
+processing capacity. These choices, including precedence over locally configured policies, are
+implementation and deployment decisions. For example, a CPE with a 1 Gbit/s connection to an
+external modem can display a provisioned rate of 2 Gbit/s together with the local link limit,
+whether or not it configures a shaper. A client that uses the rates for traffic management
+accounts for their Layer 3 meaning (<a href="#layer3" class="auto internal xref">Section 3.2</a>) and for the traffic to which they apply
+(<a href="#dual-stack" class="auto internal xref">Section 3.3</a>).<a href="#section-3.4-1" class="pilcrow">¶</a></p>
+<p id="section-3.4-2">The rates are neither a guarantee of available capacity nor a replacement for congestion control.
+Clients <span class="bcp14">MUST NOT</span> use them to bypass congestion control or to increase their sending rates beyond
+what the congestion control algorithm would otherwise permit. Clients that make the rates available
+to applications <span class="bcp14">MUST NOT</span> present them as available capacity or as a sending rate; applications can
+use them only as an upper bound or for display. Enforcement of a service limit remains the
+responsibility of the network.<a href="#section-3.4-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="options">
+<section id="section-4">
+      <h2 id="name-dhcpv6-rate-options">
+<a href="#section-4" class="section-number selfRef">4. </a><a href="#name-dhcpv6-rate-options" class="section-name selfRef">DHCPv6 Rate Options</a>
+      </h2>
+<div id="upstream-option">
+<section id="section-4.1">
+        <h3 id="name-upstream-rate-option">
+<a href="#section-4.1" class="section-number selfRef">4.1. </a><a href="#name-upstream-rate-option" class="section-name selfRef">Upstream Rate Option</a>
+        </h3>
+<p id="section-4.1-1">The Upstream Rate option (OPTION_UPSTREAM_RATE) carries the intended Layer 3 rate for the upstream
+direction. It has the following format:<a href="#section-4.1-1" class="pilcrow">¶</a></p>
+<span id="name-upstream-rate-option-format"></span><div id="fig-upstream-format">
+<figure id="figure-2">
+          <div id="section-4.1-2.1">
+            <div class="alignLeft art-svg artwork" id="section-4.1-2.1.1">
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="176" width="528" viewBox="0 0 528 176" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
+                <path d="M 8,64 L 8,160" fill="none" stroke="black"></path>
+                <path d="M 136,64 L 136,72" fill="none" stroke="black"></path>
+                <path d="M 136,88 L 136,96" fill="none" stroke="black"></path>
+                <path d="M 264,64 L 264,96" fill="none" stroke="black"></path>
+                <path d="M 520,64 L 520,160" fill="none" stroke="black"></path>
+                <path d="M 8,64 L 520,64" fill="none" stroke="black"></path>
+                <path d="M 8,96 L 520,96" fill="none" stroke="black"></path>
+                <path d="M 8,160 L 520,160" fill="none" stroke="black"></path>
+                <path class="jump" d="M 136,88 C 130,88 130,72 136,72" fill="none" stroke="black"></path>
+                <g class="text">
+                  <text x="16" y="36">0</text>
+                  <text x="176" y="36">1</text>
+                  <text x="336" y="36">2</text>
+                  <text x="496" y="36">3</text>
+                  <text x="16" y="52">0</text>
+                  <text x="32" y="52">1</text>
+                  <text x="48" y="52">2</text>
+                  <text x="64" y="52">3</text>
+                  <text x="80" y="52">4</text>
+                  <text x="96" y="52">5</text>
+                  <text x="112" y="52">6</text>
+                  <text x="128" y="52">7</text>
+                  <text x="144" y="52">8</text>
+                  <text x="160" y="52">9</text>
+                  <text x="176" y="52">0</text>
+                  <text x="192" y="52">1</text>
+                  <text x="208" y="52">2</text>
+                  <text x="224" y="52">3</text>
+                  <text x="240" y="52">4</text>
+                  <text x="256" y="52">5</text>
+                  <text x="272" y="52">6</text>
+                  <text x="288" y="52">7</text>
+                  <text x="304" y="52">8</text>
+                  <text x="320" y="52">9</text>
+                  <text x="336" y="52">0</text>
+                  <text x="352" y="52">1</text>
+                  <text x="368" y="52">2</text>
+                  <text x="384" y="52">3</text>
+                  <text x="400" y="52">4</text>
+                  <text x="416" y="52">5</text>
+                  <text x="432" y="52">6</text>
+                  <text x="448" y="52">7</text>
+                  <text x="464" y="52">8</text>
+                  <text x="480" y="52">9</text>
+                  <text x="496" y="52">0</text>
+                  <text x="512" y="52">1</text>
+                  <text x="80" y="84">option-code</text>
+                  <text x="160" y="84">TBD1)</text>
+                  <text x="388" y="84">option-len=8</text>
+                  <text x="204" y="132">Upstream</text>
+                  <text x="260" y="132">Rate</text>
+                  <text x="296" y="132">(64</text>
+                  <text x="336" y="132">bits)</text>
+                </g>
+              </svg><a href="#section-4.1-2.1.1" class="pilcrow">¶</a>
+</div>
+</div>
+<figcaption><a href="#figure-2" class="selfRef">Figure 2</a>:
+<a href="#name-upstream-rate-option-format" class="selfRef">Upstream Rate Option Format</a>
+          </figcaption></figure>
+</div>
+<span class="break"></span><dl class="dlParallel" id="section-4.1-3">
+          <dt id="section-4.1-3.1">option-code</dt>
+          <dd style="margin-left: 1.5em" id="section-4.1-3.2">
+            <p id="section-4.1-3.2.1">OPTION_UPSTREAM_RATE (TBD1).<a href="#section-4.1-3.2.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-4.1-3.3">option-len</dt>
+          <dd style="margin-left: 1.5em" id="section-4.1-3.4">
+            <p id="section-4.1-3.4.1">8.<a href="#section-4.1-3.4.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-4.1-3.5">Upstream Rate</dt>
+          <dd style="margin-left: 1.5em" id="section-4.1-3.6">
+            <p id="section-4.1-3.6.1">Unsigned 64-bit integer in network byte order, in bits per second, as specified in
+<a href="#semantics" class="auto internal xref">Section 3</a>.<a href="#section-4.1-3.6.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+</dl>
+</section>
+</div>
+<div id="downstream-option">
+<section id="section-4.2">
+        <h3 id="name-downstream-rate-option">
+<a href="#section-4.2" class="section-number selfRef">4.2. </a><a href="#name-downstream-rate-option" class="section-name selfRef">Downstream Rate Option</a>
+        </h3>
+<p id="section-4.2-1">The Downstream Rate option (OPTION_DOWNSTREAM_RATE) carries the intended Layer 3 rate for the
+downstream direction. It has the following format:<a href="#section-4.2-1" class="pilcrow">¶</a></p>
+<span id="name-downstream-rate-option-form"></span><div id="fig-downstream-format">
+<figure id="figure-3">
+          <div id="section-4.2-2.1">
+            <div class="alignLeft art-svg artwork" id="section-4.2-2.1.1">
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="176" width="528" viewBox="0 0 528 176" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
+                <path d="M 8,64 L 8,160" fill="none" stroke="black"></path>
+                <path d="M 136,64 L 136,72" fill="none" stroke="black"></path>
+                <path d="M 136,88 L 136,96" fill="none" stroke="black"></path>
+                <path d="M 264,64 L 264,96" fill="none" stroke="black"></path>
+                <path d="M 520,64 L 520,160" fill="none" stroke="black"></path>
+                <path d="M 8,64 L 520,64" fill="none" stroke="black"></path>
+                <path d="M 8,96 L 520,96" fill="none" stroke="black"></path>
+                <path d="M 8,160 L 520,160" fill="none" stroke="black"></path>
+                <path class="jump" d="M 136,88 C 130,88 130,72 136,72" fill="none" stroke="black"></path>
+                <g class="text">
+                  <text x="16" y="36">0</text>
+                  <text x="176" y="36">1</text>
+                  <text x="336" y="36">2</text>
+                  <text x="496" y="36">3</text>
+                  <text x="16" y="52">0</text>
+                  <text x="32" y="52">1</text>
+                  <text x="48" y="52">2</text>
+                  <text x="64" y="52">3</text>
+                  <text x="80" y="52">4</text>
+                  <text x="96" y="52">5</text>
+                  <text x="112" y="52">6</text>
+                  <text x="128" y="52">7</text>
+                  <text x="144" y="52">8</text>
+                  <text x="160" y="52">9</text>
+                  <text x="176" y="52">0</text>
+                  <text x="192" y="52">1</text>
+                  <text x="208" y="52">2</text>
+                  <text x="224" y="52">3</text>
+                  <text x="240" y="52">4</text>
+                  <text x="256" y="52">5</text>
+                  <text x="272" y="52">6</text>
+                  <text x="288" y="52">7</text>
+                  <text x="304" y="52">8</text>
+                  <text x="320" y="52">9</text>
+                  <text x="336" y="52">0</text>
+                  <text x="352" y="52">1</text>
+                  <text x="368" y="52">2</text>
+                  <text x="384" y="52">3</text>
+                  <text x="400" y="52">4</text>
+                  <text x="416" y="52">5</text>
+                  <text x="432" y="52">6</text>
+                  <text x="448" y="52">7</text>
+                  <text x="464" y="52">8</text>
+                  <text x="480" y="52">9</text>
+                  <text x="496" y="52">0</text>
+                  <text x="512" y="52">1</text>
+                  <text x="80" y="84">option-code</text>
+                  <text x="160" y="84">TBD2)</text>
+                  <text x="388" y="84">option-len=8</text>
+                  <text x="204" y="132">Downstream</text>
+                  <text x="268" y="132">Rate</text>
+                  <text x="304" y="132">(64</text>
+                  <text x="344" y="132">bits)</text>
+                </g>
+              </svg><a href="#section-4.2-2.1.1" class="pilcrow">¶</a>
+</div>
+</div>
+<figcaption><a href="#figure-3" class="selfRef">Figure 3</a>:
+<a href="#name-downstream-rate-option-form" class="selfRef">Downstream Rate Option Format</a>
+          </figcaption></figure>
+</div>
+<span class="break"></span><dl class="dlParallel" id="section-4.2-3">
+          <dt id="section-4.2-3.1">option-code</dt>
+          <dd style="margin-left: 1.5em" id="section-4.2-3.2">
+            <p id="section-4.2-3.2.1">OPTION_DOWNSTREAM_RATE (TBD2).<a href="#section-4.2-3.2.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-4.2-3.3">option-len</dt>
+          <dd style="margin-left: 1.5em" id="section-4.2-3.4">
+            <p id="section-4.2-3.4.1">8.<a href="#section-4.2-3.4.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-4.2-3.5">Downstream Rate</dt>
+          <dd style="margin-left: 1.5em" id="section-4.2-3.6">
+            <p id="section-4.2-3.6.1">Unsigned 64-bit integer in network byte order, in bits per second, as specified in
+<a href="#semantics" class="auto internal xref">Section 3</a>.<a href="#section-4.2-3.6.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+</dl>
+</section>
+</div>
+<div id="placement">
+<section id="section-4.3">
+        <h3 id="name-option-placement">
+<a href="#section-4.3" class="section-number selfRef">4.3. </a><a href="#name-option-placement" class="section-name selfRef">Option Placement</a>
+        </h3>
+<p id="section-4.3-1">The Rate Options are top-level options, not Identity Association (IA) sub-options. They can appear
+in Advertise messages, where they are informational (see <a href="#client" class="auto internal xref">Section 5</a>), and in Reply messages sent in
+response to Solicit, Request, Renew, Rebind, and Information-request. A server <span class="bcp14">MUST NOT</span> include
+them in replies to Confirm, Release, or Decline, or in Reconfigure messages. A client <span class="bcp14">MUST</span> ignore a
+Rate Option in any other placement or exchange.<a href="#section-4.3-1" class="pilcrow">¶</a></p>
+<p id="section-4.3-2">Clients <span class="bcp14">MUST NOT</span> send Rate Options, and servers <span class="bcp14">MUST</span> ignore Rate Options received from clients.
+This document does not define the use of Rate Options in the options field of Relay-forward or
+Relay-reply messages.<a href="#section-4.3-2" class="pilcrow">¶</a></p>
+<p id="section-4.3-3">Both options are singleton options (<span><a href="https://rfc-editor.org/rfc/rfc9915#section-21" class="relref">Section 21</a> of [<a href="#RFC9915" class="cite xref">RFC9915</a>]</span>). A server <span class="bcp14">MUST NOT</span> include more
+than one instance of the same Rate Option in a message. <span>[<a href="#RFC9915" class="cite xref">RFC9915</a>]</span> treats multiple instances of
+an option as separate instances; for the Rate Options, this document additionally specifies that a
+client that receives more than one instance of the same Rate Option <span class="bcp14">MUST</span> discard all instances of
+that option and treat it as absent.<a href="#section-4.3-3" class="pilcrow">¶</a></p>
+<p id="section-4.3-4">A Rate Option whose option-len is not 8, or whose value is 0, is invalid. A client <span class="bcp14">MUST</span> discard an
+invalid Rate Option and treat it as absent. Invalid Rate Options do not invalidate otherwise valid
+DHCPv6 configuration.<a href="#section-4.3-4" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="client">
+<section id="section-5">
+      <h2 id="name-client-behavior">
+<a href="#section-5" class="section-number selfRef">5. </a><a href="#name-client-behavior" class="section-name selfRef">Client Behavior</a>
+      </h2>
+<p id="section-5-1">DHCPv6 clients that support the Rate Options <span class="bcp14">SHOULD</span> include both option codes in the Option Request
+option (ORO) of every Solicit, Request, Renew, Rebind, and Information-request message. This
+requests rate information and indicates support for receiving it; it does not indicate whether the
+client will use the rates for traffic management.<a href="#section-5-1" class="pilcrow">¶</a></p>
+<p id="section-5-2">A client <span class="bcp14">MUST NOT</span> apply rates received in any message other than Reply. Rates in an Advertise
+message are informational and indicate the rates the server intends to supply; see <a href="#security" class="auto internal xref">Section 9</a>
+regarding their use in server selection.<a href="#section-5-2" class="pilcrow">¶</a></p>
+<p id="section-5-3">The Rate Options are configuration information received from the server and are processed like
+other non-IA configuration options of <span>[<a href="#RFC9915" class="cite xref">RFC9915</a>]</span>:<a href="#section-5-3" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-5-4.1">
+          <p id="section-5-4.1.1">A valid Rate Option in a Reply to Solicit (with Rapid Commit), Request, Renew, Rebind, or
+Information-request replaces the previously received rate for its direction, regardless of which
+of these exchanges supplied the previous rate.<a href="#section-5-4.1.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="section-5-4.2">
+          <p id="section-5-4.2.1">If a Reply to Renew, Rebind, or Information-request does not include a requested Rate Option that
+the client previously received, the client <span class="bcp14">SHOULD</span> stop using the rate for that direction, as
+specified in <span><a href="https://rfc-editor.org/rfc/rfc9915#section-18.2.10.5" class="relref">Section 18.2.10.5</a> of [<a href="#RFC9915" class="cite xref">RFC9915</a>]</span>. This applies regardless of which exchange
+supplied the rate; a client does not need to track the source of a rate.<a href="#section-5-4.2.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="section-5-4.3">
+          <p id="section-5-4.3.1">The rates are part of the client's DHCPv6 configuration and are not associated with individual
+bindings. The client discards them when it discards that configuration, for example because all
+addresses and delegated prefixes have become invalid, because it switches to another server, or
+because the underlying link or PPP session terminates. Clients that use only Information-request
+refresh them as specified in <span><a href="https://rfc-editor.org/rfc/rfc9915#section-21.23" class="relref">Section 21.23</a> of [<a href="#RFC9915" class="cite xref">RFC9915</a>]</span>.<a href="#section-5-4.3.1" class="pilcrow">¶</a></p>
+</li>
+      </ul>
+<p id="section-5-5">Replies to Confirm, Release, or Decline, and Replies that contain a top-level Status Code option
+(<span><a href="https://rfc-editor.org/rfc/rfc9915#section-21.13" class="relref">Section 21.13</a> of [<a href="#RFC9915" class="cite xref">RFC9915</a>]</span>) with a value other than Success, do not change the rates; the effect
+of binding changes is covered by the rules above. A client <span class="bcp14">MUST NOT</span> treat a rate that it has
+stopped using as current DHCPv6-provided information; subsequent use of local defaults remains a
+local decision.<a href="#section-5-5" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="server">
+<section id="section-6">
+      <h2 id="name-server-behavior">
+<a href="#section-6" class="section-number selfRef">6. </a><a href="#name-server-behavior" class="section-name selfRef">Server Behavior</a>
+      </h2>
+<p id="section-6-1">When a DHCPv6 server that supports the Rate Options receives a Solicit, Request, Renew, Rebind, or
+Information-request message whose ORO includes the code of a Rate Option, and a rate is configured
+for the client for the respective direction, the server <span class="bcp14">MUST</span> include that Rate Option in the
+resulting Advertise and Reply messages. If no rate is configured for a direction, the server omits
+the respective option; for a client that previously received it, this withdraws the rate as
+specified in <a href="#client" class="auto internal xref">Section 5</a>. Where several servers can respond to a client, for example after a Rebind,
+operators need to configure the rates consistently on all of them; otherwise, a Reply from a server
+without that configuration withdraws the rates.<a href="#section-6-1" class="pilcrow">¶</a></p>
+<p id="section-6-2">The server <span class="bcp14">MAY</span> derive the rates from local configuration profiles, from Authentication,
+Authorization, and Accounting (AAA) systems such as Remote Authentication Dial-In User Service
+(RADIUS) <span>[<a href="#RFC2865" class="cite xref">RFC2865</a>]</span>, or from external policy servers.<a href="#section-6-2" class="pilcrow">¶</a></p>
+<p id="section-6-3">Where the rates are provisioned via RADIUS, they can be carried as Rate Options in the
+DHCPv6-Options attribute <span>[<a href="#RFC9445" class="cite xref">RFC9445</a>]</span>, in which both options are permitted (see <a href="#iana" class="auto internal xref">Section 11</a>). Where the
+BNG operates as a relay agent and a separate DHCPv6 server configures the client, the BNG can
+convey this attribute to the server in the RADIUS option <span>[<a href="#RFC7037" class="cite xref">RFC7037</a>]</span>. As the omission of a
+requested Rate Option withdraws the rate (<a href="#client" class="auto internal xref">Section 5</a>), such a relay agent <span class="bcp14">SHOULD</span> include the RADIUS
+option in every Relay-forward message relaying a Solicit, Request, Renew, Rebind, or
+Information-request from the client, unless the server retains the rates for the client. In all
+cases, the server includes the Rate Options in its responses as specified in this section.<a href="#section-6-3" class="pilcrow">¶</a></p>
+<p id="section-6-4">A server <span class="bcp14">MAY</span> include the Rate Options in its responses even if the client did not request them via
+the ORO, according to its configuration. As revocation by omission applies only to requested
+options (<span><a href="https://rfc-editor.org/rfc/rfc9915#section-18.2.10.5" class="relref">Section 18.2.10.5</a> of [<a href="#RFC9915" class="cite xref">RFC9915</a>]</span>), a server cannot withdraw unrequested rates by omitting
+them; such rates are discarded only as part of the client's configuration (see <a href="#client" class="auto internal xref">Section 5</a>). This is
+a further reason for clients to request the Rate Options.<a href="#section-6-4" class="pilcrow">¶</a></p>
+<p id="section-6-5">To update the rates of a client before its next scheduled renewal, a server <span class="bcp14">MAY</span> send a Reconfigure
+message as specified in <span><a href="https://rfc-editor.org/rfc/rfc9915#section-18.3.11" class="relref">Section 18.3.11</a> of [<a href="#RFC9915" class="cite xref">RFC9915</a>]</span>, causing the client to initiate a Renew,
+Rebind, or Information-request transaction. As specified in <span>[<a href="#RFC9915" class="cite xref">RFC9915</a>]</span>, a server can send
+Reconfigure messages only to clients that have included the Reconfigure Accept option in their
+messages, and Reconfigure messages are authenticated using the Reconfiguration Key Authentication
+Protocol (RKAP; see <span><a href="https://rfc-editor.org/rfc/rfc9915#section-20.4" class="relref">Section 20.4</a> of [<a href="#RFC9915" class="cite xref">RFC9915</a>]</span>). Updated rates are conveyed in the subsequent
+Reply.<a href="#section-6-5" class="pilcrow">¶</a></p>
+<p id="section-6-6">For clients that do not support Reconfigure, updated rates take effect with the next Renew or
+Rebind transaction or, for stateless clients, with the next Information-request transaction.
+Operators can control the timing of such updates through the T1 value and the Information
+Refresh Time option (<span><a href="https://rfc-editor.org/rfc/rfc9915#section-21.23" class="relref">Section 21.23</a> of [<a href="#RFC9915" class="cite xref">RFC9915</a>]</span>). As support for Reconfigure is limited in
+deployed clients, operators cannot generally rely on it for updates before the next renewal or
+information refresh.<a href="#section-6-6" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="pppoe">
+<section id="section-7">
+      <h2 id="name-pppoe-deployments">
+<a href="#section-7" class="section-number selfRef">7. </a><a href="#name-pppoe-deployments" class="section-name selfRef">PPPoE Deployments</a>
+      </h2>
+<p id="section-7-1">In PPPoE <span>[<a href="#RFC2516" class="cite xref">RFC2516</a>]</span> architectures, the CPE typically employs DHCPv6 over the PPP link to obtain an
+IPv6 prefix via prefix delegation <span>[<a href="#RFC9915" class="cite xref">RFC9915</a>]</span>, while IPv4 is configured using IPCP <span>[<a href="#RFC1332" class="cite xref">RFC1332</a>]</span>.
+The DHCPv6 exchange conveys the Rate Options in the same way as in IPoE deployments, and the
+signaled rates apply to the combined IPv4 and IPv6 traffic of the PPP session (see <a href="#dual-stack" class="auto internal xref">Section 3.3</a>).<a href="#section-7-1" class="pilcrow">¶</a></p>
+<p id="section-7-2">As the signaled rates are Layer 3 rates, a CPE that attaches its shaper to the PPP interface applies
+them directly, without accounting for the PPPoE, PPP, Ethernet, or VLAN headers.<a href="#section-7-2" class="pilcrow">¶</a></p>
+<p id="section-7-3">If a client receives rate information from other sources, for example within PPP authentication
+messages, precedence is a matter of local policy. DHCPv6 can refresh the information during a
+session.<a href="#section-7-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="operations">
+<section id="section-8">
+      <h2 id="name-operational-considerations">
+<a href="#section-8" class="section-number selfRef">8. </a><a href="#name-operational-considerations" class="section-name selfRef">Operational Considerations</a>
+      </h2>
+<p id="section-8-1">By default, a server does not send Rate Options; rates are signaled only when configured by the
+operator. Implementations are expected to allow operators to inspect the rates in effect, for
+example per interface at a client, and to log changes to them. This document does not define a YANG
+data model; the Rate Options can be added to the YANG data model for DHCPv6 configuration
+<span>[<a href="#RFC9243" class="cite xref">RFC9243</a>]</span> in a separate document.<a href="#section-8-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="security">
+<section id="section-9">
+      <h2 id="name-security-considerations">
+<a href="#section-9" class="section-number selfRef">9. </a><a href="#name-security-considerations" class="section-name selfRef">Security Considerations</a>
+      </h2>
+<p id="section-9-1">The security considerations of DHCPv6 <span>[<a href="#RFC9915" class="cite xref">RFC9915</a>]</span> apply. Without protection against modification
+and spoofing, an attacker can advertise false rates. A client that uses an artificially low rate
+for traffic management could throttle its own connection. A falsely high rate or a withdrawal
+could remove a locally derived limit and increase queuing or loss. As the absence of a Rate Option
+withdraws a rate, an on-path attacker that removes Rate Options from DHCPv6 messages achieves the
+same effect as a forged withdrawal. Even a client that only displays rates can be misled;
+applications using the values could reduce quality or choose a more costly network interface.<a href="#section-9-1" class="pilcrow">¶</a></p>
+<p id="section-9-2">Local policy can restrict whether received rates affect traffic management and can validate values
+against deployment-specific bounds. The full unsigned 64-bit range is valid on the wire; decoding,
+arithmetic, and conversion to local APIs need to avoid overflow, truncation, and unit errors.
+Choosing not to apply a value does not change its Layer 3 meaning. Clients <span class="bcp14">SHOULD NOT</span> use signaled
+rates as the sole criterion for selecting a server or network interface.<a href="#section-9-2" class="pilcrow">¶</a></p>
+<p id="section-9-3">Operators can use DHCPv6-Shield <span>[<a href="#RFC7610" class="cite xref">RFC7610</a>]</span> to reject server messages arriving from client-facing
+ports. This does not protect against a compromised authorized server or an attacker elsewhere on
+the server-to-client path. A client accepts rate information only as part of a valid DHCPv6
+exchange and uses the restrictions specified in <a href="#placement" class="auto internal xref">Section 4.3</a>. As the rates also govern IPv4
+traffic, protecting only the IPv4 configuration protocol does not protect them.<a href="#section-9-3" class="pilcrow">¶</a></p>
+<p id="section-9-4">The security considerations of <span>[<a href="#RFC9445" class="cite xref">RFC9445</a>]</span> and <span>[<a href="#RFC7037" class="cite xref">RFC7037</a>]</span> apply to rates provisioned via RADIUS.
+A server <span class="bcp14">MUST</span> ignore Rate Options conveyed in the RADIUS option unless they are received from a
+relay agent that it trusts, for example over a path protected as described in <span>[<a href="#RFC8213" class="cite xref">RFC8213</a>]</span>.<a href="#section-9-4" class="pilcrow">¶</a></p>
+<p id="section-9-5">As the rates are signaled to clients, they do not by themselves enforce a service limit; a forged
+rate affects only the traffic management of the client that receives it.<a href="#section-9-5" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="privacy">
+<section id="section-10">
+      <h2 id="name-privacy-considerations">
+<a href="#section-10" class="section-number selfRef">10. </a><a href="#name-privacy-considerations" class="section-name selfRef">Privacy Considerations</a>
+      </h2>
+<p id="section-10-1">The privacy considerations for DHCPv6 specified in <span>[<a href="#RFC7824" class="cite xref">RFC7824</a>]</span> apply to this document. Clients can
+additionally use the anonymity profiles specified in <span>[<a href="#RFC7844" class="cite xref">RFC7844</a>]</span>.<a href="#section-10-1" class="pilcrow">¶</a></p>
+<p id="section-10-2">The Rate Options convey the rates provisioned for a client, which typically reflect the service tier
+of a subscriber. Because DHCPv6 messages are typically transmitted in cleartext, this information is
+exposed to on-path observers, including relay agents. The rate information itself does not
+identify a subscriber, but in combination with other information it can reveal commercial details
+of the service contract.<a href="#section-10-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="iana">
+<section id="section-11">
+      <h2 id="name-iana-considerations">
+<a href="#section-11" class="section-number selfRef">11. </a><a href="#name-iana-considerations" class="section-name selfRef">IANA Considerations</a>
+      </h2>
+<p id="section-11-1">RFC Editor: please replace TBD1 and TBD2 throughout this document with the values assigned by IANA,
+replace "RFC XXXX" with the RFC number assigned to this document, and remove this note.<a href="#section-11-1" class="pilcrow">¶</a></p>
+<p id="section-11-2">IANA is requested to assign two new option codes in the "Option Codes" registry within the
+"Dynamic Host Configuration Protocol for IPv6 (DHCPv6)" registry group <span>[<a href="#IANA-DHCPV6" class="cite xref">IANA-DHCPV6</a>]</span> as
+follows:<a href="#section-11-2" class="pilcrow">¶</a></p>
+<span id="name-dhcpv6-option-codes"></span><div id="tab-iana">
+<table class="center" id="table-1">
+        <caption>
+<a href="#table-1" class="selfRef">Table 1</a>:
+<a href="#name-dhcpv6-option-codes" class="selfRef">DHCPv6 Option Codes</a>
+        </caption>
+<thead>
+          <tr>
+            <th class="text-left" rowspan="1" colspan="1">Value</th>
+            <th class="text-left" rowspan="1" colspan="1">Description</th>
+            <th class="text-left" rowspan="1" colspan="1">Client ORO</th>
+            <th class="text-left" rowspan="1" colspan="1">Singleton Option</th>
+            <th class="text-left" rowspan="1" colspan="1">Status</th>
+            <th class="text-left" rowspan="1" colspan="1">Reference</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="text-left" rowspan="1" colspan="1">TBD1</td>
+            <td class="text-left" rowspan="1" colspan="1">OPTION_UPSTREAM_RATE</td>
+            <td class="text-left" rowspan="1" colspan="1">Yes</td>
+            <td class="text-left" rowspan="1" colspan="1">Yes</td>
+            <td class="text-left" rowspan="1" colspan="1"> </td>
+            <td class="text-left" rowspan="1" colspan="1">RFC XXXX</td>
+          </tr>
+          <tr>
+            <td class="text-left" rowspan="1" colspan="1">TBD2</td>
+            <td class="text-left" rowspan="1" colspan="1">OPTION_DOWNSTREAM_RATE</td>
+            <td class="text-left" rowspan="1" colspan="1">Yes</td>
+            <td class="text-left" rowspan="1" colspan="1">Yes</td>
+            <td class="text-left" rowspan="1" colspan="1"> </td>
+            <td class="text-left" rowspan="1" colspan="1">RFC XXXX</td>
+          </tr>
+        </tbody>
+      </table>
+</div>
+<p id="section-11-4">IANA is requested to add the following entries to the "DHCPv6 Options Permitted in the RADIUS
+DHCPv6-Options Attribute" registry within the "Dynamic Host Configuration Protocol for IPv6
+(DHCPv6)" registry group <span>[<a href="#IANA-DHCPV6" class="cite xref">IANA-DHCPV6</a>]</span>, as specified in <span><a href="https://rfc-editor.org/rfc/rfc9445#section-8.4.1" class="relref">Section 8.4.1</a> of [<a href="#RFC9445" class="cite xref">RFC9445</a>]</span>:<a href="#section-11-4" class="pilcrow">¶</a></p>
+<span id="name-dhcpv6-options-permitted-in"></span><div id="tab-iana-radius">
+<table class="center" id="table-2">
+        <caption>
+<a href="#table-2" class="selfRef">Table 2</a>:
+<a href="#name-dhcpv6-options-permitted-in" class="selfRef">DHCPv6 Options Permitted in the RADIUS DHCPv6-Options Attribute</a>
+        </caption>
+<thead>
+          <tr>
+            <th class="text-left" rowspan="1" colspan="1">Value</th>
+            <th class="text-left" rowspan="1" colspan="1">Description</th>
+            <th class="text-left" rowspan="1" colspan="1">Reference</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="text-left" rowspan="1" colspan="1">TBD1</td>
+            <td class="text-left" rowspan="1" colspan="1">OPTION_UPSTREAM_RATE</td>
+            <td class="text-left" rowspan="1" colspan="1">RFC XXXX</td>
+          </tr>
+          <tr>
+            <td class="text-left" rowspan="1" colspan="1">TBD2</td>
+            <td class="text-left" rowspan="1" colspan="1">OPTION_DOWNSTREAM_RATE</td>
+            <td class="text-left" rowspan="1" colspan="1">RFC XXXX</td>
+          </tr>
+        </tbody>
+      </table>
+</div>
+<p id="section-11-6">This document does not create any new registries.<a href="#section-11-6" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="sec-combined-references">
+<section id="section-12">
+      <h2 id="name-references">
+<a href="#section-12" class="section-number selfRef">12. </a><a href="#name-references" class="section-name selfRef">References</a>
+      </h2>
+<div id="sec-normative-references">
+<section id="section-12.1">
+        <h3 id="name-normative-references">
+<a href="#section-12.1" class="section-number selfRef">12.1. </a><a href="#name-normative-references" class="section-name selfRef">Normative References</a>
+        </h3>
+<dl class="references">
+<dt id="RFC2119">[RFC2119]</dt>
+        <dd>
+<span class="refAuthor">Bradner, S.</span>, <span class="refTitle">"Key words for use in RFCs to Indicate Requirement Levels"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 2119</span>, <span class="seriesInfo">DOI 10.17487/RFC2119</span>, <time datetime="1997-03" class="refDate">March 1997</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc2119">https://www.rfc-editor.org/rfc/rfc2119</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC7037">[RFC7037]</dt>
+        <dd>
+<span class="refAuthor">Yeh, L.</span> and <span class="refAuthor">M. Boucadair</span>, <span class="refTitle">"RADIUS Option for the DHCPv6 Relay Agent"</span>, <span class="seriesInfo">RFC 7037</span>, <span class="seriesInfo">DOI 10.17487/RFC7037</span>, <time datetime="2013-10" class="refDate">October 2013</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc7037">https://www.rfc-editor.org/rfc/rfc7037</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC8174">[RFC8174]</dt>
+        <dd>
+<span class="refAuthor">Leiba, B.</span>, <span class="refTitle">"Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 8174</span>, <span class="seriesInfo">DOI 10.17487/RFC8174</span>, <time datetime="2017-05" class="refDate">May 2017</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8174">https://www.rfc-editor.org/rfc/rfc8174</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC9445">[RFC9445]</dt>
+        <dd>
+<span class="refAuthor">Boucadair, M.</span>, <span class="refAuthor">Reddy.K, T.</span>, and <span class="refAuthor">A. DeKok</span>, <span class="refTitle">"RADIUS Extensions for DHCP-Configured Services"</span>, <span class="seriesInfo">RFC 9445</span>, <span class="seriesInfo">DOI 10.17487/RFC9445</span>, <time datetime="2023-08" class="refDate">August 2023</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9445">https://www.rfc-editor.org/rfc/rfc9445</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC9915">[RFC9915]</dt>
+      <dd>
+<span class="refAuthor">Mrugalski, T.</span>, <span class="refAuthor">Volz, B.</span>, <span class="refAuthor">Richardson, M.</span>, <span class="refAuthor">Jiang, S.</span>, and <span class="refAuthor">T. Winters</span>, <span class="refTitle">"Dynamic Host Configuration Protocol for IPv6 (DHCPv6)"</span>, <span class="seriesInfo">STD 102</span>, <span class="seriesInfo">RFC 9915</span>, <span class="seriesInfo">DOI 10.17487/RFC9915</span>, <time datetime="2026-01" class="refDate">January 2026</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9915">https://www.rfc-editor.org/rfc/rfc9915</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+</dl>
+</section>
+</div>
+<div id="sec-informative-references">
+<section id="section-12.2">
+        <h3 id="name-informative-references">
+<a href="#section-12.2" class="section-number selfRef">12.2. </a><a href="#name-informative-references" class="section-name selfRef">Informative References</a>
+        </h3>
+<dl class="references">
+<dt id="G.984.1">[G.984.1]</dt>
+        <dd>
+<span class="refAuthor">ITU-T</span>, <span class="refTitle">"Gigabit-capable passive optical networks (GPON): General characteristics"</span>, <span class="seriesInfo">ITU-T Recommendation G.984.1</span>, <time datetime="2008-03" class="refDate">March 2008</time>, <span>&lt;<a href="https://www.itu.int/rec/T-REC-G.984.1">https://www.itu.int/rec/T-REC-G.984.1</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="IANA-DHCPV6">[IANA-DHCPV6]</dt>
+        <dd>
+<span class="refAuthor">IANA</span>, <span class="refTitle">"Dynamic Host Configuration Protocol for IPv6 (DHCPv6)"</span>, <span>n.d.</span>, <span>&lt;<a href="https://www.iana.org/assignments/dhcpv6-parameters">https://www.iana.org/assignments/dhcpv6-parameters</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="OPENWRT">[OPENWRT]</dt>
+        <dd>
+<span class="refAuthor">OpenWrt Project</span>, <span class="refTitle">"OpenWrt Project"</span>, <span>n.d.</span>, <span>&lt;<a href="https://openwrt.org">https://openwrt.org</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC1332">[RFC1332]</dt>
+        <dd>
+<span class="refAuthor">McGregor, G.</span>, <span class="refTitle">"The PPP Internet Protocol Control Protocol (IPCP)"</span>, <span class="seriesInfo">RFC 1332</span>, <span class="seriesInfo">DOI 10.17487/RFC1332</span>, <time datetime="1992-05" class="refDate">May 1992</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc1332">https://www.rfc-editor.org/rfc/rfc1332</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC1661">[RFC1661]</dt>
+        <dd>
+<span class="refAuthor">Simpson, W., Ed.</span>, <span class="refTitle">"The Point-to-Point Protocol (PPP)"</span>, <span class="seriesInfo">STD 51</span>, <span class="seriesInfo">RFC 1661</span>, <span class="seriesInfo">DOI 10.17487/RFC1661</span>, <time datetime="1994-07" class="refDate">July 1994</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc1661">https://www.rfc-editor.org/rfc/rfc1661</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC2131">[RFC2131]</dt>
+        <dd>
+<span class="refAuthor">Droms, R.</span>, <span class="refTitle">"Dynamic Host Configuration Protocol"</span>, <span class="seriesInfo">RFC 2131</span>, <span class="seriesInfo">DOI 10.17487/RFC2131</span>, <time datetime="1997-03" class="refDate">March 1997</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc2131">https://www.rfc-editor.org/rfc/rfc2131</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC2516">[RFC2516]</dt>
+        <dd>
+<span class="refAuthor">Mamakos, L.</span>, <span class="refAuthor">Lidl, K.</span>, <span class="refAuthor">Evarts, J.</span>, <span class="refAuthor">Carrel, D.</span>, <span class="refAuthor">Simone, D.</span>, and <span class="refAuthor">R. Wheeler</span>, <span class="refTitle">"A Method for Transmitting PPP Over Ethernet (PPPoE)"</span>, <span class="seriesInfo">RFC 2516</span>, <span class="seriesInfo">DOI 10.17487/RFC2516</span>, <time datetime="1999-02" class="refDate">February 1999</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc2516">https://www.rfc-editor.org/rfc/rfc2516</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC2865">[RFC2865]</dt>
+        <dd>
+<span class="refAuthor">Rigney, C.</span>, <span class="refAuthor">Willens, S.</span>, <span class="refAuthor">Rubens, A.</span>, and <span class="refAuthor">W. Simpson</span>, <span class="refTitle">"Remote Authentication Dial In User Service (RADIUS)"</span>, <span class="seriesInfo">RFC 2865</span>, <span class="seriesInfo">DOI 10.17487/RFC2865</span>, <time datetime="2000-06" class="refDate">June 2000</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc2865">https://www.rfc-editor.org/rfc/rfc2865</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC6333">[RFC6333]</dt>
+        <dd>
+<span class="refAuthor">Durand, A.</span>, <span class="refAuthor">Droms, R.</span>, <span class="refAuthor">Woodyatt, J.</span>, and <span class="refAuthor">Y. Lee</span>, <span class="refTitle">"Dual-Stack Lite Broadband Deployments Following IPv4 Exhaustion"</span>, <span class="seriesInfo">RFC 6333</span>, <span class="seriesInfo">DOI 10.17487/RFC6333</span>, <time datetime="2011-08" class="refDate">August 2011</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc6333">https://www.rfc-editor.org/rfc/rfc6333</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC6334">[RFC6334]</dt>
+        <dd>
+<span class="refAuthor">Hankins, D.</span> and <span class="refAuthor">T. Mrugalski</span>, <span class="refTitle">"Dynamic Host Configuration Protocol for IPv6 (DHCPv6) Option for Dual-Stack Lite"</span>, <span class="seriesInfo">RFC 6334</span>, <span class="seriesInfo">DOI 10.17487/RFC6334</span>, <time datetime="2011-08" class="refDate">August 2011</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc6334">https://www.rfc-editor.org/rfc/rfc6334</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC7567">[RFC7567]</dt>
+        <dd>
+<span class="refAuthor">Baker, F., Ed.</span> and <span class="refAuthor">G. Fairhurst, Ed.</span>, <span class="refTitle">"IETF Recommendations Regarding Active Queue Management"</span>, <span class="seriesInfo">BCP 197</span>, <span class="seriesInfo">RFC 7567</span>, <span class="seriesInfo">DOI 10.17487/RFC7567</span>, <time datetime="2015-07" class="refDate">July 2015</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc7567">https://www.rfc-editor.org/rfc/rfc7567</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC7598">[RFC7598]</dt>
+        <dd>
+<span class="refAuthor">Mrugalski, T.</span>, <span class="refAuthor">Troan, O.</span>, <span class="refAuthor">Farrer, I.</span>, <span class="refAuthor">Perreault, S.</span>, <span class="refAuthor">Dec, W.</span>, <span class="refAuthor">Bao, C.</span>, <span class="refAuthor">Yeh, L.</span>, and <span class="refAuthor">X. Deng</span>, <span class="refTitle">"DHCPv6 Options for Configuration of Softwire Address and Port-Mapped Clients"</span>, <span class="seriesInfo">RFC 7598</span>, <span class="seriesInfo">DOI 10.17487/RFC7598</span>, <time datetime="2015-07" class="refDate">July 2015</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc7598">https://www.rfc-editor.org/rfc/rfc7598</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC7610">[RFC7610]</dt>
+        <dd>
+<span class="refAuthor">Gont, F.</span>, <span class="refAuthor">Liu, W.</span>, and <span class="refAuthor">G. Van de Velde</span>, <span class="refTitle">"DHCPv6-Shield: Protecting against Rogue DHCPv6 Servers"</span>, <span class="seriesInfo">BCP 199</span>, <span class="seriesInfo">RFC 7610</span>, <span class="seriesInfo">DOI 10.17487/RFC7610</span>, <time datetime="2015-08" class="refDate">August 2015</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc7610">https://www.rfc-editor.org/rfc/rfc7610</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC7824">[RFC7824]</dt>
+        <dd>
+<span class="refAuthor">Krishnan, S.</span>, <span class="refAuthor">Mrugalski, T.</span>, and <span class="refAuthor">S. Jiang</span>, <span class="refTitle">"Privacy Considerations for DHCPv6"</span>, <span class="seriesInfo">RFC 7824</span>, <span class="seriesInfo">DOI 10.17487/RFC7824</span>, <time datetime="2016-05" class="refDate">May 2016</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc7824">https://www.rfc-editor.org/rfc/rfc7824</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC7844">[RFC7844]</dt>
+        <dd>
+<span class="refAuthor">Huitema, C.</span>, <span class="refAuthor">Mrugalski, T.</span>, and <span class="refAuthor">S. Krishnan</span>, <span class="refTitle">"Anonymity Profiles for DHCP Clients"</span>, <span class="seriesInfo">RFC 7844</span>, <span class="seriesInfo">DOI 10.17487/RFC7844</span>, <time datetime="2016-05" class="refDate">May 2016</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc7844">https://www.rfc-editor.org/rfc/rfc7844</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC7942">[RFC7942]</dt>
+        <dd>
+<span class="refAuthor">Sheffer, Y.</span> and <span class="refAuthor">A. Farrel</span>, <span class="refTitle">"Improving Awareness of Running Code: The Implementation Status Section"</span>, <span class="seriesInfo">BCP 205</span>, <span class="seriesInfo">RFC 7942</span>, <span class="seriesInfo">DOI 10.17487/RFC7942</span>, <time datetime="2016-07" class="refDate">July 2016</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc7942">https://www.rfc-editor.org/rfc/rfc7942</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC8213">[RFC8213]</dt>
+        <dd>
+<span class="refAuthor">Volz, B.</span> and <span class="refAuthor">Y. Pal</span>, <span class="refTitle">"Security of Messages Exchanged between Servers and Relay Agents"</span>, <span class="seriesInfo">RFC 8213</span>, <span class="seriesInfo">DOI 10.17487/RFC8213</span>, <time datetime="2017-08" class="refDate">August 2017</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8213">https://www.rfc-editor.org/rfc/rfc8213</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC8290">[RFC8290]</dt>
+        <dd>
+<span class="refAuthor">Hoeiland-Joergensen, T.</span>, <span class="refAuthor">McKenney, P.</span>, <span class="refAuthor">Taht, D.</span>, <span class="refAuthor">Gettys, J.</span>, and <span class="refAuthor">E. Dumazet</span>, <span class="refTitle">"The Flow Queue CoDel Packet Scheduler and Active Queue Management Algorithm"</span>, <span class="seriesInfo">RFC 8290</span>, <span class="seriesInfo">DOI 10.17487/RFC8290</span>, <time datetime="2018-01" class="refDate">January 2018</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8290">https://www.rfc-editor.org/rfc/rfc8290</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC9243">[RFC9243]</dt>
+        <dd>
+<span class="refAuthor">Farrer, I., Ed.</span>, <span class="refTitle">"A YANG Data Model for DHCPv6 Configuration"</span>, <span class="seriesInfo">RFC 9243</span>, <span class="seriesInfo">DOI 10.17487/RFC9243</span>, <time datetime="2022-06" class="refDate">June 2022</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9243">https://www.rfc-editor.org/rfc/rfc9243</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC9330">[RFC9330]</dt>
+        <dd>
+<span class="refAuthor">Briscoe, B., Ed.</span>, <span class="refAuthor">De Schepper, K.</span>, <span class="refAuthor">Bagnulo, M.</span>, and <span class="refAuthor">G. White</span>, <span class="refTitle">"Low Latency, Low Loss, and Scalable Throughput (L4S) Internet Service: Architecture"</span>, <span class="seriesInfo">RFC 9330</span>, <span class="seriesInfo">DOI 10.17487/RFC9330</span>, <time datetime="2023-01" class="refDate">January 2023</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9330">https://www.rfc-editor.org/rfc/rfc9330</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC9332">[RFC9332]</dt>
+        <dd>
+<span class="refAuthor">De Schepper, K.</span>, <span class="refAuthor">Briscoe, B., Ed.</span>, and <span class="refAuthor">G. White</span>, <span class="refTitle">"Dual-Queue Coupled Active Queue Management (AQM) for Low Latency, Low Loss, and Scalable Throughput (L4S)"</span>, <span class="seriesInfo">RFC 9332</span>, <span class="seriesInfo">DOI 10.17487/RFC9332</span>, <time datetime="2023-01" class="refDate">January 2023</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9332">https://www.rfc-editor.org/rfc/rfc9332</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="SQM">[SQM]</dt>
+        <dd>
+<span class="refAuthor">The Bufferbloat Project</span>, <span class="refTitle">"SQM Scripts: Smart Queue Management"</span>, <span>n.d.</span>, <span>&lt;<a href="https://github.com/tohojo/sqm-scripts">https://github.com/tohojo/sqm-scripts</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="TR069">[TR069]</dt>
+        <dd>
+<span class="refAuthor">Broadband Forum</span>, <span class="refTitle">"CPE WAN Management Protocol"</span>, <span class="seriesInfo">TR 069 Issue 1 Amendment 6 Corrigendum 1</span>, <time datetime="2020-06" class="refDate">June 2020</time>, <span>&lt;<a href="https://www.broadband-forum.org/pdfs/tr-069-1-6-1.pdf">https://www.broadband-forum.org/pdfs/tr-069-1-6-1.pdf</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="TR101">[TR101]</dt>
+      <dd>
+<span class="refAuthor">Broadband Forum</span>, <span class="refTitle">"Migration to Ethernet-Based Broadband Aggregation"</span>, <span class="seriesInfo">TR 101 Issue 2</span>, <time datetime="2011-07" class="refDate">July 2011</time>, <span>&lt;<a href="https://www.broadband-forum.org/pdfs/tr-101-2-0-0.pdf">https://www.broadband-forum.org/pdfs/tr-101-2-0-0.pdf</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+</dl>
+</section>
+</div>
+</section>
+</div>
+<div id="impl-status">
+<section id="appendix-A">
+      <h2 id="name-implementation-status">
+<a href="#appendix-A" class="section-number selfRef">Appendix A. </a><a href="#name-implementation-status" class="section-name selfRef">Implementation Status</a>
+      </h2>
+<p id="appendix-A-1">This section is to be removed before publishing as an RFC.<a href="#appendix-A-1" class="pilcrow">¶</a></p>
+<p id="appendix-A-2">This section records the status of known implementations of the
+protocol defined by this specification at the time of posting of
+this Internet-Draft, and is based on a proposal described in
+<span>[<a href="#RFC7942" class="cite xref">RFC7942</a>]</span>.  The description of implementations in this section is
+intended to assist the IETF in its decision processes in
+progressing drafts to RFCs.  Please note that the listing of any
+individual implementation here does not imply endorsement by the
+IETF.  Furthermore, no effort has been spent to verify the
+information presented here that was supplied by IETF contributors.
+This is not intended as, and must not be construed to be, a
+catalog of available implementations or their features.  Readers
+are advised to note that other implementations may exist.<a href="#appendix-A-2" class="pilcrow">¶</a></p>
+<p id="appendix-A-3">According to <span>[<a href="#RFC7942" class="cite xref">RFC7942</a>]</span>, "this will allow reviewers and working
+groups to assign due consideration to documents that have the
+benefit of running code, which may serve as evidence of valuable
+experimentation and feedback that have made the implemented
+protocols more mature.  It is up to the individual working groups
+to use this information as they see fit".<a href="#appendix-A-3" class="pilcrow">¶</a></p>
+<p id="appendix-A-4">At the time of writing, no implementations of this document are known to the authors.<a href="#appendix-A-4" class="pilcrow">¶</a></p>
+<div id="impl-openwrt">
+<section id="appendix-A.1">
+        <h3 id="name-applicability-to-openwrt">
+<a href="#appendix-A.1" class="section-number selfRef">A.1. </a><a href="#name-applicability-to-openwrt" class="section-name selfRef">Applicability to OpenWrt</a>
+        </h3>
+<p id="appendix-A.1-1">Once option codes are assigned, the Rate Options can be supported on OpenWrt <span>[<a href="#OPENWRT" class="cite xref">OPENWRT</a>]</span> without
+changes to its DHCPv6 client, using the following existing components:<a href="#appendix-A.1-1" class="pilcrow">¶</a></p>
+<span class="break"></span><dl class="dlParallel" id="appendix-A.1-2">
+          <dt id="appendix-A.1-2.1">Requesting the options:</dt>
+          <dd style="margin-left: 1.5em" id="appendix-A.1-2.2">
+            <p id="appendix-A.1-2.2.1">The netifd DHCPv6 protocol handler accepts additional option codes in the <code>reqopts</code> list of the
+interface configuration and passes them to the DHCPv6 client odhcp6c, which includes them in the
+ORO of its requests.<a href="#appendix-A.1-2.2.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="appendix-A.1-2.3">Receiving the options:</dt>
+          <dd style="margin-left: 1.5em" id="appendix-A.1-2.4">
+            <p id="appendix-A.1-2.4.1">odhcp6c passes options that it does not process itself to its status script as environment
+variables named <code>OPTION_&lt;code&gt;</code>, containing the hex-encoded option value. The status script
+(<code>/lib/netifd/dhcpv6.script</code>) invokes user scripts in <code>/etc/odhcp6c.user.d/</code> on each state
+change, such as bound, updated, rebound, informed, unbound, and stopped. A variable that is absent
+in an update corresponds to the withdrawal of the rate, and the unbound and stopped events
+correspond to the discarding of the client's configuration (see <a href="#client" class="auto internal xref">Section 5</a>).<a href="#appendix-A.1-2.4.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="appendix-A.1-2.5">Applying the rates:</dt>
+          <dd style="margin-left: 1.5em" id="appendix-A.1-2.6">
+            <p id="appendix-A.1-2.6.1">A user script converts the rates from bit/s to the kbit/s used by the Smart Queue Management (SQM)
+package <span>[<a href="#SQM" class="cite xref">SQM</a>]</span> and updates the upload and download rates of the SQM instance on the WAN
+interface, which applies them using CAKE or fq_codel. On a PPPoE WAN interface, the shaper
+typically counts IP packets, so the rates apply directly; on Ethernet-based WAN interfaces, the
+SQM overhead settings provide the header compensation described in <a href="#layer3" class="auto internal xref">Section 3.2</a>.<a href="#appendix-A.1-2.6.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+</dl>
+<p id="appendix-A.1-3">Shell arithmetic on OpenWrt uses signed 64-bit integers, so a script-based implementation needs to
+handle values above 2^63 - 1, for example by treating them as exceeding any local limit. A native
+implementation could instead decode the options in odhcp6c and expose the rates as interface data
+via netifd, which also makes them available to other components, such as the web interface.<a href="#appendix-A.1-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="rationale">
+<section id="appendix-B">
+      <h2 id="name-design-rationale">
+<a href="#appendix-B" class="section-number selfRef">Appendix B. </a><a href="#name-design-rationale" class="section-name selfRef">Design Rationale</a>
+      </h2>
+<p id="appendix-B-1">This section is to be removed before publishing as an RFC.<a href="#appendix-B-1" class="pilcrow">¶</a></p>
+<p id="appendix-B-2">This appendix explains major design decisions to the working group. Permanent rationale is
+included in the relevant sections of this document.<a href="#appendix-B-2" class="pilcrow">¶</a></p>
+<div id="rationale-dhcpv6">
+<section id="appendix-B.1">
+        <h3 id="name-dhcpv6-only">
+<a href="#appendix-B.1" class="section-number selfRef">B.1. </a><a href="#name-dhcpv6-only" class="section-name selfRef">DHCPv6 Only</a>
+        </h3>
+<p id="appendix-B.1-1">Earlier versions of this document defined the Rate Option for both DHCPv4 and DHCPv6. This version
+defines options for DHCPv6 only; the permanent rationale is given in <a href="#applicability" class="auto internal xref">Section 1.3</a>.<a href="#appendix-B.1-1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="appendix-B.1-2.1">
+            <p id="appendix-B.1-2.1.1">DHCPv6 is available where the mechanism is needed. Broadband CPE commonly use DHCPv6 for prefix
+delegation in both IPoE and PPPoE deployments, so the options reach the target devices without
+a second protocol.<a href="#appendix-B.1-2.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="appendix-B.1-2.2">
+            <p id="appendix-B.1-2.2.1">IPv4-only deployments of the new options are unlikely. Providers and CPE vendors that implement
+new DHCP options for current services are very likely to support IPv6 as well, so an IPv4-only
+variant would add specification and implementation effort for a small and shrinking set of
+deployments.<a href="#appendix-B.1-2.2.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="appendix-B.1-2.3">
+            <p id="appendix-B.1-2.3.1">A single protocol removes considerable complexity. Signaling the same rates through DHCPv4 and
+DHCPv6 required rules for selecting between the two protocols, for keeping their values
+consistent, and for withdrawal and lifetime that differed between the protocols. These rules
+are no longer needed.<a href="#appendix-B.1-2.3.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="appendix-B.1-2.4">
+            <p id="appendix-B.1-2.4.1">IPv4 traffic remains covered. The rates describe the service on the logical interface, not an IP
+version, and apply to the combined IPv4 and IPv6 traffic, whether IPv4 is provided natively,
+configured by DHCPv4 or IPCP, or carried over IPv6 (see <a href="#dual-stack" class="auto internal xref">Section 3.3</a>).<a href="#appendix-B.1-2.4.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="appendix-B.1-2.5">
+            <p id="appendix-B.1-2.5.1">The DHCPv6 option space allows a simpler format. DHCPv4 option codes are scarce, which motivated
+a single option carrying both directions. With DHCPv6, separate Upstream Rate and Downstream Rate
+options make each direction independent and allow withdrawal by omission instead of a reserved
+zero value.<a href="#appendix-B.1-2.5.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="appendix-B.1-2.6">
+            <p id="appendix-B.1-2.6.1">Access networks that do not use DHCPv6, such as IPv4-only access, and signaling to end devices in
+local area networks are outside the scope of this document.<a href="#appendix-B.1-2.6.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="appendix-B.1-2.7">
+            <p id="appendix-B.1-2.7.1">If the working group identifies a need, a DHCPv4 option can be defined in a separate document
+that reuses the semantics specified in <a href="#semantics" class="auto internal xref">Section 3</a>.<a href="#appendix-B.1-2.7.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+<p id="appendix-B.1-3">The authors invite feedback from the working group on whether a DHCPv4 option is needed.<a href="#appendix-B.1-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="rationale-layer3">
+<section id="appendix-B.2">
+        <h3 id="name-overhead-signaling">
+<a href="#appendix-B.2" class="section-number selfRef">B.2. </a><a href="#name-overhead-signaling" class="section-name selfRef">Overhead Signaling</a>
+        </h3>
+<p id="appendix-B.2-1">The accounting reference of the signaled rates has been discussed at length. Proposals included
+signaling Layer 2 rates instead of Layer 3 rates, signaling the per-packet link-layer overhead
+together with the rates, and a selector indicating the layer at which a rate is counted. Earlier
+versions of this document included such a layer selector. This version defines a single Layer 3
+reference (see <a href="#layer3" class="auto internal xref">Section 3.2</a>) for the following reasons:<a href="#appendix-B.2-1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="appendix-B.2-2.1">
+            <p id="appendix-B.2-2.1.1">Layer 3 is the most common case. A CPE typically attaches its shaper to the IP interface, such as
+the PPP interface or the IPoE interface, where packet sizes are counted at the IP layer, so the
+signaled rate can be applied directly.<a href="#appendix-B.2-2.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="appendix-B.2-2.2">
+            <p id="appendix-B.2-2.2.1">A Layer 3 rate is independent of the encapsulation along the path. VLAN tags and PPPoE and PPP
+headers are added and removed between the CPE and the enforcement point, so the link-layer
+overhead seen by the CPE generally differs from the overhead counted at the enforcement point.
+A Layer 2 rate would only be meaningful together with a precise definition of the link and
+encapsulation to which it refers.<a href="#appendix-B.2-2.2.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="appendix-B.2-2.3">
+            <p id="appendix-B.2-2.3.1">Overhead is often not known to the server. The per-packet overhead counted at the bottleneck
+depends on the access technology, framing, padding, and implementation, which a DHCPv6 server
+frequently cannot determine. Signaling an inaccurate overhead would not improve on a
+conservative Layer 3 rate.<a href="#appendix-B.2-2.3.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="appendix-B.2-2.4">
+            <p id="appendix-B.2-2.4.1">A single reference avoids ambiguity. With one fixed meaning, all clients interpret a value
+identically, and no negotiation or capability signaling is needed. Implementations that count
+link-layer frames apply local header compensation as described in <a href="#layer3" class="auto internal xref">Section 3.2</a>, and operators
+account for overhead at the enforcement point, for example by allowing headroom or by signaling a
+conservative rate.<a href="#appendix-B.2-2.4.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+<p id="appendix-B.2-3">Layer 3 remains the default reference of the options defined in this document and is not changed
+by any extension. If the working group identifies a need, signaling of Layer 2 rates or of
+link-layer overhead, for example the per-packet overhead and framing of the bottleneck link, can be
+defined in a separate document as additional options that complement the Rate Options defined
+here.<a href="#appendix-B.2-3" class="pilcrow">¶</a></p>
+<p id="appendix-B.2-4">The authors invite feedback from the working group on whether such an extension is needed.<a href="#appendix-B.2-4" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="rationale-relay">
+<section id="appendix-B.3">
+        <h3 id="name-relay-directed-rates">
+<a href="#appendix-B.3" class="section-number selfRef">B.3. </a><a href="#name-relay-directed-rates" class="section-name selfRef">Relay-Directed Rates</a>
+        </h3>
+<p id="appendix-B.3-1">Intermediate versions of this document allowed the server to signal separate rates to relay agents
+in Relay-reply messages, so that, for example, a BNG or an access node operating as a Lightweight
+DHCPv6 Relay Agent (LDRA) could configure per-subscriber shapers and policers with values that
+differ from those signaled to the client. This mechanism has been removed from this document for
+the following reasons:<a href="#appendix-B.3-1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="appendix-B.3-2.1">
+            <p id="appendix-B.3-2.1.1">Server-to-relay configuration without a request by the relay agent is a new pattern for DHCPv6
+and would require relay agents to maintain per-client state, contrary to the stateless relay
+agent model.<a href="#appendix-B.3-2.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="appendix-B.3-2.2">
+            <p id="appendix-B.3-2.2.1">Withdrawal by omission and the loss of state after a relay agent restart would remove
+enforcement until the client's next exchange, and updates would depend on client renewal timing.<a href="#appendix-B.3-2.2.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="appendix-B.3-2.3">
+            <p id="appendix-B.3-2.3.1">The server has no indication of whether a relay agent applied the rates, and the mapping of
+Relay-reply encapsulation levels to devices depends on the relay topology.<a href="#appendix-B.3-2.3.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="appendix-B.3-2.4">
+            <p id="appendix-B.3-2.4.1">BNGs commonly obtain per-subscriber policies via AAA, which also supports updates during a
+session.<a href="#appendix-B.3-2.4.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+<p id="appendix-B.3-3">Signaling of rates to relay agents can be specified in a separate document if the working group
+identifies a need. The core mechanism defined here, rates signaled to clients, is independent of
+such an extension.<a href="#appendix-B.3-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="change-log">
+<section id="appendix-C">
+      <h2 id="name-change-log">
+<a href="#appendix-C" class="section-number selfRef">Appendix C. </a><a href="#name-change-log" class="section-name selfRef">Change Log</a>
+      </h2>
+<p id="appendix-C-1">This section is to be removed before publishing as an RFC.<a href="#appendix-C-1" class="pilcrow">¶</a></p>
+<div id="since-draft-ietf-intarea-dhcp-rate-signaling-00">
+<section id="appendix-C.1">
+        <h3 id="name-since-draft-ietf-intarea-dh">
+<a href="#appendix-C.1" class="section-number selfRef">C.1. </a><a href="#name-since-draft-ietf-intarea-dh" class="section-name selfRef">Since draft-ietf-intarea-dhcp-rate-signaling-00</a>
+        </h3>
+<ul class="normal">
+<li class="normal" id="appendix-C.1-1.1">
+            <p id="appendix-C.1-1.1.1">Changed the intended status to Standards Track; DHCPv6 base reference is now RFC 9915.<a href="#appendix-C.1-1.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="appendix-C.1-1.2">
+            <p id="appendix-C.1-1.2.1">Limited the scope to DHCPv6 and to rates signaled to clients in broadband access networks.
+Removed the DHCPv4 option, DHCPv6 snooping, rates signaled to relay agents, and the LAN,
+enterprise, and variable-capacity scenarios (see <a href="#rationale" class="auto internal xref">Appendix B</a>).<a href="#appendix-C.1-1.2.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="appendix-C.1-1.3">
+            <p id="appendix-C.1-1.3.1">Replaced the sub-option format with two fixed-format options, Upstream Rate and Downstream Rate,
+each an unsigned 64-bit value in bit/s. The value 0 is invalid; omission withdraws a rate. Not
+backward compatible with -00.<a href="#appendix-C.1-1.3.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="appendix-C.1-1.4">
+            <p id="appendix-C.1-1.4.1">Defined a fixed Layer 3 rate for the combined IPv4 and IPv6 traffic of the DHCPv6-configured
+link, with local header compensation; future options can complement but not change it.<a href="#appendix-C.1-1.4.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="appendix-C.1-1.5">
+            <p id="appendix-C.1-1.5.1">Made the use of the rates a local decision and aligned client processing with RFC 9915,
+independent of the exchange that supplied a rate.<a href="#appendix-C.1-1.5.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="appendix-C.1-1.6">
+            <p id="appendix-C.1-1.6.1">Added optional provisioning via RADIUS (RFC 9445, RFC 7037) and the corresponding IANA
+registration.<a href="#appendix-C.1-1.6.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="appendix-C.1-1.7">
+            <p id="appendix-C.1-1.7.1">Condensed operational, security, privacy, and IANA considerations; removed the implementation
+example; added OpenWrt applicability and a design rationale appendix.<a href="#appendix-C.1-1.7.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+</section>
+</div>
+</section>
+</div>
+<div id="acknowledgments">
+<section id="appendix-D">
+      <h2 id="name-acknowledgments">
+<a href="#name-acknowledgments" class="section-name selfRef">Acknowledgments</a>
+      </h2>
+<p id="appendix-D-1">The authors would like to thank Glenn Deen, Jason Livingood, and Sebastian Moeller for their
+valuable review comments and discussion, which helped to significantly improve the clarity,
+applicability, and operational guidance of this document.<a href="#appendix-D-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="authors-addresses">
+<section id="appendix-E">
+      <h2 id="name-authors-addresses">
+<a href="#name-authors-addresses" class="section-name selfRef">Authors' Addresses</a>
+      </h2>
+<address class="vcard">
+        <div dir="auto" class="left"><span class="fn nameRole">Christian Giese</span></div>
+<div dir="auto" class="left"><span class="org">RtBrick</span></div>
+<div dir="auto" class="left"><span class="country-name">Germany</span></div>
+<div class="email">
+<span>Email:</span>
+<a href="mailto:christian@rtbrick.com" class="email">christian@rtbrick.com</a>
+</div>
+</address>
+<address class="vcard">
+        <div dir="auto" class="left"><span class="fn nameRole">Richard Patterson</span></div>
+<div dir="auto" class="left"><span class="org">Sky UK</span></div>
+<div dir="auto" class="left"><span class="country-name">United Kingdom</span></div>
+<div class="email">
+<span>Email:</span>
+<a href="mailto:Richard.Patterson@sky.uk" class="email">Richard.Patterson@sky.uk</a>
+</div>
+</address>
+</section>
+</div>
+<script>const toc = document.getElementById("toc");
+toc.querySelector("h2").addEventListener("click", e => {
+  toc.classList.toggle("active");
+});
+toc.querySelector("nav").addEventListener("click", e => {
+  toc.classList.remove("active");
+});
+</script>
+</body>
+</html>
