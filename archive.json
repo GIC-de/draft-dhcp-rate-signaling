@@ -1,18 +1,8 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-10-25T02:10:25.847045+00:00",
+  "timestamp": "2026-10-27T02:47:37.005871+00:00",
   "repo": "GIC-de/draft-dhcp-rate-signaling",
   "labels": [
-    {
-      "name": "bug",
-      "description": "Something isn't working",
-      "color": "d73a4a"
-    },
-    {
-      "name": "documentation",
-      "description": "Improvements or additions to documentation",
-      "color": "0075ca"
-    },
     {
       "name": "duplicate",
       "description": "This issue or pull request already exists",
@@ -22,16 +12,6 @@
       "name": "enhancement",
       "description": "New feature or request",
       "color": "a2eeef"
-    },
-    {
-      "name": "good first issue",
-      "description": "Good for newcomers",
-      "color": "7057ff"
-    },
-    {
-      "name": "help wanted",
-      "description": "Extra attention is needed",
-      "color": "008672"
     },
     {
       "name": "invalid",
@@ -44,14 +24,19 @@
       "color": "d876e3"
     },
     {
-      "name": "wontfix",
-      "description": "This will not be worked on",
-      "color": "ffffff"
-    },
-    {
       "name": "resolved",
       "description": "Resolved in recent revisions",
       "color": "0e8a16"
+    },
+    {
+      "name": "future-work",
+      "description": "Deferred to a future document",
+      "color": "fbca04"
+    },
+    {
+      "name": "obsolete",
+      "description": "No longer applicable; the related text or mechanism was removed from the draft",
+      "color": "bfd4f2"
     }
   ],
   "issues": [
@@ -345,7 +330,7 @@
       "labels": [],
       "body": "To properly configure a traffic shaper one needs at least both the true L2-bottleneck rate (or a somewhat lower estimate thereof, e.g. if reporting sync rates of DSL links using PTM the reported rate should be derated for PTM's 64/65 encoding) and the applicable effective per-packet overhead (applicable in that all effective parts are accounted, e.g. ethernet's inter frame gap is not a data, but \"radio-silence\" worth 12 octets worth of transmission time). As the overhead is hard to deduce even when the true effective bottleneck rate is known, let's add two more mandatory fields to report here downstream and upstream per-packet overhead.\nGiven the goal of this method is to allow competent CPE-side traffic shaping/scheduling/queue management, let's make sure we mandate the necessary pieces of information to actually make that happen.",
       "createdAt": "2026-07-25T09:44:59Z",
-      "updatedAt": "2026-10-23T22:32:10Z",
+      "updatedAt": "2026-10-25T13:52:54Z",
       "closedAt": null,
       "comments": [
         {
@@ -487,6 +472,20 @@
           "body": "Here a current capture from a Telekom FTTH600 link:\n`\"SRU=330000#SRD=660000#ISP=DTAG#C=DEU#\"]`\nIn both cases these are L3-rates according to AVM's definition:\nSRT=zz\nzz = speed rate type. Possible values are L2 or L3.\nIf the speed rate type is not delivered, the default value L3 will be used.\n\nHowever, what L3 here means is neither well-defined nor easily measurable (but also not that important, as long as the signaled raet is <= the true bottleneck rate).\n\nI am still waiting for examples for 1&1.\n\nNow, the bigger question is, what level/rate does the actual traffic shaper operate on. (The one in the BNG/OLT)\n",
           "createdAt": "2026-10-23T22:32:10Z",
           "updatedAt": "2026-10-23T22:32:10Z"
+        },
+        {
+          "author": "GIC-de",
+          "authorAssociation": "OWNER",
+          "body": "I've just opened #15 with the next revision, and I want to be clear about how it treats your\npoints: **per-packet overhead is not rejected. It is moved to a separate document.** I think\nthat's a good compromise for both of us.\n\n**What the core draft now does**\n\nThe core draft is reduced to the basic functionality: two DHCPv6 options, Upstream Rate and\nDownstream Rate, each with a fixed Layer 3 meaning (the complete IP packet on the\nDHCPv6-configured link, covering IPv4 and IPv6 together). Overhead, Layer 2 rates and similar\nextensions are explicitly out of scope *for this document*, and the draft now says so in the\nnormative text (Section 3.2):\n\n> The Layer 3 meaning of the Rate Options is fixed. Future documents can define additional\n> options, for example to signal link-layer overhead or rates at another layer; such options\n> complement the Rate Options and do not change their meaning. A client that does not support\n> such an option ignores it and uses the Rate Options as specified in this document.\n\nSo an overhead option can be added on top later without reopening the core definition, and old\nclients keep working.\n\n**Why separate rather than in the core**\n\n- **Deployability.** The core is what we know works: Layer 3 rate signaling already runs in more\n  than 20 million PPPoE sessions in Germany. Keeping the core to \"two integers in, shaper\n  configured\" gives it the best chance of being implemented by CPE vendors and getting through\n  DHCP and IESG review quickly.\n- **Different provisioning.** You're right that the effective bottleneck overhead is hard to\n  measure from the CPE but easy for a competent ISP to supply. The flip side is that the ISP has\n  to know and configure it per access technology, which many don't today. A separate option lets\n  those who can provide it do so, without making the rate signal depend on it.\n- **Room to get it right.** Your earlier design (signed overhead, MPU, cell accounting) was\n  technically sound. In a document of its own it can be specified properly, including the\n  questions you raised (bottleneck at the OLT/BNG, an extra VLAN tag in the aggregation network,\n  PON overhead), instead of being squeezed into the core.\n\nThe design rationale appendix in #15 records this decision and explicitly asks the WG whether an\noverhead extension is needed, so your use case stays visible in the WG discussion.",
+          "createdAt": "2026-10-25T12:07:31Z",
+          "updatedAt": "2026-10-25T12:07:31Z"
+        },
+        {
+          "author": "moeller0",
+          "authorAssociation": "NONE",
+          "body": "> I've just opened https://github.com/GIC-de/draft-dhcp-rate-signaling/pull/15 with the next revision, and I want to be clear about how it treats your points: per-packet overhead is not rejected. It is moved to a separate document. I think that's a good compromise for both of us.\n\nAlas, I consider that to be a failure. As l stated multiple times the stated goal of competently shaping traffic is unachievable without taking overhead into account. As I keep saying, no ifs no buts. And I mean that. And since after multiple rounds of me explaining it (or trying to explain) you still seem to believe that overhead information is optional, so will the rest of the industry. A second overhead draft hence will likely not be written at all, and even if, likely ignored. I see ONE single chance of getting this right, and we should take it. Especially since we are essentially only talking about the difference between two and three numbers...\n\n> A client that does not support such an option ignores it and uses the Rate Options as specified in this document.\n\nThat is permission to keep doing it wrongly...\n\n> Different provisioning. You're right that the effective bottleneck overhead is hard to measure from the CPE but easy for a competent ISP to supply. The flip side is that the ISP has to know and configure it per access technology, which many don't today. A separate option lets those who can provide it do so, without making the rate signal depend on it.\n\nSorry, I disagree, without the overhead, this fails to achieve its goal completely. If this draft keeps ISPs in the naive belief that all it needs are rates that would be bad. Especially since all the configuration examples for Nokia, Juniper and Huawei gear I looked at, all deal with overhead explicitly... (to no surprise, traffic shaping is no rocket science, and it becomes evident pretty quickly that per-packet overhead needs to be accounted for).\n\n> Room to get it right. Your earlier design (signed overhead, MPU, cell accounting) was technically sound. In a document of its own it can be specified properly, including the questions you raised (bottleneck at the OLT/BNG, an extra VLAN tag in the aggregation network, PON overhead), instead of being squeezed into the core.\n\nWell, let's add the simple bidirectional per-packet overhead to the core format, and delegate exposing the full details to another option (that nobody will define and use)?\n\nI am a bit puzzled, why you switched from exposing the full complexity to ignoring the overhead completely? . I think we can easily strike a balance that is \"good enough\" for all parties involved (vendors/manufacturers, ISPS, and the home-shaping bufferbloat crowd)...\nCould you maybe explain that change of mind somehow: why you nows eem to feel so adamantly about only including the rates? Are we maybe not really designing a new feature/option, but writing a draft describing an existing feature? In which case, maybe we should say so and target informational status? (Mind you I am open for describing things that exist already independently on whether they follow best practice or not.)\n",
+          "createdAt": "2026-10-25T13:52:54Z",
+          "updatedAt": "2026-10-25T13:52:54Z"
         }
       ]
     },
@@ -870,7 +869,7 @@
       "labels": [],
       "body": "Review Version: \r\nhttps://gic-de.github.io/draft-dhcp-rate-signaling/draft-01-light/draft-ietf-intarea-dhcp-rate-signaling.html\r\n\r\n## Simplify to Layer 3 upstream/downstream rate options\r\n\r\nReduce the protocol to the two parameters that are actually needed:\r\nthe intended upstream and downstream rate.\r\n\r\n- Replace the OPTION_V4_RATE/OPTION_V6_RATE container and its\r\n  sub-options with four top-level options: OPTION_V4_UPSTREAM_RATE,\r\n  OPTION_V4_DOWNSTREAM_RATE, OPTION_V6_UPSTREAM_RATE and\r\n  OPTION_V6_DOWNSTREAM_RATE, each carrying a 64-bit rate in bps\r\n- Define all rates as Layer 3 (IP header + payload) rates; remove the\r\n  Applied Rate Layer sub-options\r\n- Remove the Per-Packet Overhead sub-options, including cell-based\r\n  accounting, and the related appendices\r\n- Remove the Advertised Rate sub-options\r\n- Remove client hints, the relay support indication, the Minimal\r\n  Implementation section and the example receiver processing appendix\r\n- Process each direction independently: 0 removes the rate, an\r\n  absent option leaves it unchanged\r\n- IANA: request two DHCPv4 and two DHCPv6 option codes; drop the\r\n  DHCP Rate Sub-Options registry\r\n- Rewrite the Abstract, Introduction and Operational Considerations\r\n  around Layer 3 rates (matches user-perceived speed, the same value\r\n  is valid at every node, can be fed directly into CAKE/SQM)\r\n- Add rationale for Layer 3-only rates and for separate options\r\n",
       "createdAt": "2026-10-14T07:23:10Z",
-      "updatedAt": "2026-10-23T23:02:03Z",
+      "updatedAt": "2026-10-25T11:58:35Z",
       "baseRepository": "GIC-de/draft-dhcp-rate-signaling",
       "baseRefName": "main",
       "baseRefOid": "47498ded0ed7805376a4bf72cc3124b79440e5ba",
@@ -930,6 +929,42 @@
           ]
         }
       ]
+    },
+    {
+      "number": 15,
+      "id": "PR_kwDOSj3KQc8AAAABKksLkA",
+      "title": "draft-01 (dhcpv6-only)",
+      "url": "https://github.com/GIC-de/draft-dhcp-rate-signaling/pull/15",
+      "state": "OPEN",
+      "author": "GIC-de",
+      "authorAssociation": "OWNER",
+      "assignees": [
+        "GIC-de"
+      ],
+      "labels": [],
+      "body": "## Summary\n\nThis MR restructures `draft-ietf-intarea-dhcp-rate-signaling` into a focused, DHCPv6-only\nspecification of two client options. Advanced use cases that were previously in the draft, or\ndiscussed for it, are moved to separate documents so that the core mechanism can progress quickly\nand with low review risk.\n\nThe wire format changes and is **not backward compatible with -00**.\n\n## What the draft now defines\n\n- Two DHCPv6 options, `OPTION_UPSTREAM_RATE` and `OPTION_DOWNSTREAM_RATE`, each carrying an\n  unsigned 64-bit **Layer 3 rate in bit/s** (IP header plus payload at the IP layer of the\n  DHCPv6-configured link).\n- Each rate covers the **combined IPv4 and IPv6 traffic** of that logical interface.\n- Standard DHCPv6 processing per RFC 9915:\n  - requested via the ORO and applied only from a Reply;\n  - withdrawn by omission (RFC 9915 \u00a718.2.10.5); the value 0 is invalid;\n  - rates belong to the client's DHCPv6 configuration, independent of the exchange that supplied\n    them;\n  - Replies with a non-Success status code don't change the rates.\n- Optional provisioning via RADIUS using the DHCPv6-Options attribute (RFC 9445), conveyed by a\n  relay agent in the RADIUS option (RFC 7037).\n- IANA: two DHCPv6 option codes, plus registration in the RFC 9445\n  \"DHCPv6 Options Permitted in the RADIUS DHCPv6-Options Attribute\" registry.\n\n## Why DHCPv6 only\n\n- **DHCPv6 is already where it's needed.** Broadband CPE use DHCPv6 for prefix delegation in both\n  IPoE and PPPoE deployments, so the options reach the target devices without a second protocol.\n- **IPv4 is still covered.** The rates describe the service on the logical interface, not an IP\n  version. They apply to IPv4 and IPv6 traffic together, whether IPv4 is native, configured via\n  DHCPv4 or IPCP, or carried over IPv6 (for example DS-Lite). DHCPv6 options that configure IPv4\n  service have precedent (RFC 6334, RFC 7598).\n- **Much less complexity.** Signaling the same rates through DHCPv4 and DHCPv6 required rules for\n  choosing between the protocols, keeping the values consistent, and handling withdrawal and\n  lifetime differently in each. All of that is gone.\n- **IPv4-only deployments are unlikely.** Providers and CPE vendors that implement new DHCP\n  options are very likely to support IPv6 as well.\n- **Simpler format.** The DHCPv6 option space allows one option per direction, so each direction\n  is independent and is withdrawn by omission instead of a reserved zero value.\n\n## Focus on the basic functionality\n\nThe draft now covers only the core use case: **the network tells the CPE its intended rates, so\nthe CPE can shape its upstream traffic** and keep the queue where prioritization and AQM work. Any\nmechanism that was new in DHCP terms, fragile in operation, or still under debate in the WG has\nbeen removed or moved out.\n\nRemoved from this document:\n\n- DHCPv4 option, RFC 3396 handling, and DHCPv4/DHCPv6 selection rules\n- DHCPv6 snooping and the \"Intermediate Node\" concept\n- Relay-directed rates (server-to-relay rates in Relay-reply messages)\n- LAN, enterprise, and variable-capacity deployment scenarios, and the rate selection guidance\n- The CPE implementation example (OpenWrt applicability is now in Implementation Status)\n\n## Advanced use cases moved to separate documents\n\nThe core draft now states that the **Layer 3 meaning of the Rate Options is fixed**, and that\nfuture documents can define *additional* options that complement them without changing their\nmeaning. A client that doesn't support such an option ignores it. The following are candidates\nfor those documents:\n\n| Use case | Why it is separate |\n|---|---|\n| **Overhead signaling** (Layer 2 rates or per-packet link-layer overhead) | The overhead counted at the bottleneck depends on the access technology and encapsulation, which servers often can't determine. Keeping a single Layer 3 reference avoids ambiguity; the WG can add overhead options later if needed. |\n| **Relay-directed rates** (separate rates for a BNG or LDRA in Relay-reply) | A new server-to-relay pattern that needs per-client state on relays. It fails open on withdrawal or relay restart, and its setup depends on the relay topology. BNGs usually get their policy via AAA anyway. |\n| **Link speed signaling** (client or relay reports the CPE's physical link speed: 1G / 2.5G / 10G) | The opposite direction (client/relay to server), with a different trust model. It solves downstream QoS problems when a Layer 3 service rate exceeds the CPE's Ethernet link to the external ONT or modem. |\n\nThe reasoning for these decisions is in a removable \"Design Rationale\" appendix, with an explicit\nrequest for WG feedback on whether a DHCPv4 option or overhead signaling is needed.\n\n## Other changes\n\n- Security considerations: forged and stripped options, trust in relay-supplied RADIUS data,\n  integer handling. The rates only affect the client's own traffic management; enforcement stays\n  in the network.\n- Privacy considerations now cite RFC 7824 (DHCPv6 privacy) and RFC 7844 (anonymity profiles).\n- Operational considerations: defaults, monitoring, a pointer to the DHCPv6 YANG model\n  (RFC 9243), and consistent configuration across servers.\n- Reviewed from the DHCP chair, Internet AD, IESG, IANA, and RFC Editor perspectives; all\n  references checked (normative: RFC 9915, RFC 9445, RFC 7037; no downrefs).\n- Compressed change log; figures fixed for the 72-column text output.\n\n## Open items\n\n- [ ] Early reviews: DHCPv6 designated experts, RFC 9445 registry experts / RADEXT, TSVWG\n- [ ] Heads-up to the Broadband Forum\n- [ ] Prototype on OpenWrt (odhcp6c + SQM; no DHCPv6 client changes needed)\n",
+      "createdAt": "2026-10-25T11:58:22Z",
+      "updatedAt": "2026-10-25T14:00:44Z",
+      "baseRepository": "GIC-de/draft-dhcp-rate-signaling",
+      "baseRefName": "main",
+      "baseRefOid": "47498ded0ed7805376a4bf72cc3124b79440e5ba",
+      "headRepository": "GIC-de/draft-dhcp-rate-signaling",
+      "headRefName": "draft-01-dhcpv6-only",
+      "headRefOid": "8181eca35f8a5c55f08becb6a3b129b979c29561",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [
+        {
+          "author": "moeller0",
+          "authorAssociation": "NONE",
+          "body": "Again, I will use the opportunity to request we add OPTION_BIDIRECTIONAL_PERPACKETOVERHEAD in the same document we introduce OPTION_UPSTREAM_RATE and  OPTION_DOWNSTREAM_RATE, these three together allow for pretty decent competent traffic shaping that aligns with the goal of using this option to allow a CPE to maintain control over the effective bottleneck queues to permit reliable prioritization and traffic scheduling. More overhead details can be delegated to new drafts, but the proposed triple is essentially good enough to get the job done, any subset of one or two however is not.",
+          "createdAt": "2026-10-25T14:00:44Z",
+          "updatedAt": "2026-10-25T14:00:44Z"
+        }
+      ],
+      "reviews": []
     }
   ]
 }
