@@ -16,6 +16,7 @@
 /lib
 /node_modules/
 /versioned/
+/tmp/
 Gemfile.lock
 archive.json
 draft-giese-intarea-dhcp-rate-signaling.xml
